@@ -1,7 +1,9 @@
 package com.edward.chat_system.modules.auth.controller;
 
-import com.edward.chat_system.modules.auth.dto.request.AuthRequest;
+import com.edward.chat_system.modules.auth.dto.request.LoginRequest;
+import com.edward.chat_system.modules.auth.dto.request.RegisterRequest;
 import com.edward.chat_system.modules.auth.dto.response.AuthResponse;
+import com.edward.chat_system.modules.auth.dto.response.UnverifiedResponse;
 import com.edward.chat_system.modules.auth.service.AuthService;
 import com.edward.chat_system.shared.dto.ApiResponse;
 import jakarta.validation.Valid;
@@ -21,10 +23,18 @@ public class AuthController {
     AuthService authService;
 
     @PostMapping("/login")
-    ApiResponse<AuthResponse> login(@RequestBody @Valid AuthRequest request) {
+    ApiResponse<AuthResponse> login(@RequestBody @Valid LoginRequest request) {
         return ApiResponse.<AuthResponse>builder()
                 .message("Login sucessfully")
                 .result(authService.login(request))
+                .build();
+    }
+
+    @PostMapping("/register")
+    ApiResponse<UnverifiedResponse> register(@RequestBody @Valid RegisterRequest request) {
+        return ApiResponse.<UnverifiedResponse>builder()
+                .message("Register sucessfully")
+                .result(authService.register(request))
                 .build();
     }
 }

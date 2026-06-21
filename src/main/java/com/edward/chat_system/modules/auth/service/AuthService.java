@@ -2,12 +2,14 @@ package com.edward.chat_system.modules.auth.service;
 
 import com.edward.chat_system.infrastructure.jwt.JwtSigner;
 import com.edward.chat_system.infrastructure.jwt.JwtSignerResponse;
-import com.edward.chat_system.modules.auth.dto.request.AuthRequest;
+import com.edward.chat_system.modules.auth.dto.request.LoginRequest;
+import com.edward.chat_system.modules.auth.dto.request.RegisterRequest;
 import com.edward.chat_system.modules.auth.dto.response.AuthResponse;
 import com.edward.chat_system.modules.auth.dto.response.AuthSuccessResponse;
 import com.edward.chat_system.modules.auth.dto.response.UnverifiedResponse;
 import com.edward.chat_system.modules.auth.entity.RefreshToken;
 import com.edward.chat_system.modules.auth.repository.RefreshTokenRepository;
+import com.edward.chat_system.modules.user.entity.User;
 import com.edward.chat_system.modules.user.mapper.UserMapper;
 import com.edward.chat_system.modules.user.repository.UserRepository;
 import com.edward.chat_system.shared.enums.TokenTypeEnum;
@@ -30,7 +32,13 @@ public class AuthService {
     UserMapper userMapper;
     RefreshTokenRepository refreshTokenRepository;
 
-    public AuthResponse login(AuthRequest request) {
+    UnverifiedResponse unverifiedResponseBuilder(String username) {
+        String tmpTokenString =
+                jwtSigner.generateToken(username, TokenTypeEnum.TMP_TOKEN).getToken();
+        return UnverifiedResponse.builder().tmpToken(tmpTokenString).build();
+    }
+
+    public AuthResponse login(LoginRequest request) {
         var user =
                 userRepo.findByEmail(request.getEmail())
                         .orElseThrow(() -> new AppException(ErrorCode.LOGIN_FAILED));
@@ -38,9 +46,7 @@ public class AuthService {
             throw new AppException(ErrorCode.LOGIN_FAILED);
         }
         if (!user.isVerified()) {
-            String tmpTokenString =
-                    jwtSigner.generateToken(user.getUsername(), TokenTypeEnum.TMP_TOKEN).getToken();
-            return UnverifiedResponse.builder().tmpToken(tmpTokenString).build();
+            unverifiedResponseBuilder(user.getUsername());
         }
         JwtSignerResponse accessToken =
                 jwtSigner.generateToken(user.getUsername(), TokenTypeEnum.ACCESS_TOKEN);
@@ -57,5 +63,21 @@ public class AuthService {
                 .refreshToken(refreshToken.getToken())
                 .user(userMapper.touUserResponse(user))
                 .build();
+    }
+
+    public UnverifiedResponse register(RegisterRequest request) {
+        boolean isExistsByUsername = userRepo.existsByUsername(request.getUsername());
+        if (isExistsByUsername) throw new AppException(ErrorCode.USERNAME_EXISTED);
+        var user = userRepo.findByEmail(request.getEmail()).orElseGet(User::new);
+
+        if (user.getEmail() != null && user.isVerified()) {
+            throw new AppException(ErrorCode.EMAIL_EXISTED);
+        }
+        user = userMapper.toUser(request);
+        String hashed = passwordEncoder.encode(request.getPassword());
+        user.setPassword(hashed);
+        userRepo.save(user);
+
+        return unverifiedResponseBuilder(user.getUsername());
     }
 }

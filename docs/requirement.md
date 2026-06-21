@@ -18,8 +18,8 @@
 
 **Form đăng ký gồm:**
 - Email (bắt buộc, unique)
-- Display name (bắt buộc, không unique)
-- Username (bắt buộc, unique — chỉ chứa chữ thường, số, dấu gạch dưới)
+- Display name (bắt buộc, không unique, từ 1 - 20 kí tự) 
+- Username (bắt buộc, unique — chỉ chứa chữ thường, số, dấu gạch dưới gồm 3 - 20 kí tự) 
 - Password (tối thiểu 8 ký tự, ít nhất 1 chữ hoa, 1 chữ thường, 1 ký tự đặc biệt)
 - Ngày sinh (ngày / tháng / năm)
 - Nút "Tạo tài khoản"
