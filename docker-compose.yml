@@ -1,0 +1,17 @@
+# docker-compose.yml
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: chat_system_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: chat_system
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

@@ -134,8 +134,8 @@
 - Display name (in đậm, font lớn hơn)
 - Username (dạng `@username`)
 - Ngày tạo tài khoản
-- Nhóm chung: tối đa 5 server gần nhất, nếu nhiều hơn hiển thị "+N nhóm chung"
-- Bạn chung: tối đa 5 người, nếu nhiều hơn hiển thị "+N bạn chung"
+- Nhóm chung: tối đa show data 5 server gần nhất(avatar server và tên server), hiển thị chính xác số nhóm chung.
+- Bạn chung: tối đa show data 5 người kết bạn gần nhất, hiển thị chính xác số bạn chung.
 
 ---
 
@@ -250,6 +250,13 @@
 **Quy tắc nghiệp vụ:**
 - Chỉ có thể mời người đã là thành viên server (không mời người ngoài thẳng vào channel).
 - Người được mời sẽ thấy channel trong danh sách channel của server.
+
+---
+### US38 — Thoát server
+> Với tư cách là **thành viên server**, tôi muốn thoát server.
+
+**Quy tắc nghiệp vụ:**
+- Nếu như người out server là owner thì phải nhường lại owner cho người khác.
 
 ---
 

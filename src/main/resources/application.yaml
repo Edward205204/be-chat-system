@@ -1,0 +1,32 @@
+server:
+    port: 8080
+    servlet: 
+        context-path: /rchat
+
+spring:
+    application:
+        name: chat_system
+    datasource:
+        url: "jdbc:postgresql://localhost:5432/chat_system"
+        driverClassName: "org.postgresql.Driver"
+        username: "postgres"
+        password: "postgres"
+    jpa:
+        hibernate:
+            ddl-auto: update
+        show-sql: true
+        properties:
+            hibernate:
+                dialect: org.hibernate.dialect.PostgreSQLDialect
+    output:
+        ansi:
+            enabled: ALWAYS
+
+logging:
+  pattern:
+    console: "%clr(%d{HH:mm:ss.SSS}){blue} %clr(%5p) %clr(---){faint} %clr([%t]){cyan} %clr(%-40.40logger{39}){magenta} %clr(:){faint} %m%n%wEx"
+
+jwt:
+  signerKey: "edward-learn-java-jwt-signing-key-for-hs512-minimum-64-bytes-@#123947362820"
+  valid-duration: 3600
+  refreshable-duration: 36000
