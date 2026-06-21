@@ -1,0 +1,22 @@
+package com.edward.chat_system.modules.user.dto.response;
+
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.FieldDefaults;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class UserResponse {
+    String id;
+    String username;
+    String email;
+    String displayName;
+    String avatar;
+    String banner;
+    String dateOfBirth;
+    String createdAt;
+}
