@@ -13,7 +13,8 @@ import org.springframework.http.HttpStatusCode;
 public enum ErrorCode {
     USER_EXISTED("USER_EXISTED", "User existed", HttpStatus.BAD_REQUEST),
     USER_NOT_EXISTED("USER_NOT_EXISTED", "User not existed", HttpStatus.NOT_FOUND),
-    JWT_SIGNING_FAILED("JWT_SIGNING_FAILED", "JWT signing failed", HttpStatus.INTERNAL_SERVER_ERROR),
+    JWT_SIGNING_FAILED(
+            "JWT_SIGNING_FAILED", "JWT signing failed", HttpStatus.INTERNAL_SERVER_ERROR),
 
     UNAUTHENTICATED("UNAUTHENTICATED", "Unauthenticated", HttpStatus.UNAUTHORIZED),
     UNAUTHORIZED("UNAUTHORIZED", "You do not have permisson", HttpStatus.FORBIDDEN),

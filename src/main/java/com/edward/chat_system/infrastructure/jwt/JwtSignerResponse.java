@@ -1,7 +1,6 @@
 package com.edward.chat_system.infrastructure.jwt;
 
 import java.util.Date;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

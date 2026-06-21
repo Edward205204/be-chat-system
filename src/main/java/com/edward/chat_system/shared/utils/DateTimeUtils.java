@@ -13,9 +13,7 @@ public class DateTimeUtils {
             return null;
         }
 
-        return date.toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime();
+        return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
     }
 
     public Date toDate(LocalDateTime localDateTime) {
@@ -23,8 +21,6 @@ public class DateTimeUtils {
             return null;
         }
 
-        return Date.from(
-                localDateTime.atZone(ZoneId.systemDefault())
-                        .toInstant());
+        return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
     }
 }

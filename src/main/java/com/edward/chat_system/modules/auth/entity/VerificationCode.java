@@ -32,9 +32,13 @@ import org.hibernate.annotations.CreationTimestamp;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Table(name = "verification_codes", uniqueConstraints = {
-        @UniqueConstraint(name = "uk_verification_user_type", columnNames = { "user_id", "type" })
-})
+@Table(
+        name = "verification_codes",
+        uniqueConstraints = {
+            @UniqueConstraint(
+                    name = "uk_verification_user_type",
+                    columnNames = {"user_id", "type"})
+        })
 public class VerificationCode {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

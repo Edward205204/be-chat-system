@@ -6,7 +6,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
@@ -46,6 +45,7 @@ public class User {
     String avatar;
     String banner;
     LocalDate dateOfBirth;
+
     @Column(nullable = false)
     @Builder.Default
     boolean isVerified = false;

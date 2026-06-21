@@ -1,5 +1,6 @@
 package com.edward.chat_system.shared.exception;
 
+import com.edward.chat_system.shared.dto.ApiResponse;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.constraints.Null;
 import java.util.Map;
@@ -9,8 +10,6 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-
-import com.edward.chat_system.shared.dto.ApiResponse;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -62,7 +61,8 @@ public class GlobalExceptionHandler {
 
                 ConstraintViolation<?> violation = fieldError.unwrap(ConstraintViolation.class);
 
-                Map<String, Object> attributes = violation.getConstraintDescriptor().getAttributes();
+                Map<String, Object> attributes =
+                        violation.getConstraintDescriptor().getAttributes();
 
                 errorCode = ErrorCode.valueOf(mapAttribute(message, attributes));
 

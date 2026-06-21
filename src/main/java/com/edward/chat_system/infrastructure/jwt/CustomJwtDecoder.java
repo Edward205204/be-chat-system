@@ -14,26 +14,22 @@ import org.springframework.stereotype.Component;
 @Component
 public class CustomJwtDecoder implements JwtDecoder {
 
-        private final JwtDecoder jwtDecoder;
+    private final JwtDecoder jwtDecoder;
 
-        public CustomJwtDecoder(
-                        @Value("${jwt.signerKey}") String signerKey) {
-                SecretKeySpec secretKey = new SecretKeySpec(
-                                signerKey.getBytes(StandardCharsets.UTF_8),
-                                "HmacSHA512");
+    public CustomJwtDecoder(@Value("${jwt.signerKey}") String signerKey) {
+        SecretKeySpec secretKey =
+                new SecretKeySpec(signerKey.getBytes(StandardCharsets.UTF_8), "HmacSHA512");
 
-                NimbusJwtDecoder decoder = NimbusJwtDecoder.withSecretKey(secretKey)
-                                .macAlgorithm(MacAlgorithm.HS512)
-                                .build();
+        NimbusJwtDecoder decoder =
+                NimbusJwtDecoder.withSecretKey(secretKey).macAlgorithm(MacAlgorithm.HS512).build();
 
-                decoder.setJwtValidator(
-                                JwtValidators.createDefault());
+        decoder.setJwtValidator(JwtValidators.createDefault());
 
-                this.jwtDecoder = decoder;
-        }
+        this.jwtDecoder = decoder;
+    }
 
-        @Override
-        public Jwt decode(String token) throws JwtException {
-                return jwtDecoder.decode(token);
-        }
+    @Override
+    public Jwt decode(String token) throws JwtException {
+        return jwtDecoder.decode(token);
+    }
 }
