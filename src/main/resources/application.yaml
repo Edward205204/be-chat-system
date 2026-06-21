@@ -18,6 +18,17 @@ spring:
         properties:
             hibernate:
                 dialect: org.hibernate.dialect.PostgreSQLDialect
+    mail:
+        host: "smtp.gmail.com"
+        port: 587
+        username: ${EMAIL_ACCOUNT}
+        password: ${EMAIL_APP_PASSWORD}
+        properties:
+            mail:
+                smtp:
+                    auth: true
+                    starttls:
+                        enable: true
     output:
         ansi:
             enabled: ALWAYS

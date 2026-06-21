@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 0; }
+        .container { max-width: 480px; margin: 40px auto; background: #fff; border-radius: 8px; padding: 32px; }
+        .otp-box { font-size: 36px; font-weight: bold; letter-spacing: 8px; color: #4F46E5;
+                   text-align: center; padding: 16px; background: #EEF2FF; border-radius: 8px; margin: 24px 0; }
+        .footer { color: #9CA3AF; font-size: 12px; text-align: center; margin-top: 24px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Verify your email</h2>
+    <p>Use the code below to complete your verification. It expires in <strong th:text="${expiryMinutes}">5</strong> minutes.</p>
+    <div class="otp-box" th:text="${otpCode}">000000</div>
+    <p>If you didn't request this, ignore this email.</p>
+    <div class="footer">RChat &copy; 2025</div>
+</div>
+</body>
+</html>
