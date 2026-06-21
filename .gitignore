@@ -30,6 +30,6 @@ build/
 !**/src/test/**/build/
 
 ### VS Code ###
+# ở môi trường dev, dùng chính env của vscode(đọc từ file .env) để inject vào application.yaml thay thế cho biến env của system.
 .vscode/
-
-application-local.yaml
+.env
