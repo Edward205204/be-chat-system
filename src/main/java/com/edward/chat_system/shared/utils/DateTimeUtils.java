@@ -2,25 +2,23 @@ package com.edward.chat_system.shared.utils;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Date;
 import lombok.experimental.UtilityClass;
-
 @UtilityClass
 public class DateTimeUtils {
 
-    public LocalDateTime toLocalDateTime(Date date) {
-        if (date == null) {
-            return null;
-        }
+    private static final ZoneId ZONE = ZoneId.of("Asia/Ho_Chi_Minh");
 
-        return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+    public LocalDateTime now() {
+        return LocalDateTime.now(ZONE);
     }
 
-    public Date toDate(LocalDateTime localDateTime) {
-        if (localDateTime == null) {
-            return null;
-        }
+    public LocalDateTime toLocalDateTime(java.util.Date date) {
+        if (date == null) return null;
+        return date.toInstant().atZone(ZONE).toLocalDateTime();
+    }
 
-        return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+    public java.util.Date toDate(LocalDateTime localDateTime) {
+        if (localDateTime == null) return null;
+        return java.util.Date.from(localDateTime.atZone(ZONE).toInstant());
     }
 }

@@ -39,14 +39,15 @@ import org.springframework.stereotype.Service;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthService {
 
+    
     @NonFinal
     @Value("${otp.cooldown}")
     long cooldown;
-
+    
     @NonFinal
     @Value("${otp.valid_duration}")
     long validDuration;
-
+    
     UserRepository userRepo;
     PasswordEncoder passwordEncoder;
     JwtSigner jwtSigner;
@@ -126,7 +127,7 @@ public class AuthService {
     }
 
     private void validateCoolDown(VerificationCode code) {
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = DateTimeUtils.now();
         if (now.isBefore(code.getLastSentAt().plusSeconds(cooldown)))
             throw new OtpCooldownException(ErrorCode.OTP_COOLDOWN, code.getLastSentAt());
     }
