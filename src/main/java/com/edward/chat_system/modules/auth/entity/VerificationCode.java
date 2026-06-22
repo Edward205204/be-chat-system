@@ -24,6 +24,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 @NoArgsConstructor
@@ -67,7 +68,18 @@ public class VerificationCode {
     @Column(nullable = false)
     LocalDateTime expiresAt;
 
+    @UpdateTimestamp
+    @Column(nullable = false)
+    LocalDateTime lastSentAt;
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     LocalDateTime createdAt;
+
+    public void renewOtp(String otp, long validDuration) {
+        this.attemptCount = 0;
+        this.status = VerificationCodeStatusEnum.PENDING;
+        this.code = otp;
+        this.expiresAt = LocalDateTime.now().plusSeconds(validDuration);
+    }
 }

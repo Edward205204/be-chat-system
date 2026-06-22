@@ -10,6 +10,8 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,5 +38,11 @@ public class AuthController {
                 .message("Register sucessfully")
                 .result(authService.register(request))
                 .build();
+    }
+
+    @PostMapping("/send-otp")
+    ApiResponse<Void> sendOtp(@AuthenticationPrincipal Jwt jwt) {
+        authService.sendOtp(jwt.getSubject(), jwt.getClaim("email"));
+        return ApiResponse.<Void>builder().message("Send otp successfully").build();
     }
 }

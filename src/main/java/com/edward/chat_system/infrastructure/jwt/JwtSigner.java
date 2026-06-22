@@ -1,6 +1,5 @@
 package com.edward.chat_system.infrastructure.jwt;
 
-import com.edward.chat_system.shared.enums.TokenTypeEnum;
 import com.edward.chat_system.shared.exception.AppException;
 import com.edward.chat_system.shared.exception.ErrorCode;
 import com.nimbusds.jose.JOSEException;
@@ -31,27 +30,30 @@ public class JwtSigner {
     @Value("${jwt.refresh-token-duration}")
     protected long refreshableDuration;
 
-    public JwtSignerResponse generateToken(String username, TokenTypeEnum tokenType) {
+    @Value("${jwt.tmp-token-duration}")
+    protected long tmpTokenDuration;
 
-        Date expTime =
-                TokenTypeEnum.ACCESS_TOKEN == tokenType || TokenTypeEnum.TMP_TOKEN == tokenType
-                        ? new Date(
-                                Instant.now()
-                                        .plus(accessTokenDuration, ChronoUnit.SECONDS)
-                                        .toEpochMilli())
-                        : new Date(
-                                Instant.now()
-                                        .plus(refreshableDuration, ChronoUnit.SECONDS)
-                                        .toEpochMilli());
+    public JwtSignerResponse generateToken(JwtClaimObject claim) {
+
+        long duration =
+                switch (claim.getTokenType()) {
+                    case ACCESS_TOKEN -> accessTokenDuration;
+                    case REFRESH_TOKEN -> refreshableDuration;
+                    case TMP_TOKEN -> tmpTokenDuration;
+                };
+
+        Date expTime = new Date(Instant.now().plus(duration, ChronoUnit.SECONDS).toEpochMilli());
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
         JWTClaimsSet jwtClaimsSet =
                 new JWTClaimsSet.Builder()
-                        .subject(username)
+                        .subject(claim.getUserId())
                         .issuer("edward.com")
                         .issueTime(new Date())
                         .expirationTime(expTime)
                         .jwtID(UUID.randomUUID().toString())
-                        .claim("tokenType", tokenType)
+                        .claim("tokenType", claim.getTokenType())
+                        .claim("username", claim.getUsername())
+                        .claim("email", claim.getEmail())
                         // .claim("scope", buildScope(user))
                         .build();
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());

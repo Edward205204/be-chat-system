@@ -4,5 +4,4 @@ public enum VerificationCodeStatusEnum {
     PENDING,
     VERIFIED,
     REVOKED,
-    EXPIRED
 }

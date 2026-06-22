@@ -5,6 +5,8 @@ import jakarta.mail.internet.MimeMessage;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.mail.MailException;
+import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -19,7 +21,7 @@ public class MailServiceImpl implements MailService {
     TemplateEngine templateEngine;
 
     @Override
-    public void sendOtp(String to, String otpCode) {
+    public void sendOtp(String to, String otpCode) throws MailException {
         Context context = new Context();
         context.setVariable("otpCode", otpCode);
         context.setVariable("expiryMinutes", 5);
@@ -27,7 +29,8 @@ public class MailServiceImpl implements MailService {
         sendHtmlMail(to, MailTemplate.OTP_VERIFICATION, context);
     }
 
-    private void sendHtmlMail(String to, MailTemplate template, Context context) {
+    private void sendHtmlMail(String to, MailTemplate template, Context context)
+            throws MailException {
         try {
             String html = templateEngine.process(template.getTemplateName(), context);
 
@@ -39,7 +42,7 @@ public class MailServiceImpl implements MailService {
 
             mailSender.send(message);
         } catch (MessagingException e) {
-            throw new RuntimeException("Failed to send email to " + to, e);
+            throw new MailSendException("Failed to send email to " + to, e);
         }
     }
 }

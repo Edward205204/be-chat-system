@@ -21,7 +21,13 @@ public enum ErrorCode {
     INVALID_TOKEN_TYPE("INVALID_TOKEN_TYPE", "Invalid token type", HttpStatus.UNAUTHORIZED),
 
     UNCATEGORIZED("UNCATEGORIZED", "Uncategorized exception", HttpStatus.INTERNAL_SERVER_ERROR),
-    LOGIN_FAILED("LOGIN_FAILED", "Email or Password is incorect", HttpStatus.UNAUTHORIZED);
+    LOGIN_FAILED("LOGIN_FAILED", "Email or Password is incorect", HttpStatus.UNAUTHORIZED),
+    OTP_COOLDOWN(
+            "OTP_COOLDOWN",
+            "Otp is on cooldown, please wait before requesting a new code.",
+            HttpStatus.TOO_MANY_REQUESTS),
+    ACCOUNT_VERIFIED("ACCOUNT_VERIFIED", "Account is verified", HttpStatus.CONFLICT);
+
     // INVALID_DOB("Age of user must be at least {value}",
     // HttpStatus.UNPROCESSABLE_CONTENT),
 
