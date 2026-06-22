@@ -3,6 +3,7 @@ package com.edward.chat_system.modules.auth.entity;
 import com.edward.chat_system.modules.auth.enums.VerificationCodeStatusEnum;
 import com.edward.chat_system.modules.auth.enums.VerificationCodeTypeEnum;
 import com.edward.chat_system.modules.user.entity.User;
+import com.edward.chat_system.shared.utils.DateTimeUtils;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -80,6 +81,6 @@ public class VerificationCode {
         this.attemptCount = 0;
         this.status = VerificationCodeStatusEnum.PENDING;
         this.code = otp;
-        this.expiresAt = LocalDateTime.now().plusSeconds(validDuration);
+        this.expiresAt = DateTimeUtils.now().plusSeconds(validDuration);
     }
 }

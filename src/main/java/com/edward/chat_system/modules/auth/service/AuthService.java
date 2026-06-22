@@ -39,15 +39,14 @@ import org.springframework.stereotype.Service;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthService {
 
-    
     @NonFinal
     @Value("${otp.cooldown}")
     long cooldown;
-    
+
     @NonFinal
     @Value("${otp.valid_duration}")
     long validDuration;
-    
+
     UserRepository userRepo;
     PasswordEncoder passwordEncoder;
     JwtSigner jwtSigner;
