@@ -1,0 +1,27 @@
+{"properties": [
+  {
+    "name": "jwt.refresh-token-duration",
+    "type": "java.lang.String",
+    "description": "A description for 'jwt.refresh-token-duration'"
+  },
+  {
+    "name": "jwt.signerKey",
+    "type": "java.lang.String",
+    "description": "A description for 'jwt.signerKey'"
+  },
+  {
+    "name": "jwt.access-token-duration",
+    "type": "java.lang.String",
+    "description": "A description for 'jwt.access-token-duration'"
+  },
+  {
+    "name": "otp.cooldown",
+    "type": "java.lang.String",
+    "description": "A description for 'otp.cooldown'"
+  },
+  {
+    "name": "otp.valid_duration",
+    "type": "java.lang.String",
+    "description": "A description for 'otp.valid_duration'"
+  }
+]}

@@ -34,7 +34,7 @@ public class JwtSigner {
     public JwtSignerResponse generateToken(String username, TokenTypeEnum tokenType) {
 
         Date expTime =
-                TokenTypeEnum.ACCESS_TOKEN == tokenType
+                TokenTypeEnum.ACCESS_TOKEN == tokenType || TokenTypeEnum.TMP_TOKEN == tokenType
                         ? new Date(
                                 Instant.now()
                                         .plus(accessTokenDuration, ChronoUnit.SECONDS)

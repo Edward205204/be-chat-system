@@ -1,19 +1,20 @@
 package com.edward.chat_system.infrastructure.configuration;
 
-import com.edward.chat_system.infrastructure.jwt.CustomJwtDecoder;
 import com.edward.chat_system.infrastructure.jwt.JwtAuthenticationEntryPoint;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
@@ -33,30 +34,47 @@ public class SecurityConfig {
     @Value("${jwt.signerKey}")
     String signerKey;
 
-    CustomJwtDecoder customJwtDecoder;
-
+    static final String TEMT_ENDPOINT = "/auth/send-otp";    
     static final String[] PUBLIC_ENDPOINTS = {
         "/users", "/auth/token", "/auth/introspect", "/auth/logout", "/auth/refresh"
     };
+    
+
+    @NonFinal JwtDecoder accessTokenDecoder;
+    @NonFinal JwtDecoder tmpTokenDecoder;
+    
+    public SecurityConfig(
+        @Qualifier("accessTokenDecoder") JwtDecoder accessTokenDecoder,
+        @Qualifier("tmpTokenDecoder") JwtDecoder tmpTokenDecoder) {
+        this.accessTokenDecoder = accessTokenDecoder;
+        this.tmpTokenDecoder = tmpTokenDecoder;
+    }
+    
+    @Bean
+    @Order(1)
+    public SecurityFilterChain tmpTokenFilterChain(HttpSecurity http)  {
+        return http
+                .securityMatcher(TEMT_ENDPOINT)
+                .authorizeHttpRequests(req -> req.anyRequest().authenticated())
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .jwt(jwt -> jwt.decoder(tmpTokenDecoder)
+                                       .jwtAuthenticationConverter(jwtAuthenticationConverter()))
+                        .authenticationEntryPoint(new JwtAuthenticationEntryPoint()))
+                .csrf(AbstractHttpConfigurer::disable)
+                .build();
+    }
 
     @Bean
-    SecurityFilterChain filterChain(HttpSecurity httpSecurity) {
-        return httpSecurity
-                .authorizeHttpRequests(
-                        request ->
-                                request.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS)
-                                        .permitAll()
-                                        .anyRequest()
-                                        .authenticated())
-                .oauth2ResourceServer(
-                        oauth2 ->
-                                oauth2.jwt(
-                                                jwt ->
-                                                        jwt.decoder(customJwtDecoder)
-                                                                .jwtAuthenticationConverter(
-                                                                        jwtAuthenticationConverter()))
-                                        .authenticationEntryPoint(
-                                                new JwtAuthenticationEntryPoint()))
+    @Order(2)
+    public SecurityFilterChain defaultFilterChain(HttpSecurity http) {
+        return http
+                .authorizeHttpRequests(req -> req
+                        .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
+                        .anyRequest().authenticated())
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .jwt(jwt -> jwt.decoder(accessTokenDecoder)
+                                       .jwtAuthenticationConverter(jwtAuthenticationConverter()))
+                        .authenticationEntryPoint(new JwtAuthenticationEntryPoint()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .build();
     }
