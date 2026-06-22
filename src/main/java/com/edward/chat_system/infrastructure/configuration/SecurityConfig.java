@@ -2,7 +2,6 @@ package com.edward.chat_system.infrastructure.configuration;
 
 import com.edward.chat_system.infrastructure.jwt.JwtAuthenticationEntryPoint;
 import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -25,7 +24,6 @@ import org.springframework.web.filter.CorsFilter;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-@RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @SuppressWarnings("java:S4502") // sonar
 public class SecurityConfig {
