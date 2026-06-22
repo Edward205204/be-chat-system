@@ -1,22 +1,22 @@
 package com.edward.chat_system.infrastructure.mail;
 
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.stereotype.Service;
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.Context;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Service;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class MailServiceImpl implements MailService{
+public class MailServiceImpl implements MailService {
     JavaMailSender mailSender;
-    TemplateEngine templateEngine; 
+    TemplateEngine templateEngine;
 
     @Override
     public void sendOtp(String to, String otpCode) {
@@ -35,7 +35,7 @@ public class MailServiceImpl implements MailService{
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
             helper.setTo(to);
             helper.setSubject(template.getSubject());
-            helper.setText(html, true); 
+            helper.setText(html, true);
 
             mailSender.send(message);
         } catch (MessagingException e) {

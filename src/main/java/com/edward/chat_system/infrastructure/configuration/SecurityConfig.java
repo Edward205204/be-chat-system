@@ -34,32 +34,35 @@ public class SecurityConfig {
     @Value("${jwt.signerKey}")
     String signerKey;
 
-    static final String TEMT_ENDPOINT = "/auth/send-otp";    
+    static final String TEMT_ENDPOINT = "/auth/send-otp";
     static final String[] PUBLIC_ENDPOINTS = {
         "/users", "/auth/token", "/auth/introspect", "/auth/logout", "/auth/refresh"
     };
-    
 
     @NonFinal JwtDecoder accessTokenDecoder;
     @NonFinal JwtDecoder tmpTokenDecoder;
-    
+
     public SecurityConfig(
-        @Qualifier("accessTokenDecoder") JwtDecoder accessTokenDecoder,
-        @Qualifier("tmpTokenDecoder") JwtDecoder tmpTokenDecoder) {
+            @Qualifier("accessTokenDecoder") JwtDecoder accessTokenDecoder,
+            @Qualifier("tmpTokenDecoder") JwtDecoder tmpTokenDecoder) {
         this.accessTokenDecoder = accessTokenDecoder;
         this.tmpTokenDecoder = tmpTokenDecoder;
     }
-    
+
     @Bean
     @Order(1)
-    public SecurityFilterChain tmpTokenFilterChain(HttpSecurity http)  {
-        return http
-                .securityMatcher(TEMT_ENDPOINT)
+    public SecurityFilterChain tmpTokenFilterChain(HttpSecurity http) {
+        return http.securityMatcher(TEMT_ENDPOINT)
                 .authorizeHttpRequests(req -> req.anyRequest().authenticated())
-                .oauth2ResourceServer(oauth2 -> oauth2
-                        .jwt(jwt -> jwt.decoder(tmpTokenDecoder)
-                                       .jwtAuthenticationConverter(jwtAuthenticationConverter()))
-                        .authenticationEntryPoint(new JwtAuthenticationEntryPoint()))
+                .oauth2ResourceServer(
+                        oauth2 ->
+                                oauth2.jwt(
+                                                jwt ->
+                                                        jwt.decoder(tmpTokenDecoder)
+                                                                .jwtAuthenticationConverter(
+                                                                        jwtAuthenticationConverter()))
+                                        .authenticationEntryPoint(
+                                                new JwtAuthenticationEntryPoint()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .build();
     }
@@ -67,14 +70,21 @@ public class SecurityConfig {
     @Bean
     @Order(2)
     public SecurityFilterChain defaultFilterChain(HttpSecurity http) {
-        return http
-                .authorizeHttpRequests(req -> req
-                        .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
-                        .anyRequest().authenticated())
-                .oauth2ResourceServer(oauth2 -> oauth2
-                        .jwt(jwt -> jwt.decoder(accessTokenDecoder)
-                                       .jwtAuthenticationConverter(jwtAuthenticationConverter()))
-                        .authenticationEntryPoint(new JwtAuthenticationEntryPoint()))
+        return http.authorizeHttpRequests(
+                        req ->
+                                req.requestMatchers(PUBLIC_ENDPOINTS)
+                                        .permitAll()
+                                        .anyRequest()
+                                        .authenticated())
+                .oauth2ResourceServer(
+                        oauth2 ->
+                                oauth2.jwt(
+                                                jwt ->
+                                                        jwt.decoder(accessTokenDecoder)
+                                                                .jwtAuthenticationConverter(
+                                                                        jwtAuthenticationConverter()))
+                                        .authenticationEntryPoint(
+                                                new JwtAuthenticationEntryPoint()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .build();
     }
