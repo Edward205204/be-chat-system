@@ -8,6 +8,7 @@ import com.edward.chat_system.modules.auth.dto.request.LoginRequest;
 import com.edward.chat_system.modules.auth.dto.request.RegisterRequest;
 import com.edward.chat_system.modules.auth.dto.response.AuthResponse;
 import com.edward.chat_system.modules.auth.dto.response.AuthSuccessResponse;
+import com.edward.chat_system.modules.auth.dto.response.TokenResponse;
 import com.edward.chat_system.modules.auth.dto.response.UnverifiedResponse;
 import com.edward.chat_system.modules.auth.entity.RefreshToken;
 import com.edward.chat_system.modules.auth.entity.VerificationCode;
@@ -58,6 +59,18 @@ public class AuthService {
     MailServiceImpl mailServiceImpl;
     VerificationCodeRepository verificationCodeRepository;
 
+    TokenResponse generateAccessTokenAndRefreshToken(JwtClaimObject claim) {
+        JwtSignerResponse accessToken =
+                jwtSigner.generateToken(
+                        claim.toBuilder().tokenType(TokenTypeEnum.ACCESS_TOKEN).build());
+
+        JwtSignerResponse refreshToken =
+                jwtSigner.generateToken(
+                        claim.toBuilder().tokenType(TokenTypeEnum.REFRESH_TOKEN).build());
+
+        return TokenResponse.builder().accessToken(accessToken).refreshToken(refreshToken).build();
+    }
+
     UnverifiedResponse unverifiedResponseBuilder(JwtClaimObject claim) {
         claim = claim.toBuilder().tokenType(TokenTypeEnum.TMP_TOKEN).build();
         String tmpTokenString = jwtSigner.generateToken(claim).getToken();
@@ -81,22 +94,18 @@ public class AuthService {
         if (!user.isVerified()) {
             return unverifiedResponseBuilder(claim);
         }
-        JwtSignerResponse accessToken =
-                jwtSigner.generateToken(
-                        claim.toBuilder().tokenType(TokenTypeEnum.ACCESS_TOKEN).build());
-
-        JwtSignerResponse refreshToken =
-                jwtSigner.generateToken(
-                        claim.toBuilder().tokenType(TokenTypeEnum.REFRESH_TOKEN).build());
+        TokenResponse tokenResponse = generateAccessTokenAndRefreshToken(claim);
         refreshTokenRepository.save(
                 RefreshToken.builder()
                         .user(user)
-                        .token(refreshToken.getToken())
-                        .expiresAt(DateTimeUtils.toLocalDateTime(refreshToken.getExpiresAt()))
+                        .token(tokenResponse.getRefreshToken().getToken())
+                        .expiresAt(
+                                DateTimeUtils.toLocalDateTime(
+                                        tokenResponse.getRefreshToken().getExpiresAt()))
                         .build());
         return AuthSuccessResponse.builder()
-                .accessToken(accessToken.getToken())
-                .refreshToken(refreshToken.getToken())
+                .accessToken(tokenResponse.getAccessToken().getToken())
+                .refreshToken(tokenResponse.getRefreshToken().getToken())
                 .user(userMapper.touUserResponse(user))
                 .build();
     }
@@ -136,7 +145,7 @@ public class AuthService {
     }
 
     @Retryable(value = MailException.class, maxRetries = 3, delay = 500)
-    public void sendOtp(String userId, String email) {
+    public void sendOtpVerifyEmail(String userId, String email) {
         VerificationCode code =
                 verificationCodeRepository.findByUserId(userId).orElseGet(VerificationCode::new);
         if (code.getId() != null) validateCanSendCode(code);
@@ -148,5 +157,55 @@ public class AuthService {
 
         verificationCodeRepository.save(code);
         mailServiceImpl.sendOtp(email, otp);
+    }
+
+    public TokenResponse verifyEmailOtp(String userId, String otp) {
+        VerificationCode code =
+                verificationCodeRepository
+                        .findByUserIdAndType(userId, VerificationCodeTypeEnum.EMAIL_VERIFY)
+                        .orElseThrow(() -> new AppException(ErrorCode.OTP_DOES_NOT_EXIST));
+
+        if (DateTimeUtils.now().isAfter(code.getExpiresAt()))
+            throw new AppException(ErrorCode.OTP_EXPIRED);
+
+        if (code.getStatus().equals(VerificationCodeStatusEnum.REVOKED))
+            throw new AppException(ErrorCode.OTP_REVOKED);
+        if (code.getStatus().equals(VerificationCodeStatusEnum.VERIFIED))
+            throw new AppException(ErrorCode.OTP_HAS_BEEN_USED);
+
+        if (!code.getCode().equals(otp)) {
+            code.setAttemptCount(code.getAttemptCount() + 1);
+            verificationCodeRepository.save(code);
+            if (code.getAttemptCount() > 5) {
+                code.setStatus(VerificationCodeStatusEnum.REVOKED);
+                verificationCodeRepository.save(code);
+                throw new AppException(ErrorCode.OTP_MAX_ATTEMPTS_EXCEEDED);
+            }
+            throw new AppException(ErrorCode.OTP_INCORRECT);
+        }
+
+        code.setStatus(VerificationCodeStatusEnum.VERIFIED);
+        verificationCodeRepository.save(code);
+        User user = code.getUser();
+        user.setVerified(true);
+        userRepo.save(user);
+
+        TokenResponse tokenResponse =
+                generateAccessTokenAndRefreshToken(
+                        JwtClaimObject.builder()
+                                .userId(user.getId())
+                                .email(user.getEmail())
+                                .username(user.getUsername())
+                                .build());
+
+        refreshTokenRepository.save(
+                RefreshToken.builder()
+                        .user(user)
+                        .token(tokenResponse.getRefreshToken().getToken())
+                        .expiresAt(
+                                DateTimeUtils.toLocalDateTime(
+                                        tokenResponse.getRefreshToken().getExpiresAt()))
+                        .build());
+        return tokenResponse;
     }
 }

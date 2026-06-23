@@ -25,8 +25,7 @@ import org.springframework.web.filter.CorsFilter;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @SuppressWarnings("java:S4502") // sonar
 public class SecurityConfig {
-
-    static final String TEMP_ENDPOINT = "/auth/send-otp";
+    static final String[] TEMP_ENDPOINTS = {"/auth/send/email-otp", "/auth/verify/email-otp"};
     static final String[] PUBLIC_ENDPOINTS = {
         "/auth/token", "/auth/logout", "/auth/refresh", "/auth/register", "/auth/login"
     };
@@ -44,7 +43,7 @@ public class SecurityConfig {
     @Bean
     @Order(1)
     public SecurityFilterChain tmpTokenFilterChain(HttpSecurity http) {
-        return http.securityMatcher(TEMP_ENDPOINT)
+        return http.securityMatcher(TEMP_ENDPOINTS)
                 .authorizeHttpRequests(req -> req.anyRequest().authenticated())
                 .oauth2ResourceServer(
                         oauth2 ->

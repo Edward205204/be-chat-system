@@ -42,7 +42,6 @@ public class MailServiceImpl implements MailService {
             helper.setText(html, true);
             mailSender.send(message);
         } catch (Exception e) {
-            log.error("Mail send failed: {}", e.getMessage(), e);
             throw new MailSendException("Failed to send email to " + to, e);
         }
     }
