@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatusCode;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public enum ErrorCode {
+    EMAIL_NOT_FOUND("EMAIL_NOT_FOUND", "Email not found", HttpStatus.NOT_FOUND),
     EMAIL_EXISTED("EMAIL_EXISTED", "Email existed", HttpStatus.CONFLICT),
     USERNAME_EXISTED("USERNAME_EXISTED", "Username existed", HttpStatus.CONFLICT),
     JWT_SIGNING_FAILED(
@@ -25,7 +26,6 @@ public enum ErrorCode {
             "OTP_COOLDOWN",
             "Otp is on cooldown, please wait before requesting a new code.",
             HttpStatus.TOO_MANY_REQUESTS),
-    ACCOUNT_VERIFIED("ACCOUNT_VERIFIED", "Account is verified", HttpStatus.CONFLICT),
     OTP_DOES_NOT_EXIST(
             "OTP_DOES_NOT_EXIST",
             "No OTP request found. Please request a new one.",

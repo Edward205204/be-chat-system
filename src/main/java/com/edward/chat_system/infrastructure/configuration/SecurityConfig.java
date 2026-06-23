@@ -27,7 +27,12 @@ import org.springframework.web.filter.CorsFilter;
 public class SecurityConfig {
     static final String[] TEMP_ENDPOINTS = {"/auth/send/email-otp", "/auth/verify/email-otp"};
     static final String[] PUBLIC_ENDPOINTS = {
-        "/auth/token", "/auth/logout", "/auth/refresh", "/auth/register", "/auth/login"
+        "/auth/logout",
+        "/auth/refresh",
+        "/auth/register",
+        "/auth/login",
+        "/auth/send/forgot-password",
+        "/auth/reset-password"
     };
 
     JwtDecoder accessTokenDecoder;

@@ -1,8 +1,6 @@
 package com.edward.chat_system.modules.auth.controller;
 
-import com.edward.chat_system.modules.auth.dto.request.LoginRequest;
-import com.edward.chat_system.modules.auth.dto.request.RegisterRequest;
-import com.edward.chat_system.modules.auth.dto.request.VerifyEmailRequest;
+import com.edward.chat_system.modules.auth.dto.request.*;
 import com.edward.chat_system.modules.auth.dto.response.AuthResponse;
 import com.edward.chat_system.modules.auth.dto.response.TokenResponse;
 import com.edward.chat_system.modules.auth.dto.response.UnverifiedResponse;
@@ -52,11 +50,26 @@ public class AuthController {
 
     @PostMapping("/verify/email-otp")
     ApiResponse<TokenResponse> verifyEmailOtp(
-            @RequestBody @Valid VerifyEmailRequest otp, @AuthenticationPrincipal Jwt principal) {
-        TokenResponse tokens = authService.verifyEmailOtp(principal.getSubject(), otp.getOtp());
+            @RequestBody @Valid VerifyEmailRequest request,
+            @AuthenticationPrincipal Jwt principal) {
+        TokenResponse tokens = authService.verifyEmailOtp(principal.getSubject(), request.getOtp());
         return ApiResponse.<TokenResponse>builder()
                 .message("Verify email successfully")
                 .result(tokens)
                 .build();
+    }
+
+    @PostMapping("/send/forgot-password")
+    ApiResponse<Void> sendOtpForgotPassword(@RequestBody @Valid ForgotPasswordRequest request) {
+        authService.sendOtpForgotPassword(request.getEmail());
+        return ApiResponse.<Void>builder()
+                .message("If an account exists, an OTP will be sent to your email.")
+                .build();
+    }
+
+    @PostMapping("/reset-password")
+    ApiResponse<Void> resetPassword(@RequestBody @Valid ResetPasswordRequest request) {
+        authService.resetPassword(request.getEmail(), request.getOtp(), request.getPassword());
+        return ApiResponse.<Void>builder().message("Reset password successfully").build();
     }
 }

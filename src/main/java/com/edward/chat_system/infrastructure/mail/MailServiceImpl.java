@@ -22,12 +22,12 @@ public class MailServiceImpl implements MailService {
     TemplateEngine templateEngine;
 
     @Override
-    public void sendOtp(String to, String otpCode) throws MailException {
+    public void sendOtp(String to, String otpCode, MailTemplate template) throws MailException {
         Context context = new Context();
         context.setVariable("otpCode", otpCode);
         context.setVariable("expiryMinutes", 5);
 
-        sendHtmlMail(to, MailTemplate.OTP_VERIFICATION, context);
+        sendHtmlMail(to, template, context);
     }
 
     private void sendHtmlMail(String to, MailTemplate template, Context context)

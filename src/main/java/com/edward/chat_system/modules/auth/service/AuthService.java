@@ -4,6 +4,7 @@ import com.edward.chat_system.infrastructure.jwt.JwtClaimObject;
 import com.edward.chat_system.infrastructure.jwt.JwtSigner;
 import com.edward.chat_system.infrastructure.jwt.JwtSignerResponse;
 import com.edward.chat_system.infrastructure.mail.MailServiceImpl;
+import com.edward.chat_system.infrastructure.mail.MailTemplate;
 import com.edward.chat_system.modules.auth.dto.request.LoginRequest;
 import com.edward.chat_system.modules.auth.dto.request.RegisterRequest;
 import com.edward.chat_system.modules.auth.dto.response.AuthResponse;
@@ -133,7 +134,7 @@ public class AuthService {
     private void validateCanSendCode(VerificationCode code) {
         VerificationCodeStatusEnum codeStatus = code.getStatus();
         if (codeStatus == VerificationCodeStatusEnum.VERIFIED)
-            throw new AppException(ErrorCode.ACCOUNT_VERIFIED);
+            throw new AppException(ErrorCode.OTP_HAS_BEEN_USED);
         if ((codeStatus == VerificationCodeStatusEnum.PENDING)
                 || (codeStatus == VerificationCodeStatusEnum.REVOKED)) validateCoolDown(code);
     }
@@ -156,15 +157,10 @@ public class AuthService {
         code.renewOtp(otp, validDuration);
 
         verificationCodeRepository.save(code);
-        mailServiceImpl.sendOtp(email, otp);
+        mailServiceImpl.sendOtp(email, otp, MailTemplate.OTP_VERIFICATION);
     }
 
-    public TokenResponse verifyEmailOtp(String userId, String otp) {
-        VerificationCode code =
-                verificationCodeRepository
-                        .findByUserIdAndType(userId, VerificationCodeTypeEnum.EMAIL_VERIFY)
-                        .orElseThrow(() -> new AppException(ErrorCode.OTP_DOES_NOT_EXIST));
-
+    VerificationCode validateOtp(VerificationCode code, String otp) {
         if (DateTimeUtils.now().isAfter(code.getExpiresAt()))
             throw new AppException(ErrorCode.OTP_EXPIRED);
 
@@ -173,7 +169,7 @@ public class AuthService {
         if (code.getStatus().equals(VerificationCodeStatusEnum.VERIFIED))
             throw new AppException(ErrorCode.OTP_HAS_BEEN_USED);
 
-        if (!code.getCode().equals(otp)) {
+        if (!otp.equals(code.getCode())) {
             code.setAttemptCount(code.getAttemptCount() + 1);
             verificationCodeRepository.save(code);
             if (code.getAttemptCount() > 5) {
@@ -183,6 +179,16 @@ public class AuthService {
             }
             throw new AppException(ErrorCode.OTP_INCORRECT);
         }
+        return code;
+    }
+
+    public TokenResponse verifyEmailOtp(String userId, String otp) {
+        VerificationCode code =
+                verificationCodeRepository
+                        .findByUserIdAndType(userId, VerificationCodeTypeEnum.EMAIL_VERIFY)
+                        .orElseThrow(() -> new AppException(ErrorCode.OTP_DOES_NOT_EXIST));
+
+        code = validateOtp(code, otp);
 
         code.setStatus(VerificationCodeStatusEnum.VERIFIED);
         verificationCodeRepository.save(code);
@@ -207,5 +213,40 @@ public class AuthService {
                                         tokenResponse.getRefreshToken().getExpiresAt()))
                         .build());
         return tokenResponse;
+    }
+
+    @Retryable(value = MailException.class, maxRetries = 3, delay = 500)
+    public void sendOtpForgotPassword(String email) {
+        User user = userRepo.findByEmail(email).orElse(null);
+        if (user == null) return;
+        VerificationCode code =
+                verificationCodeRepository
+                        .findByUserIdAndType(user.getId(), VerificationCodeTypeEnum.RESET_PASSWORD)
+                        .orElseGet(VerificationCode::new);
+        if (code.getId() != null) validateCanSendCode(code);
+        String otp = OtpUtils.generateOtp();
+        code.setUser(user);
+        code.setType(VerificationCodeTypeEnum.RESET_PASSWORD);
+        code.renewOtp(otp, validDuration);
+        verificationCodeRepository.save(code);
+        mailServiceImpl.sendOtp(email, otp, MailTemplate.FORGOT_PASSWORD);
+    }
+
+    //    clear toàn bộ refresh token của account
+
+    public void resetPassword(String email, String otp, String newPassword) {
+        User user =
+                userRepo.findByEmail(email)
+                        .orElseThrow(() -> new AppException(ErrorCode.EMAIL_NOT_FOUND));
+        VerificationCode code =
+                verificationCodeRepository
+                        .findByUserIdAndType(user.getId(), VerificationCodeTypeEnum.RESET_PASSWORD)
+                        .orElseThrow(() -> new AppException(ErrorCode.OTP_DOES_NOT_EXIST));
+
+        validateOtp(code, otp);
+        code.setStatus(VerificationCodeStatusEnum.VERIFIED);
+        user.setPassword(passwordEncoder.encode(newPassword));
+        refreshTokenRepository.deleteByUserId(user.getId());
+        userRepo.save(user);
     }
 }
