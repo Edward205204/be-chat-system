@@ -1,9 +1,6 @@
 package com.edward.chat_system.modules.auth.dto.request;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Past;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.*;
 import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -43,7 +40,7 @@ public class RegisterRequest {
     @Length(min = 1, max = 20, message = "Display name must be 1 - 20 chars")
     String displayName;
 
-    @NotBlank(message = "Date of birth is required")
     @Past(message = "Date of birth must be in the past")
+    @NotNull(message = "Date of birth is required")
     private LocalDate dateOfBirth;
 }

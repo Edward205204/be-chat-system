@@ -1,10 +1,10 @@
 package com.edward.chat_system.infrastructure.mail;
 
-import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -39,9 +40,9 @@ public class MailServiceImpl implements MailService {
             helper.setTo(to);
             helper.setSubject(template.getSubject());
             helper.setText(html, true);
-
             mailSender.send(message);
-        } catch (MessagingException e) {
+        } catch (Exception e) {
+            log.error("Mail send failed: {}", e.getMessage(), e);
             throw new MailSendException("Failed to send email to " + to, e);
         }
     }

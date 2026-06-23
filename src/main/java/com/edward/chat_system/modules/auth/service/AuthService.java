@@ -12,6 +12,7 @@ import com.edward.chat_system.modules.auth.dto.response.UnverifiedResponse;
 import com.edward.chat_system.modules.auth.entity.RefreshToken;
 import com.edward.chat_system.modules.auth.entity.VerificationCode;
 import com.edward.chat_system.modules.auth.enums.VerificationCodeStatusEnum;
+import com.edward.chat_system.modules.auth.enums.VerificationCodeTypeEnum;
 import com.edward.chat_system.modules.auth.exception.OtpCooldownException;
 import com.edward.chat_system.modules.auth.repository.RefreshTokenRepository;
 import com.edward.chat_system.modules.auth.repository.VerificationCodeRepository;
@@ -28,12 +29,14 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
 import org.springframework.resilience.annotation.Retryable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -56,7 +59,7 @@ public class AuthService {
     VerificationCodeRepository verificationCodeRepository;
 
     UnverifiedResponse unverifiedResponseBuilder(JwtClaimObject claim) {
-        claim.toBuilder().tokenType(TokenTypeEnum.TMP_TOKEN).build();
+        claim = claim.toBuilder().tokenType(TokenTypeEnum.TMP_TOKEN).build();
         String tmpTokenString = jwtSigner.generateToken(claim).getToken();
         return UnverifiedResponse.builder().tmpToken(tmpTokenString).build();
     }
@@ -74,6 +77,7 @@ public class AuthService {
                         .username(user.getUsername())
                         .email(user.getEmail())
                         .build();
+        log.info("Claim: {}", claim.toString());
         if (!user.isVerified()) {
             return unverifiedResponseBuilder(claim);
         }
@@ -135,10 +139,11 @@ public class AuthService {
     public void sendOtp(String userId, String email) {
         VerificationCode code =
                 verificationCodeRepository.findByUserId(userId).orElseGet(VerificationCode::new);
-        if (code.getStatus() != null) validateCanSendCode(code);
+        if (code.getId() != null) validateCanSendCode(code);
         String otp = OtpUtils.generateOtp();
 
         code.setUser(userRepo.getReferenceById(userId));
+        code.setType(VerificationCodeTypeEnum.EMAIL_VERIFY);
         code.renewOtp(otp, validDuration);
 
         verificationCodeRepository.save(code);

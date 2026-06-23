@@ -3,9 +3,7 @@ package com.edward.chat_system.infrastructure.configuration;
 import com.edward.chat_system.infrastructure.jwt.JwtAuthenticationEntryPoint;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -28,17 +26,13 @@ import org.springframework.web.filter.CorsFilter;
 @SuppressWarnings("java:S4502") // sonar
 public class SecurityConfig {
 
-    @NonFinal
-    @Value("${jwt.signerKey}")
-    String signerKey;
-
-    static final String TEMT_ENDPOINT = "/auth/send-otp";
+    static final String TEMP_ENDPOINT = "/auth/send-otp";
     static final String[] PUBLIC_ENDPOINTS = {
-        "/users", "/auth/token", "/auth/introspect", "/auth/logout", "/auth/refresh"
+        "/auth/token", "/auth/logout", "/auth/refresh", "/auth/register", "/auth/login"
     };
 
-    @NonFinal JwtDecoder accessTokenDecoder;
-    @NonFinal JwtDecoder tmpTokenDecoder;
+    JwtDecoder accessTokenDecoder;
+    JwtDecoder tmpTokenDecoder;
 
     public SecurityConfig(
             @Qualifier("accessTokenDecoder") JwtDecoder accessTokenDecoder,
@@ -50,7 +44,7 @@ public class SecurityConfig {
     @Bean
     @Order(1)
     public SecurityFilterChain tmpTokenFilterChain(HttpSecurity http) {
-        return http.securityMatcher(TEMT_ENDPOINT)
+        return http.securityMatcher(TEMP_ENDPOINT)
                 .authorizeHttpRequests(req -> req.anyRequest().authenticated())
                 .oauth2ResourceServer(
                         oauth2 ->
