@@ -67,10 +67,10 @@
 
 > Với tư cách là **người dùng**, tôi muốn đặt lại mật khẩu khi quên để lấy lại quyền truy cập.
 
-**Luồng 3 màn hình:**
+**Luồng 2 màn hình:**
 1. Nhập email → nút "Gửi mã xác nhận"
-2. Nhập OTP (tương tự US12: cooldown 60s, hết hạn sau 10 phút)
-3. Nhập password mới + xác nhận → nút "Đặt lại mật khẩu"
+2. Nhập password mới + Nhập OTP (tương tự US12: cooldown 60s, hết hạn sau 10 phút) + xác nhận
+        → nút "Đặt lại mật khẩu"
 
 **Quy tắc nghiệp vụ:**
 - Nếu email không tồn tại → vẫn hiển thị "Nếu email tồn tại, mã sẽ được gửi" (tránh lộ thông tin).
