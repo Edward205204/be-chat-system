@@ -32,6 +32,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
 import org.springframework.resilience.annotation.Retryable;
@@ -60,7 +61,7 @@ public class AuthService {
     MailServiceImpl mailServiceImpl;
     VerificationCodeRepository verificationCodeRepository;
 
-    TokenResponse generateAccessTokenAndRefreshToken(JwtClaimObject claim) {
+    TokenResponse generateAccessTokenAndRefreshToken(@NonNull JwtClaimObject claim) {
         JwtSignerResponse accessToken =
                 jwtSigner.generateToken(
                         claim.toBuilder().tokenType(TokenTypeEnum.ACCESS_TOKEN).build());
@@ -78,7 +79,7 @@ public class AuthService {
         return UnverifiedResponse.builder().tmpToken(tmpTokenString).build();
     }
 
-    public AuthResponse login(LoginRequest request) {
+    public AuthResponse login(@NonNull LoginRequest request) {
         var user =
                 userRepo.findByEmail(request.getEmail())
                         .orElseThrow(() -> new AppException(ErrorCode.LOGIN_FAILED));
@@ -91,7 +92,6 @@ public class AuthService {
                         .username(user.getUsername())
                         .email(user.getEmail())
                         .build();
-        log.info("Claim: {}", claim.toString());
         if (!user.isVerified()) {
             return unverifiedResponseBuilder(claim);
         }
@@ -111,7 +111,7 @@ public class AuthService {
                 .build();
     }
 
-    public UnverifiedResponse register(RegisterRequest request) {
+    public UnverifiedResponse register(@NonNull RegisterRequest request) {
         boolean isExistsByUsername = userRepo.existsByUsername(request.getUsername());
         if (isExistsByUsername) throw new AppException(ErrorCode.USERNAME_EXISTED);
         var user = userRepo.findByEmail(request.getEmail()).orElseGet(User::new);
@@ -131,7 +131,7 @@ public class AuthService {
                         .build());
     }
 
-    private void validateCanSendCode(VerificationCode code) {
+    private void validateCanSendCode(@NonNull VerificationCode code) {
         VerificationCodeStatusEnum codeStatus = code.getStatus();
         if (codeStatus == VerificationCodeStatusEnum.VERIFIED)
             throw new AppException(ErrorCode.OTP_HAS_BEEN_USED);
@@ -139,7 +139,7 @@ public class AuthService {
                 || (codeStatus == VerificationCodeStatusEnum.REVOKED)) validateCoolDown(code);
     }
 
-    private void validateCoolDown(VerificationCode code) {
+    private void validateCoolDown(@NonNull VerificationCode code) {
         LocalDateTime now = DateTimeUtils.now();
         if (now.isBefore(code.getLastSentAt().plusSeconds(cooldown)))
             throw new OtpCooldownException(ErrorCode.OTP_COOLDOWN, code.getLastSentAt());
@@ -160,7 +160,7 @@ public class AuthService {
         mailServiceImpl.sendOtp(email, otp, MailTemplate.OTP_VERIFICATION);
     }
 
-    VerificationCode validateOtp(VerificationCode code, String otp) {
+    VerificationCode validateOtp(@NonNull VerificationCode code, String otp) {
         if (DateTimeUtils.now().isAfter(code.getExpiresAt()))
             throw new AppException(ErrorCode.OTP_EXPIRED);
 
@@ -232,8 +232,6 @@ public class AuthService {
         mailServiceImpl.sendOtp(email, otp, MailTemplate.FORGOT_PASSWORD);
     }
 
-    //    clear toàn bộ refresh token của account
-
     public void resetPassword(String email, String otp, String newPassword) {
         User user =
                 userRepo.findByEmail(email)
@@ -248,5 +246,36 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(newPassword));
         refreshTokenRepository.deleteByUserId(user.getId());
         userRepo.save(user);
+    }
+
+    public void logout(String refreshToken) {
+        refreshTokenRepository.deleteByToken(refreshToken);
+    }
+
+    public TokenResponse refreshToken(String oldToken) {
+        RefreshToken refreshToken =
+                refreshTokenRepository
+                        .findByToken(oldToken)
+                        .orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
+        if (DateTimeUtils.now().isAfter(refreshToken.getExpiresAt()))
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        User user = refreshToken.getUser();
+        JwtClaimObject claim =
+                JwtClaimObject.builder()
+                        .email(user.getEmail())
+                        .username(user.getUsername())
+                        .userId(user.getId())
+                        .build();
+        TokenResponse tokenResponse = generateAccessTokenAndRefreshToken(claim);
+        refreshTokenRepository.save(
+                RefreshToken.builder()
+                        .user(user)
+                        .token(tokenResponse.getRefreshToken().getToken())
+                        .expiresAt(
+                                DateTimeUtils.toLocalDateTime(
+                                        tokenResponse.getRefreshToken().getExpiresAt()))
+                        .build());
+
+        return tokenResponse;
     }
 }

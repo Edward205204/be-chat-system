@@ -72,4 +72,18 @@ public class AuthController {
         authService.resetPassword(request.getEmail(), request.getOtp(), request.getPassword());
         return ApiResponse.<Void>builder().message("Reset password successfully").build();
     }
+
+    @PostMapping("/logout")
+    ApiResponse<Void> logout(@RequestBody @Valid TokenRequest request) {
+        authService.logout(request.getRefreshToken());
+        return ApiResponse.<Void>builder().message("Logout successfully").build();
+    }
+
+    @PostMapping("/refresh")
+    ApiResponse<TokenResponse> refreshToken(@RequestBody @Valid TokenRequest request) {
+        return ApiResponse.<TokenResponse>builder()
+                .message("Refresh Token successfully")
+                .result(authService.refreshToken(request.getRefreshToken()))
+                .build();
+    }
 }
