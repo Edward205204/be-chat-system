@@ -1,6 +1,6 @@
 package com.edward.chat_system.features.auth.dto.response;
 
-import com.edward.chat_system.infrastructure.jwt.JwtSignerResponse;
+import com.edward.chat_system.infrastructure.security.jwt.JwtSignerResponse;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 

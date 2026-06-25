@@ -1,5 +1,5 @@
 /* (C)2026 */
-package com.edward.chat_system.infrastructure.configuration;
+package com.edward.chat_system.infrastructure.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

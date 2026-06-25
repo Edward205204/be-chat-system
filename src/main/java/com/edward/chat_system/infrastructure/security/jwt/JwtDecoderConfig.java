@@ -1,4 +1,4 @@
-package com.edward.chat_system.infrastructure.jwt;
+package com.edward.chat_system.infrastructure.security.jwt;
 
 import com.edward.chat_system.shared.enums.TokenTypeEnum;
 import java.nio.charset.StandardCharsets;

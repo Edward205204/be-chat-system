@@ -1,6 +1,5 @@
-package com.edward.chat_system.infrastructure.jwt;
+package com.edward.chat_system.infrastructure.security.jwt;
 
-import java.util.Date;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,5 +14,5 @@ import lombok.experimental.FieldDefaults;
 @Data
 public class JwtSignerResponse {
     String token;
-    Date expiresAt;
+    java.util.Date expiresAt;
 }

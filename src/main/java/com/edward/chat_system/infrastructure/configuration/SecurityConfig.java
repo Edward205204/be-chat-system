@@ -1,6 +1,6 @@
 package com.edward.chat_system.infrastructure.configuration;
 
-import com.edward.chat_system.infrastructure.jwt.JwtAuthenticationEntryPoint;
+import com.edward.chat_system.infrastructure.security.jwt.JwtAuthenticationEntryPoint;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Qualifier;
