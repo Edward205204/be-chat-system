@@ -34,8 +34,6 @@ import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.MailException;
-import org.springframework.resilience.annotation.Retryable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -119,7 +117,7 @@ public class AuthService {
         if (user.getEmail() != null && user.isVerified()) {
             throw new AppException(ErrorCode.EMAIL_EXISTED);
         }
-        user = userMapper.toUser(request);
+        userMapper.updateUserFromRequest(user, request);
         String hashed = passwordEncoder.encode(request.getPassword());
         user.setPassword(hashed);
         user = userRepo.save(user);
@@ -145,7 +143,6 @@ public class AuthService {
             throw new OtpCooldownException(ErrorCode.OTP_COOLDOWN, code.getLastSentAt());
     }
 
-    @Retryable(value = MailException.class, maxRetries = 3, delay = 500)
     public void sendOtpVerifyEmail(String userId, String email) {
         VerificationCode code =
                 verificationCodeRepository.findByUserId(userId).orElseGet(VerificationCode::new);
@@ -215,7 +212,6 @@ public class AuthService {
         return tokenResponse;
     }
 
-    @Retryable(value = MailException.class, maxRetries = 3, delay = 500)
     public void sendOtpForgotPassword(String email) {
         User user = userRepo.findByEmail(email).orElse(null);
         if (user == null) return;
@@ -245,6 +241,7 @@ public class AuthService {
         code.setStatus(VerificationCodeStatusEnum.VERIFIED);
         user.setPassword(passwordEncoder.encode(newPassword));
         refreshTokenRepository.deleteByUserId(user.getId());
+        verificationCodeRepository.save(code);
         userRepo.save(user);
     }
 
@@ -267,6 +264,7 @@ public class AuthService {
                         .userId(user.getId())
                         .build();
         TokenResponse tokenResponse = generateAccessTokenAndRefreshToken(claim);
+        refreshTokenRepository.deleteByToken(oldToken);
         refreshTokenRepository.save(
                 RefreshToken.builder()
                         .user(user)

@@ -9,6 +9,7 @@ import org.springframework.mail.MailException;
 import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.resilience.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -22,7 +23,8 @@ public class MailServiceImpl implements MailService {
     TemplateEngine templateEngine;
 
     @Override
-    public void sendOtp(String to, String otpCode, MailTemplate template) throws MailException {
+    @Retryable(value = MailException.class, maxRetries = 3, delay = 500)
+    public void sendOtp(String to, String otpCode, MailTemplate template) {
         Context context = new Context();
         context.setVariable("otpCode", otpCode);
         context.setVariable("expiryMinutes", 5);
