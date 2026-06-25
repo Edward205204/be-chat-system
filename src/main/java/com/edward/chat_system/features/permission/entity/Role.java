@@ -31,9 +31,6 @@ public class Role {
     @Length(min = 7, max = 7)
     String color;
 
-    @Column(nullable = false) // true = role everyone
-    boolean isEveryone;
-
     @Column(nullable = false)
     @Builder.Default
     int position = 0;
@@ -42,12 +39,4 @@ public class Role {
     @CreationTimestamp
     LocalDateTime createdAt;
 
-    @PrePersist
-    @PreUpdate
-    private void ensureEveryonePosition() {
-        //        đảm bảo position = 0 cho role @everyone
-        if (isEveryone) {
-            position = 0;
-        }
-    }
 }

@@ -30,4 +30,8 @@ public class Channel {
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     LocalDate createdAt;
+
+    @Column(nullable = false)
+    @Builder.Default
+    boolean isPrivate = false;
 }

@@ -2,7 +2,6 @@ package com.edward.chat_system.features.channel.entity;
 
 import com.edward.chat_system.features.channel.enums.ChannelPermissionKey;
 import com.edward.chat_system.features.permission.entity.Role;
-import com.edward.chat_system.features.permission.enums.PermissionValue;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -35,8 +34,4 @@ public class ChannelRolePermission {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     ChannelPermissionKey permission;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    PermissionValue value;
 }
