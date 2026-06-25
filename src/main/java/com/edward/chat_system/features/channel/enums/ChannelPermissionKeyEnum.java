@@ -1,6 +1,6 @@
 package com.edward.chat_system.features.channel.enums;
 
-public enum ChannelPermissionKey {
+public enum ChannelPermissionKeyEnum {
     VIEW_CHANNEL,
     MANAGE_CHANNEL,
     MANAGE_CHANNEL_PERMISSIONS,

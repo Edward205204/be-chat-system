@@ -1,6 +1,6 @@
 package com.edward.chat_system.features.channel.entity;
 
-import com.edward.chat_system.features.channel.enums.ChannelPermissionKey;
+import com.edward.chat_system.features.channel.enums.ChannelPermissionKeyEnum;
 import com.edward.chat_system.features.permission.entity.Role;
 import jakarta.persistence.*;
 import lombok.*;
@@ -33,5 +33,5 @@ public class ChannelRolePermission {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    ChannelPermissionKey permission;
+    ChannelPermissionKeyEnum permission;
 }

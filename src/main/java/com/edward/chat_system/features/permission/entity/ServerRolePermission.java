@@ -1,6 +1,6 @@
 package com.edward.chat_system.features.permission.entity;
 
-import com.edward.chat_system.features.server.enums.ServerPermissionKey;
+import com.edward.chat_system.features.server.enums.ServerPermissionKeyEnum;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -31,5 +31,5 @@ public class ServerRolePermission {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    ServerPermissionKey permission;
+    ServerPermissionKeyEnum permission;
 }

@@ -1,6 +1,6 @@
 package com.edward.chat_system.features.server.enums;
 
-public enum InviteStatus {
+public enum InviteStatusEnum {
     PENDING,
     ACCEPTED,
     REJECTED,

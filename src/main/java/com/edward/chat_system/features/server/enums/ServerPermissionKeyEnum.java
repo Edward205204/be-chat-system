@@ -1,6 +1,6 @@
 package com.edward.chat_system.features.server.enums;
 
-public enum ServerPermissionKey {
+public enum ServerPermissionKeyEnum {
     MANAGE_CHANNELS,
     CREATE_INVITE,
     MANAGE_SERVER,

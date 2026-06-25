@@ -1,6 +1,6 @@
 package com.edward.chat_system.features.server.entity;
 
-import com.edward.chat_system.features.server.enums.InviteStatus;
+import com.edward.chat_system.features.server.enums.InviteStatusEnum;
 import com.edward.chat_system.features.user.entity.User;
 import com.edward.chat_system.shared.utils.DateTimeUtils;
 import jakarta.persistence.*;
@@ -40,7 +40,7 @@ public class ServerInvitation {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
-    InviteStatus status = InviteStatus.PENDING;
+    InviteStatusEnum status = InviteStatusEnum.PENDING;
 
     @Column(nullable = false)
     LocalDateTime expiresAt;
