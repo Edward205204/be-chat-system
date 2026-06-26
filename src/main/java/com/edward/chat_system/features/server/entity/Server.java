@@ -14,6 +14,9 @@ import org.hibernate.annotations.CreationTimestamp;
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
+@Table(name = "servers", indexes = {
+        @Index(name = "idx_servers_owner_id", columnList = "owner_id")
+})
 public class Server {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

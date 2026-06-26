@@ -2,7 +2,6 @@ package com.edward.chat_system.infrastructure.security.jwt;
 
 import com.edward.chat_system.shared.dto.ApiResponse;
 import com.edward.chat_system.shared.exception.ErrorCode;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;

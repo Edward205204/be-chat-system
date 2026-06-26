@@ -42,6 +42,10 @@ public enum ErrorCode {
                     + " been revoked. Please request a new one.",
             HttpStatus.TOO_MANY_REQUESTS),
     OTP_HAS_BEEN_USED("OTP_HAS_BEEN_USED", "Otp has been used", HttpStatus.BAD_REQUEST),
+
+    NOT_A_MEMBER("NOT_A_MEMBER", "User is not a member of a server", HttpStatus.FORBIDDEN),
+    MISSING_PERMISSION("MISSING_PERMISSION", "User isn't allowed to perform this action",
+            HttpStatus.FORBIDDEN),
     ;
     // INVALID_DOB("Age of user must be at least {value}",
     // HttpStatus.UNPROCESSABLE_CONTENT),

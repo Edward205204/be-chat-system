@@ -16,11 +16,6 @@ import lombok.experimental.FieldDefaults;
         name = "server_role_permission",
         uniqueConstraints = {@UniqueConstraint(columnNames = {"role_id", "permission"})})
 public class ServerRolePermission {
-    //    id         VARCHAR(36)          [pk]
-    //    role_id    VARCHAR(36)          [not null, ref: > roles.id]
-    //    permission server_permission_key [not null]
-    //
-    //    Note: 'Unique theo (role_id, permission)'
     @Id
     @GeneratedValue(generator = "UUID")
     String id;
