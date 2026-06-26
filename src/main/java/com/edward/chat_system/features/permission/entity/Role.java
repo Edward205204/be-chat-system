@@ -38,5 +38,4 @@ public class Role {
     @Column(nullable = false)
     @CreationTimestamp
     LocalDateTime createdAt;
-
 }

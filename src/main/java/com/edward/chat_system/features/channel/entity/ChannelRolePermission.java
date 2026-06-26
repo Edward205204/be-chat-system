@@ -17,6 +17,10 @@ import lombok.experimental.FieldDefaults;
         name = "channel_role_permissions",
         uniqueConstraints = {
             @UniqueConstraint(columnNames = {"channel_id", "role_id", "permission"})
+        },
+        indexes = {
+            @Index(name = "idx_crp_role_id", columnList = "role_id"),
+            @Index(name = "idx_crp_permission", columnList = "permission")
         })
 public class ChannelRolePermission {
     @Id

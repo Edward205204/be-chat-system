@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatusCode;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public enum ErrorCode {
+    CHANNEL_IS_NOT_EXIST("CHANNEL_IS_NOT_EXIST", "Channel is not exist", HttpStatus.BAD_REQUEST),
     EMAIL_NOT_FOUND("EMAIL_NOT_FOUND", "Email not found", HttpStatus.NOT_FOUND),
     EMAIL_EXISTED("EMAIL_EXISTED", "Email existed", HttpStatus.CONFLICT),
     USERNAME_EXISTED("USERNAME_EXISTED", "Username existed", HttpStatus.CONFLICT),
@@ -44,7 +45,9 @@ public enum ErrorCode {
     OTP_HAS_BEEN_USED("OTP_HAS_BEEN_USED", "Otp has been used", HttpStatus.BAD_REQUEST),
 
     NOT_A_MEMBER("NOT_A_MEMBER", "User is not a member of a server", HttpStatus.FORBIDDEN),
-    MISSING_PERMISSION("MISSING_PERMISSION", "User isn't allowed to perform this action",
+    MISSING_PERMISSION(
+            "MISSING_PERMISSION",
+            "User isn't allowed to perform this action",
             HttpStatus.FORBIDDEN),
     ;
     // INVALID_DOB("Age of user must be at least {value}",

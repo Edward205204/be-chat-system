@@ -9,18 +9,19 @@ import org.mapstruct.*;
 public interface UserMapper {
     UserResponse touUserResponse(User user);
 
-//    @Mapping(target = "id", ignore = true)
-//    @Mapping(target = "avatar", ignore = true)
-//    @Mapping(target = "banner", ignore = true)
-//    @Mapping(target = "isVerified", ignore = true)
-//    @Mapping(target = "createdAt", ignore = true)
-//    User toUser(RegisterRequest request)
+    //    @Mapping(target = "id", ignore = true)
+    //    @Mapping(target = "avatar", ignore = true)
+    //    @Mapping(target = "banner", ignore = true)
+    //    @Mapping(target = "isVerified", ignore = true)
+    //    @Mapping(target = "createdAt", ignore = true)
+    //    User toUser(RegisterRequest request)
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "avatar", ignore = true)
     @Mapping(target = "banner", ignore = true)
-    @Mapping(target = "isVerified", ignore = true)
+    //    @Mapping(target = "isVerified", ignore = true)
+    @Mapping(target = "verified", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     void updateUserFromRequest(@MappingTarget User user, RegisterRequest request);
 }

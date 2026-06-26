@@ -14,7 +14,8 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 @Table(
         name = "role_members",
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"role_id", "server_member_id"})})
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"role_id", "server_member_id"})},
+        indexes = {@Index(name = "idx_rm_server_member_id", columnList = "server_member_id")})
 public class RoleMember {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

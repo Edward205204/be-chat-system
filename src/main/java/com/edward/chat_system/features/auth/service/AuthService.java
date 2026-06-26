@@ -16,11 +16,11 @@ import com.edward.chat_system.features.auth.repository.VerificationCodeRepositor
 import com.edward.chat_system.features.user.entity.User;
 import com.edward.chat_system.features.user.mapper.UserMapper;
 import com.edward.chat_system.features.user.repository.UserRepository;
+import com.edward.chat_system.infrastructure.mail.MailServiceImpl;
+import com.edward.chat_system.infrastructure.mail.MailTemplate;
 import com.edward.chat_system.infrastructure.security.jwt.JwtClaimObject;
 import com.edward.chat_system.infrastructure.security.jwt.JwtSigner;
 import com.edward.chat_system.infrastructure.security.jwt.JwtSignerResponse;
-import com.edward.chat_system.infrastructure.mail.MailServiceImpl;
-import com.edward.chat_system.infrastructure.mail.MailTemplate;
 import com.edward.chat_system.shared.enums.TokenTypeEnum;
 import com.edward.chat_system.shared.exception.AppException;
 import com.edward.chat_system.shared.exception.ErrorCode;

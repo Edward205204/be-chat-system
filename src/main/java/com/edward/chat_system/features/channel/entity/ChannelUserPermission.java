@@ -16,8 +16,7 @@ import lombok.experimental.FieldDefaults;
 @Table(
         name = "channel_user_permissions",
         uniqueConstraints = {
-            @UniqueConstraint(
-                    columnNames = {"channel_id", "server_member_id", "permission"})
+            @UniqueConstraint(columnNames = {"channel_id", "server_member_id", "permission"})
         })
 public class ChannelUserPermission {
     @Id

@@ -14,6 +14,7 @@ import lombok.experimental.FieldDefaults;
 @Entity
 @Table(
         name = "server_role_permission",
+        indexes = {@Index(name = "idx_server_rolepermission", columnList = "permission")},
         uniqueConstraints = {@UniqueConstraint(columnNames = {"role_id", "permission"})})
 public class ServerRolePermission {
     @Id
