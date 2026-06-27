@@ -49,6 +49,13 @@ public enum ErrorCode {
             "MISSING_PERMISSION",
             "User isn't allowed to perform this action",
             HttpStatus.FORBIDDEN),
+
+    ROLE_NAME_DUPLICATE("ROLE_NAME_DUPLICATE ", "Role name is duplicate", HttpStatus.CONFLICT),
+
+    NOW_DO_NOT_HAVE_PERMISSION(
+            "NOW_DO_NOT_HAVE_PERMISSION",
+            "User isn't allowed to perform this action",
+            HttpStatus.FORBIDDEN),
     ;
     // INVALID_DOB("Age of user must be at least {value}",
     // HttpStatus.UNPROCESSABLE_CONTENT),

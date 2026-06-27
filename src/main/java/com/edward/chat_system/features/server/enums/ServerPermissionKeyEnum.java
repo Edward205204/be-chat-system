@@ -8,5 +8,5 @@ public enum ServerPermissionKeyEnum {
     KICK_MEMBER,
     BAN_MEMBER,
     MUTE_MEMBER,
-    MANAGE_ROLES
+    MANAGE_ROLES,
 }

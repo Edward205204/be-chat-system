@@ -7,18 +7,22 @@ import com.edward.chat_system.features.server.repository.ServerMemberRepository;
 import com.edward.chat_system.shared.exception.AppException;
 import com.edward.chat_system.shared.exception.ErrorCode;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class RequiresServerPermissionComponent {
     ServerMemberRepository serverMemberRepository;
     ServerRolePermissionRepository serverRolePermissionRepository;
+
+    boolean isManageRolePermission(ServerPermissionKeyEnum permission) {
+        return permission == ServerPermissionKeyEnum.MANAGE_SERVER;
+    }
 
     public void check(String serverId, ServerPermissionKeyEnum permission) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -32,11 +36,14 @@ public class RequiresServerPermissionComponent {
 
         if (info.getIsOwner()) return;
 
+        if (isManageRolePermission(permission))
+            throw new AppException(ErrorCode.NOW_DO_NOT_HAVE_PERMISSION);
+
         if (permission == ServerPermissionKeyEnum.NONE) return;
 
         boolean hasPermission =
                 serverRolePermissionRepository.hasPermission(info.getMemberId(), permission);
 
-        if (!hasPermission) throw new AppException(ErrorCode.MISSING_PERMISSION);
+        if (!hasPermission) throw new AppException(ErrorCode.NOW_DO_NOT_HAVE_PERMISSION);
     }
 }

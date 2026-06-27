@@ -1,6 +1,6 @@
 package com.edward.chat_system.infrastructure.security.jwt;
 
-import com.edward.chat_system.shared.enums.TokenTypeEnum;
+import com.edward.chat_system.features.auth.enums.TokenTypeEnum;
 import java.nio.charset.StandardCharsets;
 import javax.crypto.spec.SecretKeySpec;
 import org.springframework.beans.factory.annotation.Value;

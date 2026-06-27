@@ -1,4 +1,4 @@
-package com.edward.chat_system.shared.enums;
+package com.edward.chat_system.features.auth.enums;
 
 public enum TokenTypeEnum {
     ACCESS_TOKEN,

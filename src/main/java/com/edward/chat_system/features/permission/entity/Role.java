@@ -15,7 +15,13 @@ import org.hibernate.validator.constraints.Length;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
-@Table(name = "roles")
+@Table(
+        name = "roles",
+        uniqueConstraints = {
+            @UniqueConstraint(
+                    name = "uk_roles_server_name",
+                    columnNames = {"server_id", "name"})
+        })
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -31,9 +37,9 @@ public class Role {
     @Length(min = 7, max = 7)
     String color;
 
-    @Column(nullable = false)
-    @Builder.Default
-    int position = 0;
+    //    @Column(nullable = false)
+    //    @Builder.Default
+    //    int position = 0
 
     @Column(nullable = false)
     @CreationTimestamp

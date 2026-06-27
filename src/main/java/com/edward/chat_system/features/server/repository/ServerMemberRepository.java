@@ -20,4 +20,6 @@ public interface ServerMemberRepository extends JpaRepository<ServerMember, Stri
             """)
     Optional<ServerMemberInfo> findServerMemberInfo(
             @Param("serverId") String serverId, @Param("userId") String userId);
+
+    boolean existsByServerIdAndUserId(String serverId, String userId);
 }

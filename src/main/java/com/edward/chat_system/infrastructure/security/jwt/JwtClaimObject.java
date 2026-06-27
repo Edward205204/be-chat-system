@@ -1,6 +1,6 @@
 package com.edward.chat_system.infrastructure.security.jwt;
 
-import com.edward.chat_system.shared.enums.TokenTypeEnum;
+import com.edward.chat_system.features.auth.enums.TokenTypeEnum;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
