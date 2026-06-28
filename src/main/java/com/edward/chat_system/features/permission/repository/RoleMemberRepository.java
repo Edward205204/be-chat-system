@@ -8,7 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface RoleMemberRepository extends JpaRepository<RoleMember, String> {
-    @Query("""
+    @Query(
+            """
    SELECT sm.id AS serverMemberId,
           u.id AS userId,
           u.displayName AS displayName,

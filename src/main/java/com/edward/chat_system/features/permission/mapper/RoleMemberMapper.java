@@ -2,10 +2,9 @@ package com.edward.chat_system.features.permission.mapper;
 
 import com.edward.chat_system.features.permission.dto.response.RoleMemberResponse;
 import com.edward.chat_system.features.permission.projection.RoleMemberProjection;
+import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-
-import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface RoleMemberMapper {

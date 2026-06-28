@@ -86,14 +86,16 @@ public class RoleService {
     public List<RoleMemberResponse> getRoleMember(@ServerId String serverId, String roleId) {
         checkRoleExist(serverId, roleId);
         List<RoleMemberProjection> roleMembers = roleMemberRepository.findAllByRoleId(roleId);
-       return roleMemberMapper.toResponseList(roleMembers);
+        return roleMemberMapper.toResponseList(roleMembers);
     }
 
     @RequiresServerPermission(ServerPermissionKeyEnum.MANAGE_ROLES)
     public void addRoleMember(@ServerId String serverId, String roleId, String memberId) {
         checkRoleExist(serverId, roleId);
-        roleMemberRepository.save(RoleMember.builder()
-                .role(roleRepository.getReferenceById(roleId))
-                .serverMember(serverMemberRepository.getReferenceById(memberId)).build());
+        roleMemberRepository.save(
+                RoleMember.builder()
+                        .role(roleRepository.getReferenceById(roleId))
+                        .serverMember(serverMemberRepository.getReferenceById(memberId))
+                        .build());
     }
 }
