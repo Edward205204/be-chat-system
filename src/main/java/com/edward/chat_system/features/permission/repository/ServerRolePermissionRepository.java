@@ -39,4 +39,6 @@ public interface ServerRolePermissionRepository
     void deletePermission(
             @Param("roleId") String roleId,
             @Param("permission") ServerPermissionKeyEnum permission);
+
+    boolean existsByRoleIdAndPermission(String roleId, ServerPermissionKeyEnum permission);
 }

@@ -22,4 +22,6 @@ public interface ServerMemberRepository extends JpaRepository<ServerMember, Stri
             @Param("serverId") String serverId, @Param("userId") String userId);
 
     boolean existsByServerIdAndUserId(String serverId, String userId);
+
+    boolean existsByIdAndServerId(String memberId, String serverId);
 }

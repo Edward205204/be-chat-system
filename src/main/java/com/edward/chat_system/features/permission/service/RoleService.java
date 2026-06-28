@@ -78,8 +78,8 @@ public class RoleService {
 
     @RequiresServerPermission(ServerPermissionKeyEnum.MANAGE_ROLES)
     public void deleteRole(@ServerId String serverId, String roleId) {
-        Role role = checkRoleExist(serverId, roleId);
-        roleRepository.delete(role);
+        checkRoleExist(serverId, roleId);
+        roleRepository.deleteByRoleId(roleId);
     }
 
     //   AFTER: @RequireRoleMember
@@ -92,10 +92,24 @@ public class RoleService {
     @RequiresServerPermission(ServerPermissionKeyEnum.MANAGE_ROLES)
     public void addRoleMember(@ServerId String serverId, String roleId, String memberId) {
         checkRoleExist(serverId, roleId);
+        if (!serverMemberRepository.existsByIdAndServerId(memberId, serverId)) {
+            throw new AppException(ErrorCode.NOT_A_MEMBER);
+        }
+
+        if (roleMemberRepository.existsByRoleIdAndServerMemberId(roleId, memberId)) {
+            throw new AppException(ErrorCode.USER_ALREADY_ASSIGNED_FOR_THIS_ROLE);
+        }
+
         roleMemberRepository.save(
                 RoleMember.builder()
                         .role(roleRepository.getReferenceById(roleId))
                         .serverMember(serverMemberRepository.getReferenceById(memberId))
                         .build());
+    }
+
+    @RequiresServerPermission(ServerPermissionKeyEnum.MANAGE_ROLES)
+    public void removeRoleMember(@ServerId String serverId, String roleId, String memberId) {
+        checkRoleExist(serverId, roleId);
+        roleMemberRepository.deleteByRoleIdAndMemberId(roleId, memberId);
     }
 }

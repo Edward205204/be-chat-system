@@ -53,6 +53,16 @@ public enum ErrorCode {
     ROLE_NAME_DUPLICATE("ROLE_NAME_DUPLICATE ", "Role name is duplicate", HttpStatus.CONFLICT),
     ROLE_NOT_EXIST("ROLE_NOT_EXIST", "Role is not exist", HttpStatus.NOT_FOUND),
 
+    USER_ALREADY_ASSIGNED_FOR_THIS_ROLE(
+            "USE_ALREADY_ASSIGNED_FOR_THIS_ROLE",
+            "User is already assigned for this role",
+            HttpStatus.CONFLICT),
+
+    PERMISSION_DUPLICATE_FOR_THIS_ROLE(
+            "PERMISSION_DUPLICATE_FOR_THIS_ROLE",
+            "Permission is already assigned for this role",
+            HttpStatus.CONFLICT),
+
     NOW_DO_NOT_HAVE_PERMISSION(
             "NOW_DO_NOT_HAVE_PERMISSION",
             "User isn't allowed to perform this action",

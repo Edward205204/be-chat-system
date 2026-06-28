@@ -49,6 +49,9 @@ public class ServerPermissionService {
         Role role = checkRoleExist(serverId, roleId);
         ServerPermissionKeyEnum permission =
                 ServerPermissionKeyEnum.valueOf(request.getPermission());
+        if ((serverRolePermissionRepository.existsByRoleIdAndPermission(roleId, permission)))
+            throw new AppException(ErrorCode.PERMISSION_DUPLICATE_FOR_THIS_ROLE);
+
         serverRolePermissionRepository.save(
                 ServerRolePermission.builder().role(role).permission(permission).build());
     }
