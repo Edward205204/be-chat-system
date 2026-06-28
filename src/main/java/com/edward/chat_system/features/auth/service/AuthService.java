@@ -26,6 +26,7 @@ import com.edward.chat_system.shared.exception.AppException;
 import com.edward.chat_system.shared.exception.ErrorCode;
 import com.edward.chat_system.shared.utils.DateTimeUtils;
 import com.edward.chat_system.shared.utils.OtpUtils;
+import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -228,6 +229,7 @@ public class AuthService {
         mailServiceImpl.sendOtp(email, otp, MailTemplate.FORGOT_PASSWORD);
     }
 
+    @Transactional
     public void resetPassword(String email, String otp, String newPassword) {
         User user =
                 userRepo.findByEmail(email)
