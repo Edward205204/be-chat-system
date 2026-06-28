@@ -25,6 +25,10 @@ public class RequiresChannelPermissionComponent {
     ChannelRolePermissionRepository channelRolePermissionRepository;
 
     public String resolveServerId(String channelId) {
+        // AFTER: Replace resolveServerId() with resolveChannelInfo() to fetch both serverId and
+        // isPrivate
+        // in a single query, avoiding a redundant channel lookup when caller does not pass
+        // @ServerId.
         return channelRepository
                 .findServerIdByChannelId(channelId)
                 .orElseThrow(() -> new AppException(ErrorCode.CHANNEL_IS_NOT_EXIST));

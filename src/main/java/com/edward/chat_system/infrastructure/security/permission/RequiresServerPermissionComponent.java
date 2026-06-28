@@ -20,8 +20,11 @@ public class RequiresServerPermissionComponent {
     ServerMemberRepository serverMemberRepository;
     ServerRolePermissionRepository serverRolePermissionRepository;
 
+    // AFTER
+    // Owner-only until the role position hierarchy is implemented.
+    // Delegating MANAGE_ROLES without position constraints risks privilege escalation.
     boolean isManageRolePermission(ServerPermissionKeyEnum permission) {
-        return permission == ServerPermissionKeyEnum.MANAGE_SERVER;
+        return permission == ServerPermissionKeyEnum.MANAGE_ROLES;
     }
 
     public void check(String serverId, ServerPermissionKeyEnum permission) {

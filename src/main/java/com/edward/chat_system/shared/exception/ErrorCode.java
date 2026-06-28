@@ -51,6 +51,7 @@ public enum ErrorCode {
             HttpStatus.FORBIDDEN),
 
     ROLE_NAME_DUPLICATE("ROLE_NAME_DUPLICATE ", "Role name is duplicate", HttpStatus.CONFLICT),
+    ROLE_NOT_EXIST("ROLE_NOT_EXIST", "Role is not exist", HttpStatus.NOT_FOUND),
 
     NOW_DO_NOT_HAVE_PERMISSION(
             "NOW_DO_NOT_HAVE_PERMISSION",
