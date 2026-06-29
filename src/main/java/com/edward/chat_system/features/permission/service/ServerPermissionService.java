@@ -2,7 +2,7 @@ package com.edward.chat_system.features.permission.service;
 
 import com.edward.chat_system.features.permission.dto.request.AddPermissionRequest;
 import com.edward.chat_system.features.permission.dto.response.GetPermissionResponse;
-import com.edward.chat_system.features.permission.dto.request.RolePermissionPutUpdateRequest;
+import com.edward.chat_system.features.permission.dto.request.ServerPermissionPutUpdateRequest;
 import com.edward.chat_system.features.permission.dto.response.RoleWithPermissionResponse;
 import com.edward.chat_system.features.permission.entity.Role;
 import com.edward.chat_system.features.permission.entity.ServerRolePermission;
@@ -67,7 +67,7 @@ public class ServerPermissionService {
     @Transactional
     @RequiresServerPermission(ServerPermissionKeyEnum.MANAGE_ROLES)
     public RoleWithPermissionResponse updatePermissionForRole(
-            @ServerId String serverId, String roleId, RolePermissionPutUpdateRequest request) {
+            @ServerId String serverId, String roleId, ServerPermissionPutUpdateRequest request) {
         Role role = checkRoleExist(serverId, roleId);
         serverRolePermissionRepository.deleteByRole_Id(roleId);
         serverRolePermissionRepository.flush();

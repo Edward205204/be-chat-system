@@ -7,7 +7,7 @@ import com.edward.chat_system.features.channel.repository.ChannelRepository;
 import com.edward.chat_system.features.channel.repository.ChannelRolePermissionRepository;
 import com.edward.chat_system.features.channel.repository.ChannelUserPermissionRepository;
 import com.edward.chat_system.features.permission.dto.request.AddChannelPermissionForRoleRequest;
-import com.edward.chat_system.features.permission.dto.request.ChannelRolePermissionPutUpdateRequest;
+import com.edward.chat_system.features.permission.dto.request.ChannelPermissionPutUpdateRequest;
 import com.edward.chat_system.features.permission.dto.response.ChannelPermissionByRoleResponse;
 import com.edward.chat_system.features.permission.dto.response.ChannelPermissionByUserResponse;
 import com.edward.chat_system.features.permission.dto.response.ChannelPermissionConfigDataResponse;
@@ -142,7 +142,7 @@ public class ChannelPermissionService {
             @ServerId String serverId,
             @ChannelId String channelId,
             String roleId,
-            ChannelRolePermissionPutUpdateRequest request) {
+            ChannelPermissionPutUpdateRequest request) {
         checkRoleExist(serverId, roleId);
         channelRolePermissionRepository.deleteManyByRoleIdAndChannelId(roleId, channelId);
 
