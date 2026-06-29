@@ -19,7 +19,6 @@ import com.edward.chat_system.features.permission.projection.UserPermissionRow;
 import com.edward.chat_system.features.permission.repository.RoleRepository;
 import com.edward.chat_system.features.server.entity.ServerMember;
 import com.edward.chat_system.features.server.repository.ServerMemberRepository;
-import com.edward.chat_system.features.user.repository.UserRepository;
 import com.edward.chat_system.infrastructure.aop.annotation.ChannelId;
 import com.edward.chat_system.infrastructure.aop.annotation.RequiresChannelPermission;
 import com.edward.chat_system.infrastructure.aop.annotation.ServerId;
@@ -42,7 +41,6 @@ public class ChannelPermissionService {
     RoleRepository roleRepository;
     ChannelUserPermissionRepository channelUserPermissionRepository;
     ServerMemberRepository serverMemberRepository;
-    private final UserRepository userRepository;
 
     void checkRoleExist(String serverId, String roleId) {
         roleRepository
@@ -50,8 +48,9 @@ public class ChannelPermissionService {
                 .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXIST));
     }
 
-    boolean isMemberOfServer(String serverId, String memberId) {
-        return serverMemberRepository.existsByIdAndServerId(memberId, serverId);
+    void isMemberOfServer(String serverId, String memberId) {
+        if (!serverMemberRepository.existsByIdAndServerId(memberId, serverId))
+            throw new AppException(ErrorCode.NOT_A_MEMBER);
     }
 
     @RequiresChannelPermission(ChannelPermissionKeyEnum.MANAGE_CHANNEL_PERMISSIONS)
@@ -182,8 +181,7 @@ public class ChannelPermissionService {
             @ChannelId String channelId,
             AddChannelPermissionForUserRequest request) {
 
-        if (!isMemberOfServer(serverId, request.getMemberId()))
-            throw new AppException(ErrorCode.NOT_A_MEMBER);
+        isMemberOfServer(serverId, request.getMemberId());
 
         if (channelUserPermissionRepository.existsByUniqueConstraint(
                 channelId,
@@ -206,8 +204,7 @@ public class ChannelPermissionService {
             @ChannelId String channelId,
             String memberId,
             String permission) {
-        if (!isMemberOfServer(serverId, memberId)) throw new AppException(ErrorCode.NOT_A_MEMBER);
-
+        isMemberOfServer(serverId, memberId);
         channelUserPermissionRepository.deleteByUniqueConstraint(
                 channelId, memberId, ChannelPermissionKeyEnum.valueOf(permission));
     }
@@ -219,7 +216,7 @@ public class ChannelPermissionService {
             String memberId,
             ChannelPermissionPutUpdateRequest request) {
 
-        if (!isMemberOfServer(serverId, memberId)) throw new AppException(ErrorCode.NOT_A_MEMBER);
+        isMemberOfServer(serverId, memberId);
 
         channelUserPermissionRepository.deleteManyByChannelIdAndMemberId(channelId, memberId);
 
