@@ -19,7 +19,7 @@ public class UserService {
     UserRepository userRepository;
     UserMapper userMapper;
 
-    UserResponse getMe(String userId) {
+    public UserResponse getMe(String userId) {
         User user =
                 userRepository
                         .findById(userId)
@@ -27,7 +27,7 @@ public class UserService {
         return userMapper.toUserResponse(user);
     }
 
-    UserResponse updateProfile(String userId, UserPatchUpdateRequest request) {
+    public UserResponse updateProfile(String userId, UserPatchUpdateRequest request) {
         User user =
                 userRepository
                         .findById(userId)
@@ -41,14 +41,14 @@ public class UserService {
         return userMapper.toUserResponse(userRepository.save(user));
     }
 
-    UserResponse searchUser(String currentUserId, String q) {
+    public UserResponse searchUser(String currentUserId, String q) {
         return userRepository
                 .searchByUsernameOrEmail(q.trim(), currentUserId)
                 .map(userMapper::toUserResponse)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
     }
 
-    UserPublicResponse getOtherUserProfile(String userId) {
+    public UserPublicResponse getOtherUserProfile(String userId) {
         User user =
                 userRepository
                         .findById(userId)
