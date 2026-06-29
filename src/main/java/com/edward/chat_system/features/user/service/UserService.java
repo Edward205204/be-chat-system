@@ -45,7 +45,7 @@ public class UserService {
         return userRepository
                 .searchByUsernameOrEmail(q.trim(), currentUserId)
                 .map(userMapper::toUserResponse)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+                .orElse(null);
     }
 
     public UserPublicResponse getOtherUserProfile(String userId) {

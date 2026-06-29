@@ -5,8 +5,6 @@ import com.edward.chat_system.features.user.dto.response.UserPublicResponse;
 import com.edward.chat_system.features.user.dto.response.UserResponse;
 import com.edward.chat_system.features.user.service.UserService;
 import com.edward.chat_system.shared.dto.ApiResponse;
-import com.edward.chat_system.shared.exception.AppException;
-import com.edward.chat_system.shared.exception.ErrorCode;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -45,26 +43,12 @@ public class UserController {
     // AFTER
     @GetMapping("/search")
     ApiResponse<UserResponse> searchUser(
-            @AuthenticationPrincipal Jwt principal,
-            @RequestParam("q") String q) {
-        try {
-            UserResponse result = userService.searchUser(principal.getSubject(), q);
-            return ApiResponse.<UserResponse>builder()
-                    .message("User found")
-                    .result(result)
-                    .build();
-        } catch (AppException e) {
-            if (e.getErrorCode() == ErrorCode.USER_NOT_FOUND) {
-                return ApiResponse.<UserResponse>builder()
-                        .message("No user found")
-                        .result(null)
-                        .build();
-            }
-            throw e;
-        }
+            @AuthenticationPrincipal Jwt principal, @RequestParam("q") String q) {
+        UserResponse result = userService.searchUser(principal.getSubject(), q);
+        return ApiResponse.<UserResponse>builder().message("User found").result(result).build();
     }
 
-    //AFTER
+    // AFTER
     @GetMapping("/{userId}")
     ApiResponse<UserPublicResponse> getOtherUserProfile(@PathVariable String userId) {
         return ApiResponse.<UserPublicResponse>builder()
