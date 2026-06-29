@@ -106,7 +106,7 @@ public class AuthService {
         return AuthSuccessResponse.builder()
                 .accessToken(tokenResponse.getAccessToken().getToken())
                 .refreshToken(tokenResponse.getRefreshToken().getToken())
-                .user(userMapper.touUserResponse(user))
+                .user(userMapper.toUserResponse(user))
                 .build();
     }
 

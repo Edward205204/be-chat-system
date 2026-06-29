@@ -15,6 +15,7 @@ public enum ErrorCode {
     EMAIL_NOT_FOUND("EMAIL_NOT_FOUND", "Email not found", HttpStatus.NOT_FOUND),
     EMAIL_EXISTED("EMAIL_EXISTED", "Email existed", HttpStatus.CONFLICT),
     USERNAME_EXISTED("USERNAME_EXISTED", "Username existed", HttpStatus.CONFLICT),
+    USER_NOT_FOUND("USER_NOT_FOUND", "User is not exist", HttpStatus.NOT_FOUND),
     JWT_SIGNING_FAILED(
             "JWT_SIGNING_FAILED", "JWT signing failed", HttpStatus.INTERNAL_SERVER_ERROR),
 
