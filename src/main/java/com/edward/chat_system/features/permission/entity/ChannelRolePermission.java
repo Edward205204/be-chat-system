@@ -1,7 +1,7 @@
-package com.edward.chat_system.features.channel.entity;
+package com.edward.chat_system.features.permission.entity;
 
+import com.edward.chat_system.features.channel.entity.Channel;
 import com.edward.chat_system.features.channel.enums.ChannelPermissionKeyEnum;
-import com.edward.chat_system.features.permission.entity.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;

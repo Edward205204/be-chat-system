@@ -1,7 +1,7 @@
 package com.edward.chat_system.features.permission.service;
 
 import com.edward.chat_system.features.channel.entity.Channel;
-import com.edward.chat_system.features.channel.entity.ChannelRolePermission;
+import com.edward.chat_system.features.permission.entity.ChannelRolePermission;
 import com.edward.chat_system.features.channel.enums.ChannelPermissionKeyEnum;
 import com.edward.chat_system.features.channel.repository.ChannelRepository;
 import com.edward.chat_system.features.channel.repository.ChannelRolePermissionRepository;
@@ -36,6 +36,7 @@ public class ChannelPermissionService {
     ChannelRepository channelRepository;
     RoleRepository roleRepository;
     ChannelUserPermissionRepository channelUserPermissionRepository;
+
 
     void checkRoleExist(String serverId, String roleId) {
         roleRepository

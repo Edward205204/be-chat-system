@@ -1,6 +1,6 @@
 package com.edward.chat_system.features.channel.repository;
 
-import com.edward.chat_system.features.channel.entity.ChannelUserPermission;
+import com.edward.chat_system.features.permission.entity.ChannelUserPermission;
 import com.edward.chat_system.features.channel.enums.ChannelPermissionKeyEnum;
 import com.edward.chat_system.features.permission.projection.UserPermissionRow;
 import java.util.List;
