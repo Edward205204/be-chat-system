@@ -14,12 +14,12 @@ public interface ChannelUserPermissionRepository
             """
     SELECT  COUNT(cup) > 0
     FROM ChannelUserPermission cup
-    WHERE cup.serverMember.user.id = :memberId
+    WHERE cup.serverMember.user.id = :userId
     AND cup.channel.id = :channelId
     AND cup.permission = :permission
 """)
     boolean hasPermission(
-            @Param("memberId") String memberId,
+            @Param("userId") String userId,
             @Param("channelId") String channelId,
             @Param("permission") ChannelPermissionKeyEnum permission);
 
