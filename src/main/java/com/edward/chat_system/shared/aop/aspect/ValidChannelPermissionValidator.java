@@ -1,7 +1,6 @@
 package com.edward.chat_system.shared.aop.aspect;
 
 import com.edward.chat_system.features.channel.enums.ChannelPermissionKeyEnum;
-import com.edward.chat_system.features.server.enums.ServerPermissionKeyEnum;
 import com.edward.chat_system.shared.aop.annotation.ValidChannelPermission;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

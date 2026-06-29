@@ -9,4 +9,6 @@ import org.springframework.data.repository.query.Param;
 public interface ChannelRepository extends JpaRepository<Channel, String> {
     @Query("SELECT c.server.id FROM Channel c WHERE c.id = :channelId")
     Optional<String> findServerIdByChannelId(@Param("channelId") String channelId);
+
+    Optional<Channel> findByIdAndServerId(String id, String serverId);
 }

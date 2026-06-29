@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AtLeastOneField
-public class RolePermissionPutUpdate {
+public class RolePermissionPutUpdateRequest {
     @NotBlank(message = "Permission is required")
     Set<@ValidServerPermission String> permission;
 }
