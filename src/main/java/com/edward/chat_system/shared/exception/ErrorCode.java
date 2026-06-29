@@ -63,6 +63,11 @@ public enum ErrorCode {
             "Permission is already assigned for this role",
             HttpStatus.CONFLICT),
 
+    PERMISSION_DUPLICATE_FOR_THIS_USER(
+            "PERMISSION_DUPLICATE_FOR_THIS_USER",
+            "Permission is already assigned for this user",
+            HttpStatus.CONFLICT),
+
     NOW_DO_NOT_HAVE_PERMISSION(
             "NOW_DO_NOT_HAVE_PERMISSION",
             "User isn't allowed to perform this action",

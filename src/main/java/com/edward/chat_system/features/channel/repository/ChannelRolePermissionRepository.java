@@ -1,7 +1,7 @@
 package com.edward.chat_system.features.channel.repository;
 
-import com.edward.chat_system.features.permission.entity.ChannelRolePermission;
 import com.edward.chat_system.features.channel.enums.ChannelPermissionKeyEnum;
+import com.edward.chat_system.features.permission.entity.ChannelRolePermission;
 import com.edward.chat_system.features.permission.projection.RolePermissionRow;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;

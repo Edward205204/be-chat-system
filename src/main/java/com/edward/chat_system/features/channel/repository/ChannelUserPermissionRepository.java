@@ -1,10 +1,11 @@
 package com.edward.chat_system.features.channel.repository;
 
-import com.edward.chat_system.features.permission.entity.ChannelUserPermission;
 import com.edward.chat_system.features.channel.enums.ChannelPermissionKeyEnum;
+import com.edward.chat_system.features.permission.entity.ChannelUserPermission;
 import com.edward.chat_system.features.permission.projection.UserPermissionRow;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -34,4 +35,39 @@ public interface ChannelUserPermissionRepository
             WHERE cup.channel.id = :channelId
             """)
     List<UserPermissionRow> findUserPermissionsByChannelId(@Param("channelId") String channelId);
+
+    @Query(
+            """
+    SELECT COUNT(cup) > 0 FROM ChannelUserPermission cup
+    WHERE cup.channel.id = :channelId
+    AND cup.serverMember.id  = :memberId
+    AND cup.permission = :permission
+""")
+    boolean existsByUniqueConstraint(
+            @Param("channelId") String channelId,
+            @Param("memberId") String memberId,
+            @Param("permission") ChannelPermissionKeyEnum permission);
+
+    @Modifying
+    @Query(
+            """
+    DELETE FROM ChannelUserPermission cup
+    WHERE cup.channel.id = :channelId
+    AND cup.serverMember.id  = :memberId
+    AND cup.permission = :permission
+""")
+    void deleteByUniqueConstraint(
+            @Param("channelId") String channelId,
+            @Param("memberId") String memberId,
+            @Param("permission") ChannelPermissionKeyEnum permission);
+
+    @Modifying
+    @Query(
+            """
+    DELETE FROM ChannelUserPermission cup
+    WHERE cup.channel.id = :channelId
+    AND cup.serverMember.id = :memberId
+""")
+    void deleteManyByChannelIdAndMemberId(
+            @Param("channelId") String channelId, @Param("memberId") String memberId);
 }

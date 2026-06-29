@@ -1,20 +1,25 @@
 package com.edward.chat_system.features.permission.service;
 
 import com.edward.chat_system.features.channel.entity.Channel;
-import com.edward.chat_system.features.permission.entity.ChannelRolePermission;
 import com.edward.chat_system.features.channel.enums.ChannelPermissionKeyEnum;
 import com.edward.chat_system.features.channel.repository.ChannelRepository;
 import com.edward.chat_system.features.channel.repository.ChannelRolePermissionRepository;
 import com.edward.chat_system.features.channel.repository.ChannelUserPermissionRepository;
 import com.edward.chat_system.features.permission.dto.request.AddChannelPermissionForRoleRequest;
+import com.edward.chat_system.features.permission.dto.request.AddChannelPermissionForUserRequest;
 import com.edward.chat_system.features.permission.dto.request.ChannelPermissionPutUpdateRequest;
 import com.edward.chat_system.features.permission.dto.response.ChannelPermissionByRoleResponse;
 import com.edward.chat_system.features.permission.dto.response.ChannelPermissionByUserResponse;
 import com.edward.chat_system.features.permission.dto.response.ChannelPermissionConfigDataResponse;
+import com.edward.chat_system.features.permission.entity.ChannelRolePermission;
+import com.edward.chat_system.features.permission.entity.ChannelUserPermission;
 import com.edward.chat_system.features.permission.entity.Role;
 import com.edward.chat_system.features.permission.projection.RolePermissionRow;
 import com.edward.chat_system.features.permission.projection.UserPermissionRow;
 import com.edward.chat_system.features.permission.repository.RoleRepository;
+import com.edward.chat_system.features.server.entity.ServerMember;
+import com.edward.chat_system.features.server.repository.ServerMemberRepository;
+import com.edward.chat_system.features.user.repository.UserRepository;
 import com.edward.chat_system.infrastructure.aop.annotation.ChannelId;
 import com.edward.chat_system.infrastructure.aop.annotation.RequiresChannelPermission;
 import com.edward.chat_system.infrastructure.aop.annotation.ServerId;
@@ -36,12 +41,17 @@ public class ChannelPermissionService {
     ChannelRepository channelRepository;
     RoleRepository roleRepository;
     ChannelUserPermissionRepository channelUserPermissionRepository;
-
+    ServerMemberRepository serverMemberRepository;
+    private final UserRepository userRepository;
 
     void checkRoleExist(String serverId, String roleId) {
         roleRepository
                 .findByIdAndServerId(roleId, serverId)
                 .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXIST));
+    }
+
+    boolean isMemberOfServer(String serverId, String memberId) {
+        return serverMemberRepository.existsByIdAndServerId(memberId, serverId);
     }
 
     @RequiresChannelPermission(ChannelPermissionKeyEnum.MANAGE_CHANNEL_PERMISSIONS)
@@ -164,5 +174,72 @@ public class ChannelPermissionService {
                         .toList();
 
         channelRolePermissionRepository.saveAll(channelRolePermissionEntity);
+    }
+
+    @RequiresChannelPermission(ChannelPermissionKeyEnum.MANAGE_CHANNEL_PERMISSIONS)
+    public void addChannelPermissionForUser(
+            @ServerId String serverId,
+            @ChannelId String channelId,
+            AddChannelPermissionForUserRequest request) {
+
+        if (!isMemberOfServer(serverId, request.getMemberId()))
+            throw new AppException(ErrorCode.NOT_A_MEMBER);
+
+        if (channelUserPermissionRepository.existsByUniqueConstraint(
+                channelId,
+                request.getMemberId(),
+                ChannelPermissionKeyEnum.valueOf(request.getPermission())))
+            throw new AppException(ErrorCode.USER_ALREADY_ASSIGNED_FOR_THIS_ROLE);
+
+        channelUserPermissionRepository.save(
+                ChannelUserPermission.builder()
+                        .channel(channelRepository.getReferenceById(channelId))
+                        .serverMember(
+                                serverMemberRepository.getReferenceById(request.getMemberId()))
+                        .permission(ChannelPermissionKeyEnum.valueOf(request.getPermission()))
+                        .build());
+    }
+
+    @RequiresChannelPermission(ChannelPermissionKeyEnum.MANAGE_CHANNEL_PERMISSIONS)
+    public void removeChannelPermissionForUser(
+            @ServerId String serverId,
+            @ChannelId String channelId,
+            String memberId,
+            String permission) {
+        if (!isMemberOfServer(serverId, memberId)) throw new AppException(ErrorCode.NOT_A_MEMBER);
+
+        channelUserPermissionRepository.deleteByUniqueConstraint(
+                channelId, memberId, ChannelPermissionKeyEnum.valueOf(permission));
+    }
+
+    @RequiresChannelPermission(ChannelPermissionKeyEnum.MANAGE_CHANNEL)
+    public void updateChannelPermissionForUser(
+            @ServerId String serverId,
+            @ChannelId String channelId,
+            String memberId,
+            ChannelPermissionPutUpdateRequest request) {
+
+        if (!isMemberOfServer(serverId, memberId)) throw new AppException(ErrorCode.NOT_A_MEMBER);
+
+        channelUserPermissionRepository.deleteManyByChannelIdAndMemberId(channelId, memberId);
+
+        ServerMember serverMember = serverMemberRepository.getReferenceById(memberId);
+        Channel channel = channelRepository.getReferenceById(channelId);
+
+        List<ChannelUserPermission> channelUserPermissionEntity =
+                request.getPermission().stream()
+                        .distinct()
+                        .map(
+                                permission ->
+                                        ChannelUserPermission.builder()
+                                                .serverMember(serverMember)
+                                                .channel(channel)
+                                                .permission(
+                                                        ChannelPermissionKeyEnum.valueOf(
+                                                                permission))
+                                                .build())
+                        .toList();
+
+        channelUserPermissionRepository.saveAll(channelUserPermissionEntity);
     }
 }
