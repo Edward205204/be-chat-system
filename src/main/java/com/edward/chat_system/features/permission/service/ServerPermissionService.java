@@ -1,7 +1,7 @@
 package com.edward.chat_system.features.permission.service;
 
 import com.edward.chat_system.features.permission.dto.request.AddPermissionRequest;
-import com.edward.chat_system.features.permission.dto.request.GetPermissionRequest;
+import com.edward.chat_system.features.permission.dto.response.GetPermissionResponse;
 import com.edward.chat_system.features.permission.dto.request.RolePermissionPutUpdateRequest;
 import com.edward.chat_system.features.permission.dto.response.RoleWithPermissionResponse;
 import com.edward.chat_system.features.permission.entity.Role;
@@ -36,11 +36,11 @@ public class ServerPermissionService {
     }
 
     @RequiresServerMember
-    public GetPermissionRequest getServerPermission(@ServerId String serverId, String roleId) {
+    public GetPermissionResponse getServerPermission(@ServerId String serverId, String roleId) {
         checkRoleExist(serverId, roleId);
         List<PermissionNameProjection> permissionList =
                 serverRolePermissionRepository.findPermissionsByRoleId(roleId);
-        return GetPermissionRequest.builder().roleId(roleId).permissions(permissionList).build();
+        return GetPermissionResponse.builder().roleId(roleId).permissions(permissionList).build();
     }
 
     @RequiresServerPermission(ServerPermissionKeyEnum.MANAGE_ROLES)

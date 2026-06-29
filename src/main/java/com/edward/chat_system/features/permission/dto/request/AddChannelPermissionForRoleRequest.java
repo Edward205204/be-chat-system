@@ -13,7 +13,7 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @Data
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
-public class AddChannelPermissionRequest {
+public class AddChannelPermissionForRoleRequest {
     @NotBlank(message = "Channel id is required")
     String roleId;
 

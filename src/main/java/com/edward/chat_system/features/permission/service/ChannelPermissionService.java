@@ -6,7 +6,7 @@ import com.edward.chat_system.features.channel.enums.ChannelPermissionKeyEnum;
 import com.edward.chat_system.features.channel.repository.ChannelRepository;
 import com.edward.chat_system.features.channel.repository.ChannelRolePermissionRepository;
 import com.edward.chat_system.features.channel.repository.ChannelUserPermissionRepository;
-import com.edward.chat_system.features.permission.dto.request.AddChannelPermissionRequest;
+import com.edward.chat_system.features.permission.dto.request.AddChannelPermissionForRoleRequest;
 import com.edward.chat_system.features.permission.dto.request.ChannelRolePermissionPutUpdateRequest;
 import com.edward.chat_system.features.permission.dto.response.ChannelPermissionByRoleResponse;
 import com.edward.chat_system.features.permission.dto.response.ChannelPermissionByUserResponse;
@@ -110,7 +110,7 @@ public class ChannelPermissionService {
     public void addChannelPermissionForRole(
             @ServerId String serverId,
             @ChannelId String channelId,
-            AddChannelPermissionRequest request) {
+            AddChannelPermissionForRoleRequest request) {
         checkRoleExist(serverId, request.getRoleId());
         boolean isExist =
                 channelRolePermissionRepository.existsByUniqueConstraint(
