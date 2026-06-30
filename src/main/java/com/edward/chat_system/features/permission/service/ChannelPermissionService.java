@@ -146,7 +146,7 @@ public class ChannelPermissionService {
                 channelId, roleId, ChannelPermissionKeyEnum.valueOf(permission));
     }
 
-    @RequiresChannelPermission(ChannelPermissionKeyEnum.MANAGE_CHANNEL)
+    @RequiresChannelPermission(ChannelPermissionKeyEnum.MANAGE_CHANNEL_PERMISSIONS)
     public void updateChannelPermissionForRole(
             @ServerId String serverId,
             @ChannelId String channelId,
@@ -209,7 +209,7 @@ public class ChannelPermissionService {
                 channelId, memberId, ChannelPermissionKeyEnum.valueOf(permission));
     }
 
-    @RequiresChannelPermission(ChannelPermissionKeyEnum.MANAGE_CHANNEL)
+    @RequiresChannelPermission(ChannelPermissionKeyEnum.MANAGE_CHANNEL_PERMISSIONS)
     public void updateChannelPermissionForUser(
             @ServerId String serverId,
             @ChannelId String channelId,
