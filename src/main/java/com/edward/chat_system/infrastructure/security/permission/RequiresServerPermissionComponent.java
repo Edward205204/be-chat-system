@@ -45,7 +45,8 @@ public class RequiresServerPermissionComponent {
         if (permission == ServerPermissionKeyEnum.NONE) return;
 
         boolean hasPermission =
-                serverRolePermissionRepository.hasPermission(info.getMemberId(), permission);
+                serverRolePermissionRepository.hasPermission(
+                        serverId, info.getUserId(), permission);
 
         if (!hasPermission) throw new AppException(ErrorCode.NOW_DO_NOT_HAVE_PERMISSION);
     }

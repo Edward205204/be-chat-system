@@ -15,11 +15,19 @@ public interface ServerRolePermissionRepository
             """
             SELECT COUNT(srp) > 0
             FROM ServerRolePermission srp
-            JOIN RoleMember rm ON rm.role.id = srp.role.id
-            WHERE rm.serverMember.user.id = :memberId
-            AND srp.permission = :permission
+            JOIN srp.role r
+            WHERE srp.permission = :permission
+            AND (
+            r.isDefault = true AND r.server.id = :serverId
+            OR EXISTS (
+                SELECT 1 FROM RoleMember rm
+                WHERE rm.role.id = r.id
+                AND rm.serverMember.user.id = :memberId
+                        )
+               )
             """)
     boolean hasPermission(
+            @Param("serverId") String serverId,
             @Param("memberId") String memberId,
             @Param("permission") ServerPermissionKeyEnum permission);
 

@@ -55,7 +55,7 @@ public class RequiresChannelPermissionComponent {
         if (channelUserPermissionRepository.hasPermission(userId, channelId, permission)) return;
 
         boolean hasPermission =
-                channelRolePermissionRepository.hasPermission(info.getMemberId(), permission);
+                channelRolePermissionRepository.hasPermission(info.getUserId(), permission);
 
         if (!hasPermission) throw new AppException(ErrorCode.MISSING_PERMISSION);
     }

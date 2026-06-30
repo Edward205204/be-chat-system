@@ -17,6 +17,7 @@ import org.hibernate.validator.constraints.Length;
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 @Table(
         name = "roles",
+        indexes = {@Index(name = "idx_roles_server_default", columnList = "server_id, is_default")},
         uniqueConstraints = {
             @UniqueConstraint(
                     name = "uk_roles_server_name",
@@ -29,6 +30,10 @@ public class Role {
 
     @Column(nullable = false)
     String name;
+
+    @Column(nullable = false)
+    @Builder.Default
+    boolean isDefault = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "server_id", nullable = false)

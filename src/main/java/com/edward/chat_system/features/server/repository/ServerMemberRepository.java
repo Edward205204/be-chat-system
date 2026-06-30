@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param;
 public interface ServerMemberRepository extends JpaRepository<ServerMember, String> {
     @Query(
             """
-            SELECT sm.user.id AS memberId,
+            SELECT sm.user.id AS userId,
                    sm.server.id AS serverId,
                    (s.user.id = :userId) AS isOwner
             FROM ServerMember sm
