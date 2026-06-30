@@ -7,6 +7,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 
+// indexes = {@Index(name = "idx_srp_permission_role", columnList = "permission, role_id")},
 @Entity
 @Getter
 @Setter
@@ -16,7 +17,7 @@ import org.hibernate.annotations.CreationTimestamp;
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 @Table(
         name = "servers",
-        indexes = {@Index(name = "idx_servers_owner_id", columnList = "owner_id")})
+        indexes = {@Index(name = "idx_servers_owner_id_name", columnList = "owner_id, name")})
 public class Server {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

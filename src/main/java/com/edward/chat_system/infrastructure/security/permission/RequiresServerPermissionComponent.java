@@ -2,7 +2,7 @@ package com.edward.chat_system.infrastructure.security.permission;
 
 import com.edward.chat_system.features.permission.repository.ServerRolePermissionRepository;
 import com.edward.chat_system.features.server.enums.ServerPermissionKeyEnum;
-import com.edward.chat_system.features.server.projection.ServerMemberInfo;
+import com.edward.chat_system.features.server.projection.ServerMemberInfoProjection;
 import com.edward.chat_system.features.server.repository.ServerMemberRepository;
 import com.edward.chat_system.shared.exception.AppException;
 import com.edward.chat_system.shared.exception.ErrorCode;
@@ -32,7 +32,7 @@ public class RequiresServerPermissionComponent {
         if (auth == null) throw new AppException(ErrorCode.UNAUTHENTICATED);
         String userId = auth.getName();
 
-        ServerMemberInfo info =
+        ServerMemberInfoProjection info =
                 serverMemberRepository
                         .findServerMemberInfo(serverId, userId)
                         .orElseThrow(() -> new AppException(ErrorCode.NOT_A_MEMBER));

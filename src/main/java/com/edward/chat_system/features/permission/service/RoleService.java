@@ -1,16 +1,19 @@
 package com.edward.chat_system.features.permission.service;
 
+import com.edward.chat_system.features.permission.constant.RoleConstants;
 import com.edward.chat_system.features.permission.dto.request.CreateRoleRequest;
 import com.edward.chat_system.features.permission.dto.request.RolePatchUpdateRequest;
 import com.edward.chat_system.features.permission.dto.response.RoleMemberResponse;
 import com.edward.chat_system.features.permission.dto.response.RoleResponse;
 import com.edward.chat_system.features.permission.entity.Role;
 import com.edward.chat_system.features.permission.entity.RoleMember;
+import com.edward.chat_system.features.permission.entity.ServerRolePermission;
 import com.edward.chat_system.features.permission.mapper.RoleMapper;
 import com.edward.chat_system.features.permission.mapper.RoleMemberMapper;
 import com.edward.chat_system.features.permission.projection.RoleMemberProjection;
 import com.edward.chat_system.features.permission.repository.RoleMemberRepository;
 import com.edward.chat_system.features.permission.repository.RoleRepository;
+import com.edward.chat_system.features.permission.repository.ServerRolePermissionRepository;
 import com.edward.chat_system.features.server.enums.ServerPermissionKeyEnum;
 import com.edward.chat_system.features.server.repository.ServerMemberRepository;
 import com.edward.chat_system.features.server.repository.ServerRepository;
@@ -34,6 +37,7 @@ public class RoleService {
     ServerRepository serverRepository;
     ServerMemberRepository serverMemberRepository;
     RoleMemberRepository roleMemberRepository;
+    private final ServerRolePermissionRepository serverRolePermissionRepository;
 
     Role checkRoleExist(String serverId, String roleId) {
         return roleRepository
@@ -59,6 +63,23 @@ public class RoleService {
                         .build();
         role = roleRepository.save(role);
         return roleMapper.toRoleResponse(role);
+    }
+
+    public void createDefaultEveryoneRoleWithDefaultPermission(String serverId) {
+        Role role =
+                Role.builder()
+                        .name(RoleConstants.DEFAULT_ROLE_NAME)
+                        .color(RoleConstants.DEFAULT_ROLE_COLOR)
+                        .server(serverRepository.getReferenceById(serverId))
+                        .build();
+        roleRepository.save(role);
+
+        ServerRolePermission serverRolePermission =
+                ServerRolePermission.builder()
+                        .role(role)
+                        .permission(ServerPermissionKeyEnum.CREATE_INVITE)
+                        .build();
+        serverRolePermissionRepository.save(serverRolePermission);
     }
 
     @RequiresServerPermission(ServerPermissionKeyEnum.MANAGE_ROLES)

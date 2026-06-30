@@ -5,7 +5,7 @@ import com.edward.chat_system.features.channel.enums.ChannelPermissionKeyEnum;
 import com.edward.chat_system.features.channel.repository.ChannelRepository;
 import com.edward.chat_system.features.channel.repository.ChannelRolePermissionRepository;
 import com.edward.chat_system.features.channel.repository.ChannelUserPermissionRepository;
-import com.edward.chat_system.features.server.projection.ServerMemberInfo;
+import com.edward.chat_system.features.server.projection.ServerMemberInfoProjection;
 import com.edward.chat_system.features.server.repository.ServerMemberRepository;
 import com.edward.chat_system.shared.exception.AppException;
 import com.edward.chat_system.shared.exception.ErrorCode;
@@ -36,7 +36,7 @@ public class RequiresChannelPermissionComponent {
 
     public void check(String serverId, String channelId, ChannelPermissionKeyEnum permission) {
         String userId = currentUserProvider.getUserId();
-        ServerMemberInfo info =
+        ServerMemberInfoProjection info =
                 serverMemberRepository
                         .findServerMemberInfo(serverId, userId)
                         .orElseThrow(() -> new AppException(ErrorCode.NOT_A_MEMBER));

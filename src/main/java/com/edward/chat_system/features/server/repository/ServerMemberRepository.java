@@ -1,7 +1,7 @@
 package com.edward.chat_system.features.server.repository;
 
 import com.edward.chat_system.features.server.entity.ServerMember;
-import com.edward.chat_system.features.server.projection.ServerMemberInfo;
+import com.edward.chat_system.features.server.projection.ServerMemberInfoProjection;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -18,7 +18,7 @@ public interface ServerMemberRepository extends JpaRepository<ServerMember, Stri
             WHERE sm.server.id = :serverId
             AND sm.user.id = :userId
             """)
-    Optional<ServerMemberInfo> findServerMemberInfo(
+    Optional<ServerMemberInfoProjection> findServerMemberInfo(
             @Param("serverId") String serverId, @Param("userId") String userId);
 
     boolean existsByServerIdAndUserId(String serverId, String userId);

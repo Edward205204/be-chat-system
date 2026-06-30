@@ -73,6 +73,9 @@ public enum ErrorCode {
             "NOW_DO_NOT_HAVE_PERMISSION",
             "User isn't allowed to perform this action",
             HttpStatus.FORBIDDEN),
+
+    SERVER_NAME_DUPLICATE("SERVER_NAME_DUPLICATE", "Server name is duplicate", HttpStatus.CONFLICT),
+    SERVER_NOT_EXIST("SERVER_NOT_EXIST", "Server is not exist", HttpStatus.NOT_FOUND),
     ;
     // INVALID_DOB("Age of user must be at least {value}",
     // HttpStatus.UNPROCESSABLE_CONTENT),

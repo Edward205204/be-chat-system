@@ -1,6 +1,6 @@
 package com.edward.chat_system.features.server.projection;
 
-public interface ServerMemberInfo {
+public interface ServerMemberInfoProjection {
     String getUserId();
 
     String getServerId();
