@@ -20,10 +20,11 @@ public enum ErrorCode {
             "JWT_SIGNING_FAILED", "JWT signing failed", HttpStatus.INTERNAL_SERVER_ERROR),
 
     UNAUTHENTICATED("UNAUTHENTICATED", "Unauthenticated", HttpStatus.UNAUTHORIZED),
-    UNAUTHORIZED("UNAUTHORIZED", "You do not have permisson", HttpStatus.FORBIDDEN),
+    UNAUTHORIZED(
+            "UNAUTHORIZED", "You do not have permission for this action", HttpStatus.FORBIDDEN),
 
     UNCATEGORIZED("UNCATEGORIZED", "Uncategorized exception", HttpStatus.INTERNAL_SERVER_ERROR),
-    LOGIN_FAILED("LOGIN_FAILED", "Email or Password is incorect", HttpStatus.UNAUTHORIZED),
+    LOGIN_FAILED("LOGIN_FAILED", "Email or Password is incorrect", HttpStatus.UNAUTHORIZED),
     OTP_COOLDOWN(
             "OTP_COOLDOWN",
             "Otp is on cooldown, please wait before requesting a new code.",

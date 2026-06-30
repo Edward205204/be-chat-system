@@ -5,14 +5,20 @@ import com.edward.chat_system.features.channel.entity.Channel;
 import com.edward.chat_system.features.channel.repository.ChannelRepository;
 import com.edward.chat_system.features.permission.service.RoleService;
 import com.edward.chat_system.features.server.dto.request.CreateServerRequest;
+import com.edward.chat_system.features.server.dto.request.ServerPatchUpdateRequest;
 import com.edward.chat_system.features.server.dto.response.ServerResponse;
+import com.edward.chat_system.features.server.dto.response.ServerUpdateResponse;
 import com.edward.chat_system.features.server.entity.Server;
 import com.edward.chat_system.features.server.entity.ServerMember;
+import com.edward.chat_system.features.server.enums.ServerPermissionKeyEnum;
+import com.edward.chat_system.features.server.mapper.ServerMapper;
 import com.edward.chat_system.features.server.projection.ServerProjection;
 import com.edward.chat_system.features.server.repository.ServerMemberRepository;
 import com.edward.chat_system.features.server.repository.ServerRepository;
 import com.edward.chat_system.features.user.entity.User;
 import com.edward.chat_system.features.user.repository.UserRepository;
+import com.edward.chat_system.infrastructure.aop.annotation.RequiresOwner;
+import com.edward.chat_system.infrastructure.aop.annotation.RequiresServerPermission;
 import com.edward.chat_system.infrastructure.aop.annotation.ServerId;
 import com.edward.chat_system.shared.exception.AppException;
 import com.edward.chat_system.shared.exception.ErrorCode;
@@ -32,6 +38,12 @@ public class ServerService {
     ServerMemberRepository serverMemberRepository;
     RoleService roleService;
     ChannelRepository channelRepository;
+    ServerMapper serverMapper;
+
+    void checkServerNameDuplicate(String userId, String serverName) {
+        if (serverRepository.existsByUserIdAndName(userId, serverName))
+            throw new AppException(ErrorCode.SERVER_NAME_DUPLICATE);
+    }
 
     public List<ServerResponse> getMyServers(String userId) {
         return serverRepository.findAllServerUserJoined(userId).stream()
@@ -68,8 +80,7 @@ public class ServerService {
 
     @Transactional
     public ServerResponse createServer(String userId, CreateServerRequest request) {
-        if (serverRepository.existsByUserIdAndName(userId, request.getName()))
-            throw new AppException(ErrorCode.SERVER_NAME_DUPLICATE);
+        checkServerNameDuplicate(userId, request.getName());
         User user = userRepository.getReferenceById(userId);
         Server server =
                 Server.builder()
@@ -97,5 +108,27 @@ public class ServerService {
                 .isOwner(true)
                 .joinedAt(serverMember.getJoinedAt())
                 .build();
+    }
+
+    @RequiresServerPermission(ServerPermissionKeyEnum.MANAGE_SERVER)
+    public ServerUpdateResponse serverUpdateResponse(
+            @ServerId String serverId, String userId, ServerPatchUpdateRequest request) {
+        if (request.getName() != null) checkServerNameDuplicate(userId, request.getName());
+
+        Server server =
+                serverRepository
+                        .findById(serverId)
+                        .orElseThrow(() -> new AppException(ErrorCode.SERVER_NOT_EXIST));
+
+        serverMapper.updateServerFromDto(request, server);
+
+        serverRepository.save(server);
+
+        return serverMapper.toServerUpdateResponse(server);
+    }
+
+    @RequiresOwner
+    public void deleteServer(@ServerId String serverId) {
+        serverRepository.deleteById(serverId);
     }
 }
