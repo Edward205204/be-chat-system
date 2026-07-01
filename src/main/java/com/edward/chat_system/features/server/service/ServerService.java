@@ -7,22 +7,23 @@ import com.edward.chat_system.features.permission.dto.response.RoleResponse;
 import com.edward.chat_system.features.permission.projection.MemberRoleRow;
 import com.edward.chat_system.features.permission.repository.RoleMemberRepository;
 import com.edward.chat_system.features.permission.service.RoleService;
+import com.edward.chat_system.features.server.dto.request.BanMemberRequest;
 import com.edward.chat_system.features.server.dto.request.CreateServerRequest;
-import com.edward.chat_system.features.server.dto.request.MuteMember;
+import com.edward.chat_system.features.server.dto.request.MuteMemberRequest;
 import com.edward.chat_system.features.server.dto.request.ServerPatchUpdateRequest;
-import com.edward.chat_system.features.server.dto.response.ServerMemberItemResponse;
-import com.edward.chat_system.features.server.dto.response.ServerMemberResponse;
-import com.edward.chat_system.features.server.dto.response.ServerResponse;
-import com.edward.chat_system.features.server.dto.response.ServerUpdateResponse;
+import com.edward.chat_system.features.server.dto.response.*;
 import com.edward.chat_system.features.server.entity.Server;
+import com.edward.chat_system.features.server.entity.ServerBan;
 import com.edward.chat_system.features.server.entity.ServerMember;
 import com.edward.chat_system.features.server.enums.ServerPermissionKeyEnum;
 import com.edward.chat_system.features.server.mapper.ServerMapper;
 import com.edward.chat_system.features.server.projection.MemberProjection;
 import com.edward.chat_system.features.server.projection.ServerProjection;
+import com.edward.chat_system.features.server.repository.ServerBanRepository;
 import com.edward.chat_system.features.server.repository.ServerMemberRepository;
 import com.edward.chat_system.features.server.repository.ServerRepository;
 import com.edward.chat_system.features.user.entity.User;
+import com.edward.chat_system.features.user.mapper.UserMapper;
 import com.edward.chat_system.features.user.repository.UserRepository;
 import com.edward.chat_system.infrastructure.aop.annotation.RequiresOwner;
 import com.edward.chat_system.infrastructure.aop.annotation.RequiresServerMember;
@@ -52,6 +53,8 @@ public class ServerService {
     ChannelRepository channelRepository;
     ServerMapper serverMapper;
     RoleMemberRepository roleMemberRepository;
+    ServerBanRepository serverBanRepository;
+    private final UserMapper userMapper;
 
     void checkServerNameDuplicate(String userId, String serverName) {
         if (serverRepository.existsByUserIdAndName(userId, serverName))
@@ -214,7 +217,52 @@ public class ServerService {
     }
 
     @RequiresServerPermission(ServerPermissionKeyEnum.MUTE_MEMBER)
-    public void muteMember(@ServerId String serverId, String memberId, MuteMember request) {
+    public void muteMember(@ServerId String serverId, String memberId, MuteMemberRequest request) {
         serverMemberRepository.muteOrUnmuteServerMember(serverId, memberId, request.isMute());
+    }
+
+    @Transactional
+    @RequiresServerPermission(ServerPermissionKeyEnum.BAN_MEMBER)
+    public void banMember(
+            @ServerId String serverId,
+            String bannedUserId,
+            String bannerUserId,
+            BanMemberRequest request) {
+        if (!serverMemberRepository.existsByServerIdAndUserId(serverId, bannedUserId))
+            throw new AppException(ErrorCode.NOT_A_MEMBER);
+
+        Server server = serverRepository.getReferenceById(serverId);
+        User bannedUser = userRepository.getReferenceById(bannedUserId);
+        User bannerUser = userRepository.getReferenceById(bannerUserId);
+        serverMemberRepository.deleteByServerIdAndUserId(serverId, bannedUserId);
+        serverBanRepository.save(
+                ServerBan.builder()
+                        .server(server)
+                        .user(bannedUser)
+                        .bannedBy(bannerUser)
+                        .reason(request.getReason())
+                        .build());
+    }
+
+    @RequiresServerPermission(ServerPermissionKeyEnum.BAN_MEMBER)
+    public void unbanMember(@ServerId String serverId, String bannedUserId) {
+        serverBanRepository.deleteByServerIdAndUserId(serverId, bannedUserId);
+    }
+
+    @RequiresServerPermission(ServerPermissionKeyEnum.BAN_MEMBER)
+    public List<ServerBanResponse> banList(@ServerId String serverId, Pageable pageable) {
+        return serverBanRepository.findByServerId(serverId, pageable).getContent().stream()
+                .map(
+                        item ->
+                                ServerBanResponse.builder()
+                                        .id(item.getId())
+                                        .user(userMapper.toUserBanInfoResponse(item.getUser()))
+                                        .bannedBy(
+                                                userMapper.toUserBanInfoResponse(
+                                                        item.getBannedBy()))
+                                        .reason(item.getReason())
+                                        .createdAt(item.getCreatedAt())
+                                        .build())
+                .toList();
     }
 }
