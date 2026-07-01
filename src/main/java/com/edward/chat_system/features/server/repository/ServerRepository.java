@@ -4,7 +4,6 @@ import com.edward.chat_system.features.server.entity.Server;
 import com.edward.chat_system.features.server.projection.ServerProjection;
 import java.util.List;
 import java.util.Optional;
-import org.jspecify.annotations.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -46,7 +45,15 @@ public interface ServerRepository extends JpaRepository<Server, String> {
     @Modifying
     @Query(
             """
-    DELETE FROM Server s WHERE s.id = :serverId
+    UPDATE Server s
+    SET s.user.id = (
+        SELECT sm.user.id
+        FROM ServerMember sm
+        WHERE sm.id = :newOwnerMemberId
+          AND sm.server.id = :serverId
+    )
+    WHERE s.id = :serverId
 """)
-    void deleteById(@Param("serverId") @NonNull String serverId);
+    void updateOwnership(
+            @Param("serverId") String serverId, @Param("newOwnerMemberId") String newOwnerMemberId);
 }

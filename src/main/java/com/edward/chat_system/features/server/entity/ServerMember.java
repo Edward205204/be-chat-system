@@ -16,8 +16,11 @@ import org.hibernate.annotations.CreationTimestamp;
 @Setter
 @Table(
         name = "server_members",
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"server_id", "user_id"})},
-        indexes = {@Index(name = "idx_server_members_user_id", columnList = "user_id")})
+        indexes = {
+            @Index(name = "idx_server_members_user_id", columnList = "user_id"),
+            @Index(name = "idx_servermember_server_id", columnList = "server_id, joinedAt, id")
+        },
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"server_id", "user_id"})})
 public class ServerMember {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

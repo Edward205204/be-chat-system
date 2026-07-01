@@ -3,30 +3,42 @@ package com.edward.chat_system.features.server.service;
 import com.edward.chat_system.features.channel.constant.ChannelConstants;
 import com.edward.chat_system.features.channel.entity.Channel;
 import com.edward.chat_system.features.channel.repository.ChannelRepository;
+import com.edward.chat_system.features.permission.dto.response.RoleResponse;
+import com.edward.chat_system.features.permission.projection.MemberRoleRow;
+import com.edward.chat_system.features.permission.repository.RoleMemberRepository;
 import com.edward.chat_system.features.permission.service.RoleService;
 import com.edward.chat_system.features.server.dto.request.CreateServerRequest;
+import com.edward.chat_system.features.server.dto.request.MuteMember;
 import com.edward.chat_system.features.server.dto.request.ServerPatchUpdateRequest;
+import com.edward.chat_system.features.server.dto.response.ServerMemberItemResponse;
+import com.edward.chat_system.features.server.dto.response.ServerMemberResponse;
 import com.edward.chat_system.features.server.dto.response.ServerResponse;
 import com.edward.chat_system.features.server.dto.response.ServerUpdateResponse;
 import com.edward.chat_system.features.server.entity.Server;
 import com.edward.chat_system.features.server.entity.ServerMember;
 import com.edward.chat_system.features.server.enums.ServerPermissionKeyEnum;
 import com.edward.chat_system.features.server.mapper.ServerMapper;
+import com.edward.chat_system.features.server.projection.MemberProjection;
 import com.edward.chat_system.features.server.projection.ServerProjection;
 import com.edward.chat_system.features.server.repository.ServerMemberRepository;
 import com.edward.chat_system.features.server.repository.ServerRepository;
 import com.edward.chat_system.features.user.entity.User;
 import com.edward.chat_system.features.user.repository.UserRepository;
 import com.edward.chat_system.infrastructure.aop.annotation.RequiresOwner;
+import com.edward.chat_system.infrastructure.aop.annotation.RequiresServerMember;
 import com.edward.chat_system.infrastructure.aop.annotation.RequiresServerPermission;
 import com.edward.chat_system.infrastructure.aop.annotation.ServerId;
 import com.edward.chat_system.shared.exception.AppException;
 import com.edward.chat_system.shared.exception.ErrorCode;
 import jakarta.transaction.Transactional;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -39,6 +51,7 @@ public class ServerService {
     RoleService roleService;
     ChannelRepository channelRepository;
     ServerMapper serverMapper;
+    RoleMemberRepository roleMemberRepository;
 
     void checkServerNameDuplicate(String userId, String serverName) {
         if (serverRepository.existsByUserIdAndName(userId, serverName))
@@ -130,5 +143,78 @@ public class ServerService {
     @RequiresOwner
     public void deleteServer(@ServerId String serverId) {
         serverRepository.deleteById(serverId);
+    }
+
+    @RequiresServerMember
+    public ServerMemberResponse getServerMember(@ServerId String serverId, Pageable pageable) {
+        //        @PathVariable String serverId,
+        //        @PageableDefault(size = 50) Pageable pageable
+        Page<MemberProjection> memberPage =
+                serverMemberRepository.findMembersByServerId(serverId, pageable);
+
+        List<String> memberIds =
+                memberPage.getContent().stream().map(MemberProjection::getMemberId).toList();
+
+        Map<String, List<RoleResponse>> rolesByMember =
+                memberIds.isEmpty()
+                        ? Map.of()
+                        : roleMemberRepository.findRolesByMemberIds(memberIds).stream()
+                                .collect(
+                                        Collectors.groupingBy(
+                                                MemberRoleRow::getMemberId,
+                                                Collectors.mapping(
+                                                        row ->
+                                                                RoleResponse.builder()
+                                                                        .id(row.getRoleId())
+                                                                        .name(row.getRoleName())
+                                                                        .color(row.getRoleColor())
+                                                                        .build(),
+                                                        Collectors.toList())));
+
+        List<ServerMemberItemResponse> items =
+                memberPage.getContent().stream()
+                        .map(
+                                m ->
+                                        ServerMemberItemResponse.builder()
+                                                .memberId(m.getMemberId())
+                                                .userId(m.getUserId())
+                                                .displayName(m.getDisplayName())
+                                                .username(m.getUsername())
+                                                .avatar(m.getAvatar())
+                                                .isOwner(m.getUserId().equals(m.getOwnerId()))
+                                                .isMuted(m.getIsMuted())
+                                                .joinedAt(m.getJoinedAt())
+                                                .roles(
+                                                        rolesByMember.getOrDefault(
+                                                                m.getMemberId(), List.of()))
+                                                .build())
+                        .toList();
+
+        return ServerMemberResponse.builder()
+                .total(memberPage.getTotalElements())
+                .page(pageable.getPageNumber())
+                .size(pageable.getPageSize())
+                .items(items)
+                .build();
+    }
+
+    @RequiresServerPermission(ServerPermissionKeyEnum.KICK_MEMBER)
+    public void kickMember(@ServerId String serverId, String memberId) {
+        serverMemberRepository.deleteByIdAndServerId(memberId, serverId);
+    }
+
+    @RequiresOwner
+    public void transferOwner(@ServerId String serverId, String newOwnerId) {
+        serverRepository.updateOwnership(serverId, newOwnerId);
+    }
+
+    @RequiresServerMember
+    public void leaveServer(@ServerId String serverId, String userId) {
+        serverMemberRepository.deleteByServerIdAndUserId(serverId, userId);
+    }
+
+    @RequiresServerPermission(ServerPermissionKeyEnum.MUTE_MEMBER)
+    public void muteMember(@ServerId String serverId, String memberId, MuteMember request) {
+        serverMemberRepository.muteOrUnmuteServerMember(serverId, memberId, request.isMute());
     }
 }
