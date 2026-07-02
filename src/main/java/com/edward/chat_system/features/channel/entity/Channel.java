@@ -2,7 +2,7 @@ package com.edward.chat_system.features.channel.entity;
 
 import com.edward.chat_system.features.server.entity.Server;
 import jakarta.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
@@ -14,7 +14,9 @@ import org.hibernate.annotations.CreationTimestamp;
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
-@Table(name = "channels")
+@Table(
+        name = "channels",
+        indexes = {@Index(name = "idx_channel_server_id", columnList = "server_id, createdAt, id")})
 public class Channel {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -29,7 +31,7 @@ public class Channel {
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
-    LocalDate createdAt;
+    LocalDateTime createdAt;
 
     @Column(nullable = false)
     @Builder.Default
