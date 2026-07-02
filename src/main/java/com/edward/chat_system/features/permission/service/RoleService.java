@@ -70,6 +70,7 @@ public class RoleService {
                 Role.builder()
                         .name(RoleConstants.DEFAULT_ROLE_NAME)
                         .color(RoleConstants.DEFAULT_ROLE_COLOR)
+                        .isDefault(true)
                         .server(serverRepository.getReferenceById(serverId))
                         .build();
         roleRepository.save(role);
