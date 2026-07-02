@@ -14,7 +14,13 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @Entity
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
-@Table(name = "invite_links")
+@Table(
+        name = "invite_links",
+        indexes = {
+            @Index(
+                    name = "idx_invite_server_created",
+                    columnList = "server_id, created_at DESC, id DESC")
+        })
 public class InviteLink {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -32,7 +38,8 @@ public class InviteLink {
     String token;
 
     @Column(nullable = false)
-    boolean isRevoked;
+    @Builder.Default
+    boolean isRevoked = false;
 
     @Column(nullable = false)
     @Builder.Default

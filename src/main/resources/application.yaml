@@ -3,6 +3,9 @@ server:
     servlet: 
         context-path: /rchat
 
+app:
+    frontend-url: http://localhost:3000
+
 spring:
     application:
         name: chat_system

@@ -11,7 +11,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Data
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
-public class UserBanInfoResponse {
+public class UserBasicInfoResponse {
     String id;
     String username;
     String displayName;

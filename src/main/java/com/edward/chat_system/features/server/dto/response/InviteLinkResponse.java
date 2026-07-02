@@ -10,10 +10,13 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ServerBanResponse {
+public class InviteLinkResponse {
     String id;
-    UserBasicInfoResponse user;
-    UserBasicInfoResponse bannedBy;
-    String reason;
+    String token;
+    String inviteUrl;
+    UserBasicInfoResponse createdBy;
+    long useCount;
+    LocalDateTime expiresAt;
     LocalDateTime createdAt;
+    boolean isRevoked;
 }

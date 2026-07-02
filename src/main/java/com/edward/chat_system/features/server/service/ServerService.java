@@ -12,16 +12,20 @@ import com.edward.chat_system.features.server.dto.request.CreateServerRequest;
 import com.edward.chat_system.features.server.dto.request.MuteMemberRequest;
 import com.edward.chat_system.features.server.dto.request.ServerPatchUpdateRequest;
 import com.edward.chat_system.features.server.dto.response.*;
+import com.edward.chat_system.features.server.entity.InviteLink;
 import com.edward.chat_system.features.server.entity.Server;
 import com.edward.chat_system.features.server.entity.ServerBan;
 import com.edward.chat_system.features.server.entity.ServerMember;
 import com.edward.chat_system.features.server.enums.ServerPermissionKeyEnum;
+import com.edward.chat_system.features.server.mapper.InviteLinkMapper;
 import com.edward.chat_system.features.server.mapper.ServerMapper;
 import com.edward.chat_system.features.server.projection.MemberProjection;
 import com.edward.chat_system.features.server.projection.ServerProjection;
+import com.edward.chat_system.features.server.repository.InviteLinkRepository;
 import com.edward.chat_system.features.server.repository.ServerBanRepository;
 import com.edward.chat_system.features.server.repository.ServerMemberRepository;
 import com.edward.chat_system.features.server.repository.ServerRepository;
+import com.edward.chat_system.features.user.dto.response.UserBasicInfoResponse;
 import com.edward.chat_system.features.user.entity.User;
 import com.edward.chat_system.features.user.mapper.UserMapper;
 import com.edward.chat_system.features.user.repository.UserRepository;
@@ -29,8 +33,12 @@ import com.edward.chat_system.infrastructure.aop.annotation.RequiresOwner;
 import com.edward.chat_system.infrastructure.aop.annotation.RequiresServerMember;
 import com.edward.chat_system.infrastructure.aop.annotation.RequiresServerPermission;
 import com.edward.chat_system.infrastructure.aop.annotation.ServerId;
+import com.edward.chat_system.shared.dto.CursorPageResponse;
 import com.edward.chat_system.shared.exception.AppException;
 import com.edward.chat_system.shared.exception.ErrorCode;
+import com.edward.chat_system.shared.utils.CursorUtils;
+import com.edward.chat_system.shared.utils.InviteUrlBuilder;
+import com.edward.chat_system.shared.utils.SecureTokenGenerator;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +62,10 @@ public class ServerService {
     ServerMapper serverMapper;
     RoleMemberRepository roleMemberRepository;
     ServerBanRepository serverBanRepository;
-    private final UserMapper userMapper;
+    UserMapper userMapper;
+    InviteLinkRepository inviteLinkRepository;
+    CursorUtils cursorUtils;
+    InviteLinkMapper inviteLinkMapper;
 
     void checkServerNameDuplicate(String userId, String serverName) {
         if (serverRepository.existsByUserIdAndName(userId, serverName))
@@ -148,6 +159,7 @@ public class ServerService {
         serverRepository.deleteById(serverId);
     }
 
+    // AFTER Page Offset
     @RequiresServerMember
     public ServerMemberResponse getServerMember(@ServerId String serverId, Pageable pageable) {
         //        @PathVariable String serverId,
@@ -249,6 +261,7 @@ public class ServerService {
         serverBanRepository.deleteByServerIdAndUserId(serverId, bannedUserId);
     }
 
+    // AFTER Page Offset
     @RequiresServerPermission(ServerPermissionKeyEnum.BAN_MEMBER)
     public List<ServerBanResponse> banList(@ServerId String serverId, Pageable pageable) {
         return serverBanRepository.findByServerId(serverId, pageable).getContent().stream()
@@ -264,5 +277,98 @@ public class ServerService {
                                         .createdAt(item.getCreatedAt())
                                         .build())
                 .toList();
+    }
+
+    @RequiresServerPermission(ServerPermissionKeyEnum.CREATE_INVITE)
+    public InviteLinkResponse createInviteLink(@ServerId String serverId, String userId) {
+        String token = SecureTokenGenerator.generate();
+        Server server = serverRepository.getReferenceById(serverId);
+        User user =
+                userRepository
+                        .findById(userId)
+                        .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        InviteLink inviteLink = InviteLink.builder().server(server).user(user).token(token).build();
+        inviteLink = inviteLinkRepository.save(inviteLink);
+        UserBasicInfoResponse userInfo =
+                UserBasicInfoResponse.builder()
+                        .id(user.getId())
+                        .username(user.getUsername())
+                        .displayName(user.getDisplayName())
+                        .avatar(user.getAvatar())
+                        .build();
+        String inviteUrl = InviteUrlBuilder.build(token);
+        return InviteLinkResponse.builder()
+                .id(inviteLink.getId())
+                .token(token)
+                .inviteUrl(inviteUrl)
+                .createdBy(userInfo)
+                .useCount(inviteLink.getUseCount())
+                .expiresAt(inviteLink.getExpiresAt())
+                .createdAt(inviteLink.getCreatedAt())
+                .isRevoked(inviteLink.isRevoked())
+                .build();
+    }
+
+    private List<InviteLink> fetchWithCursor(String serverId, String cursor, int fetchSize) {
+        var payload = cursorUtils.decode(cursor);
+        return inviteLinkRepository.findNextPage(
+                serverId, payload.createdAt(), payload.id(), fetchSize);
+    }
+
+    @RequiresServerPermission(ServerPermissionKeyEnum.MANAGE_SERVER)
+    public CursorPageResponse<InviteLinkResponse> getAllInviteLink(
+            @ServerId String serverId, String cursor, int size) {
+
+        int fetchSize = size + 1;
+
+        List<InviteLink> results =
+                (cursor == null || cursor.isBlank())
+                        ? inviteLinkRepository.findFirstPage(serverId, fetchSize)
+                        : fetchWithCursor(serverId, cursor, fetchSize);
+
+        boolean hasNext = results.size() > size;
+        List<InviteLink> pageItems = hasNext ? results.subList(0, size) : results;
+
+        String nextCursor = null;
+        if (hasNext) {
+            InviteLink last = pageItems.getLast();
+            nextCursor = cursorUtils.encode(last.getCreatedAt(), last.getId());
+        }
+
+        return CursorPageResponse.<InviteLinkResponse>builder()
+                .data(pageItems.stream().map(inviteLinkMapper::toResponse).toList())
+                .nextCursor(nextCursor)
+                .hasNext(hasNext)
+                .build();
+    }
+
+    @RequiresServerPermission(ServerPermissionKeyEnum.MANAGE_SERVER)
+    public void revokeInviteLink(@ServerId String serverId, String inviteLinkId) {
+        inviteLinkRepository.deleteByIdAndServerId(inviteLinkId, serverId);
+    }
+
+    @Transactional
+    public UserJoinServerByLinkResponse jointByLink(String token, String userId) {
+        InviteLink inviteLink =
+                inviteLinkRepository
+                        .findValidInviteLinkByToken(token)
+                        .orElseThrow(() -> new AppException(ErrorCode.INVITE_LINK_NOT_FOUND));
+        Server server = inviteLink.getServer();
+        User user = userRepository.getReferenceById(userId);
+        if (serverMemberRepository.existsByServerIdAndUserId(server.getId(), userId))
+            throw new AppException(ErrorCode.USER_ALREADY_A_MEMBER);
+        if (serverBanRepository.existsByServer_IdAndUser_Id(server.getId(), userId))
+            throw new AppException(ErrorCode.USER_BANNED);
+        ServerMember serverMember =
+                serverMemberRepository.save(
+                        ServerMember.builder().server(server).user(user).build());
+
+        inviteLink.setUseCount(inviteLink.getUseCount() + 1);
+        inviteLinkRepository.save(inviteLink);
+        return UserJoinServerByLinkResponse.builder()
+                .serverId(server.getId())
+                .serverName(server.getName())
+                .joinedAt(serverMember.getJoinedAt())
+                .build();
     }
 }

@@ -16,6 +16,8 @@ public enum ErrorCode {
     EMAIL_EXISTED("EMAIL_EXISTED", "Email existed", HttpStatus.CONFLICT),
     USERNAME_EXISTED("USERNAME_EXISTED", "Username existed", HttpStatus.CONFLICT),
     USER_NOT_FOUND("USER_NOT_FOUND", "User is not exist", HttpStatus.NOT_FOUND),
+    USER_BANNED("USER_BANNED", "User is banned", HttpStatus.FORBIDDEN),
+    USER_ALREADY_A_MEMBER("USER_ALREADY_A_MEMBER", "User is already a member", HttpStatus.CONFLICT),
     JWT_SIGNING_FAILED(
             "JWT_SIGNING_FAILED", "JWT signing failed", HttpStatus.INTERNAL_SERVER_ERROR),
 
@@ -74,13 +76,15 @@ public enum ErrorCode {
             "NOW_DO_NOT_HAVE_PERMISSION",
             "User isn't allowed to perform this action",
             HttpStatus.FORBIDDEN),
-
+    INVALID_CURSOR("INVALID_CURSOR", "Invalid cursor", HttpStatus.BAD_REQUEST),
     SERVER_NAME_DUPLICATE("SERVER_NAME_DUPLICATE", "Server name is duplicate", HttpStatus.CONFLICT),
     SERVER_NOT_EXIST("SERVER_NOT_EXIST", "Server is not exist", HttpStatus.NOT_FOUND),
+
+    INVITE_LINK_NOT_FOUND(
+            "INVITE_LINK_NOT_FOUND", "Invite link is not found", HttpStatus.NOT_FOUND),
     ;
     // INVALID_DOB("Age of user must be at least {value}",
     // HttpStatus.UNPROCESSABLE_CONTENT),
-
     String code;
     String message;
     HttpStatusCode statusCode;

@@ -26,4 +26,6 @@ public interface ServerBanRepository extends JpaRepository<ServerBan, String> {
     ORDER BY sb.createdAt DESC
 """)
     Page<ServerBan> findByServerId(@Param("serverId") String serverId, Pageable pageable);
+
+    boolean existsByServer_IdAndUser_Id(String serverId, String userId);
 }
