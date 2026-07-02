@@ -1,20 +1,18 @@
-package com.edward.chat_system.features.channel.dto.response;
+package com.edward.chat_system.features.channel.dto.request;
 
-import java.time.LocalDateTime;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Data
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
-public class ChannelResponse {
-    String id;
-    String name;
-    boolean isPrivate;
-    LocalDateTime createdAt;
+public class AddToChannelRequest {
+    @NotBlank(message = "Member Id is required")
+    String memberId;
 }

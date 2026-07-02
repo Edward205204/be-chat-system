@@ -70,4 +70,14 @@ public interface ChannelUserPermissionRepository
 """)
     void deleteManyByChannelIdAndMemberId(
             @Param("channelId") String channelId, @Param("memberId") String memberId);
+
+    @Query(
+            """
+    SELECT COUNT(cup) > 0 FROM ChannelUserPermission cup WHERE cup.channel.id = :channelId AND cup.serverMember.id = :memberId AND
+    cup.permission = :permission
+""")
+    boolean existsByUniqueConstraint(
+            @Param("channelId") String channelId,
+            @Param("memberId") String memberId,
+            @Param("permission") String permission);
 }

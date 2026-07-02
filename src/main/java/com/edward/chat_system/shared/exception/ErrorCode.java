@@ -80,6 +80,9 @@ public enum ErrorCode {
     SERVER_NAME_DUPLICATE("SERVER_NAME_DUPLICATE", "Server name is duplicate", HttpStatus.CONFLICT),
     SERVER_NOT_EXIST("SERVER_NOT_EXIST", "Server is not exist", HttpStatus.NOT_FOUND),
 
+    CHANNEL_NAME_DUPLICATE(
+            "CHANNEL_NAME_DUPLICATE", "Channel name is duplicate", HttpStatus.CONFLICT),
+
     INVITE_LINK_NOT_FOUND(
             "INVITE_LINK_NOT_FOUND", "Invite link is not found", HttpStatus.NOT_FOUND),
     ;

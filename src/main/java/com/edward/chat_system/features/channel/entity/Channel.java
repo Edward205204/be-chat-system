@@ -16,7 +16,12 @@ import org.hibernate.annotations.CreationTimestamp;
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 @Table(
         name = "channels",
-        indexes = {@Index(name = "idx_channel_server_id", columnList = "server_id, createdAt, id")})
+        indexes = {@Index(name = "idx_channel_server_id", columnList = "server_id, createdAt, id")},
+        uniqueConstraints = {
+            @UniqueConstraint(
+                    name = "uc_channel_name_server_id",
+                    columnNames = {"name", "server_id"})
+        })
 public class Channel {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

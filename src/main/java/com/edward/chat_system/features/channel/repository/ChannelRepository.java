@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -14,6 +15,8 @@ public interface ChannelRepository extends JpaRepository<Channel, String> {
     Optional<String> findServerIdByChannelId(@Param("channelId") String channelId);
 
     Optional<Channel> findByIdAndServerId(String id, String serverId);
+
+    boolean existsByNameAndServer_Id(String name, String serverId);
 
     @Query(
             """
@@ -94,4 +97,11 @@ public interface ChannelRepository extends JpaRepository<Channel, String> {
             @Param("cursorCreatedAt") LocalDateTime cursorCreatedAt,
             @Param("cursorId") String cursorId,
             @Param("limit") int limit);
+
+    @Modifying
+    @Query(
+            """
+    DELETE FROM Channel c WHERE c.id = :id AND c.server.id = :serverId
+""")
+    void deleteByIdAndServer_Id(@Param("id") String id, @Param("serverId") String serverId);
 }
