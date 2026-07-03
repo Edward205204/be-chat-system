@@ -25,24 +25,28 @@ public class RequiresChannelPermissionComponent {
     ChannelRolePermissionRepository channelRolePermissionRepository;
 
     public String resolveServerId(String channelId) {
-        // AFTER: Replace resolveServerId() with resolveChannelInfo() to fetch both serverId and
-        // isPrivate
-        // in a single query, avoiding a redundant channel lookup when caller does not pass
-        // @ServerId.
         return channelRepository
                 .findServerIdByChannelId(channelId)
                 .orElseThrow(() -> new AppException(ErrorCode.CHANNEL_IS_NOT_EXIST));
     }
 
     public void check(String serverId, String channelId, ChannelPermissionKeyEnum permission) {
-        String userId = currentUserProvider.getUserId();
+        doCheck(currentUserProvider.getUserId(), serverId, channelId, permission);
+    }
+
+    public void check(
+            String userId, String serverId, String channelId, ChannelPermissionKeyEnum permission) {
+        doCheck(userId, serverId, channelId, permission);
+    }
+
+    private void doCheck(
+            String userId, String serverId, String channelId, ChannelPermissionKeyEnum permission) {
         ServerMemberInfoProjection info =
                 serverMemberRepository
                         .findServerMemberInfo(serverId, userId)
                         .orElseThrow(() -> new AppException(ErrorCode.NOT_A_MEMBER));
 
         if (info.getIsOwner()) return;
-
         if (permission == ChannelPermissionKeyEnum.NONE) return;
 
         Channel channel =
@@ -51,12 +55,8 @@ public class RequiresChannelPermissionComponent {
                         .orElseThrow(() -> new AppException(ErrorCode.CHANNEL_IS_NOT_EXIST));
 
         if (!channel.isPrivate()) return;
-
         if (channelUserPermissionRepository.hasPermission(userId, channelId, permission)) return;
-
-        boolean hasPermission =
-                channelRolePermissionRepository.hasPermission(info.getUserId(), permission);
-
-        if (!hasPermission) throw new AppException(ErrorCode.MISSING_PERMISSION);
+        if (!channelRolePermissionRepository.hasPermission(userId, permission))
+            throw new AppException(ErrorCode.MISSING_PERMISSION);
     }
 }

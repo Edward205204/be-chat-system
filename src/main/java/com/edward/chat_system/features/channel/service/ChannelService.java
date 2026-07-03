@@ -152,5 +152,5 @@ public class ChannelService {
         channelUserPermissionRepository.save(channelUserPermission);
     }
 
-//    AFTER: Add role to private channel
+    //    AFTER: Add role to private channel
 }
