@@ -125,13 +125,13 @@ public class ChannelService {
     }
 
     @RequiresChannelPermission(ChannelPermissionKeyEnum.MANAGE_CHANNEL)
-    void deleteChannel(@ServerId String serverId, @ChannelId String channelId) {
+    public void deleteChannel(@ServerId String serverId, @ChannelId String channelId) {
         //  cascade delete
         channelRepository.deleteByIdAndServer_Id(channelId, serverId);
     }
 
     @RequiresChannelPermission(ChannelPermissionKeyEnum.INVITE_MEMBERS)
-    void addMemberToPrivateChannel(
+    public void addMemberToPrivateChannel(
             @ServerId String serverId, @ChannelId String channelId, AddToChannelRequest request) {
         final ChannelPermissionKeyEnum permissionKeyEnum = ChannelPermissionKeyEnum.VIEW_CHANNEL;
         if (serverMemberRepository.existsByIdAndServerId(request.getMemberId(), serverId))
