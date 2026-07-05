@@ -77,4 +77,7 @@ DELETE FROM ServerMember sm WHERE sm.server.id = :serverId AND sm.user.id = :use
             @Param("serverId") String serverId,
             @Param("memberId") String memberId,
             @Param("mute") boolean mute);
+
+    //    OPTIMIZATION
+    Optional<ServerMember> findByIdAndServerId(String memberId, String serverId);
 }

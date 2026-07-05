@@ -219,8 +219,13 @@ public class ServerService {
     }
 
     @RequiresOwner
-    public void transferOwner(@ServerId String serverId, String newOwnerId) {
-        serverRepository.updateOwnership(serverId, newOwnerId);
+    public void transferOwner(@ServerId String serverId, String newOwnerMemberId) {
+        ServerMember newOwnerMemberInfo =
+                serverMemberRepository
+                        .findByIdAndServerId(newOwnerMemberId, serverId)
+                        .orElseThrow(() -> new AppException(ErrorCode.NOT_A_MEMBER));
+        String newOwnerUserId = newOwnerMemberInfo.getUser().getId();
+        serverRepository.updateOwner(serverId, newOwnerUserId);
     }
 
     @RequiresServerMember

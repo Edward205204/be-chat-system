@@ -43,17 +43,6 @@ public interface ServerRepository extends JpaRepository<Server, String> {
             @Param("serverId") String serverId, @Param("userId") String userId);
 
     @Modifying
-    @Query(
-            """
-    UPDATE Server s
-    SET s.user.id = (
-        SELECT sm.user.id
-        FROM ServerMember sm
-        WHERE sm.id = :newOwnerMemberId
-          AND sm.server.id = :serverId
-    )
-    WHERE s.id = :serverId
-""")
-    void updateOwnership(
-            @Param("serverId") String serverId, @Param("newOwnerMemberId") String newOwnerMemberId);
+    @Query("UPDATE Server s SET s.user.id = :newOwnerId WHERE s.id = :serverId")
+    void updateOwner(@Param("serverId") String serverId, @Param("newOwnerId") String newOwnerId);
 }
