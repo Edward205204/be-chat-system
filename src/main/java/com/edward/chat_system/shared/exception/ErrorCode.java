@@ -85,6 +85,10 @@ public enum ErrorCode {
 
     INVITE_LINK_NOT_FOUND(
             "INVITE_LINK_NOT_FOUND", "Invite link is not found", HttpStatus.NOT_FOUND),
+
+    FILE_STORAGE_ERROR(
+            "FILE_STORAGE_ERROR", "File storage error", HttpStatus.INTERNAL_SERVER_ERROR),
+    FILE_NOT_FOUND("FILE_NOT_FOUND", "File is not found", HttpStatus.NOT_FOUND),
     ;
     // INVALID_DOB("Age of user must be at least {value}",
     // HttpStatus.UNPROCESSABLE_CONTENT),
