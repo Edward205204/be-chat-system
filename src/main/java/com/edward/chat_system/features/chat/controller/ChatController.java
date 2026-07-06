@@ -18,6 +18,9 @@ public class ChatController {
 
     @MessageMapping("/chat.send")
     public void send(@AuthenticationPrincipal Jwt principal, SendMessageRequest request) {
-        service.send(principal.getSubject(), principal.getClaim("username"), request);
+        service.send(principal.getSubject(),
+                principal.getClaim("username"),
+                request.getChannelId(),
+                request.getContent());
     }
 }
