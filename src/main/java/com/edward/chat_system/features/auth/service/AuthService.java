@@ -154,8 +154,9 @@ public class AuthService {
         code.setType(VerificationCodeTypeEnum.EMAIL_VERIFY);
         code.renewOtp(otp, validDuration);
 
-        verificationCodeRepository.save(code);
         mailServiceImpl.sendOtp(email, otp, MailTemplate.OTP_VERIFICATION);
+
+        verificationCodeRepository.save(code);
     }
 
     VerificationCode validateOtp(@NonNull VerificationCode code, String otp) {
@@ -225,8 +226,8 @@ public class AuthService {
         code.setUser(user);
         code.setType(VerificationCodeTypeEnum.RESET_PASSWORD);
         code.renewOtp(otp, validDuration);
-        verificationCodeRepository.save(code);
         mailServiceImpl.sendOtp(email, otp, MailTemplate.FORGOT_PASSWORD);
+        verificationCodeRepository.save(code);
     }
 
     @Transactional
