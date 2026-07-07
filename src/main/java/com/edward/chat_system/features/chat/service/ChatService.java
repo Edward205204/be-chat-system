@@ -28,16 +28,13 @@ public class ChatService {
     private final ChannelRepository channelRepository;
 
     @RequiresChannelPermission(ChannelPermissionKeyEnum.VIEW_CHANNEL)
-    public void send(String senderId, String senderName, @ChannelId String channelId,String content) {
+    public void send(
+            String senderId, String senderName, @ChannelId String channelId, String content) {
         User sender = userRepository.getReferenceById(senderId);
         Channel channel = channelRepository.getReferenceById(channelId);
         Message message =
                 repository.save(
-                        Message.builder()
-                                .content(content)
-                                .sender(sender)
-                                .channel(channel)
-                                .build());
+                        Message.builder().content(content).sender(sender).channel(channel).build());
         repository.flush();
         publisher.publishEvent(
                 MessageCreatedEvent.builder()

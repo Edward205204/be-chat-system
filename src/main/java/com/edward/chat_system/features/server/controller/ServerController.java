@@ -67,11 +67,11 @@ public class ServerController {
 
     // AFTER
     @PatchMapping("/{serverId}")
-    ApiResponse<ServerUpdateResponse> updateServer(
+    ApiResponse<ServerPatchUpdateResponse> updateServer(
             @AuthenticationPrincipal Jwt principal,
             @PathVariable String serverId,
             @RequestBody @Valid ServerPatchUpdateRequest request) {
-        return ApiResponse.<ServerUpdateResponse>builder()
+        return ApiResponse.<ServerPatchUpdateResponse>builder()
                 .message("Update server successfully")
                 .result(
                         serverService.serverUpdateResponse(

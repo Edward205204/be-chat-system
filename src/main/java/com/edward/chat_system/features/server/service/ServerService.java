@@ -3,6 +3,7 @@ package com.edward.chat_system.features.server.service;
 import com.edward.chat_system.features.channel.constant.ChannelConstants;
 import com.edward.chat_system.features.channel.entity.Channel;
 import com.edward.chat_system.features.channel.repository.ChannelRepository;
+import com.edward.chat_system.features.file.FileService;
 import com.edward.chat_system.features.permission.dto.response.RoleResponse;
 import com.edward.chat_system.features.permission.projection.MemberRoleRow;
 import com.edward.chat_system.features.permission.repository.RoleMemberRepository;
@@ -66,6 +67,7 @@ public class ServerService {
     InviteLinkRepository inviteLinkRepository;
     CursorUtils cursorUtils;
     InviteLinkMapper inviteLinkMapper;
+    FileService fileService;
 
     void checkServerNameDuplicate(String userId, String serverName) {
         if (serverRepository.existsByUserIdAndName(userId, serverName))
@@ -126,6 +128,8 @@ public class ServerService {
                         .build();
         channelRepository.save(channel);
 
+        fileService.claimFile(request.getAvatar());
+
         return ServerResponse.builder()
                 .id(server.getId())
                 .name(server.getName())
@@ -138,7 +142,7 @@ public class ServerService {
     }
 
     @RequiresServerPermission(ServerPermissionKeyEnum.MANAGE_SERVER)
-    public ServerUpdateResponse serverUpdateResponse(
+    public ServerPatchUpdateResponse serverUpdateResponse(
             @ServerId String serverId, String userId, ServerPatchUpdateRequest request) {
         if (request.getName() != null) checkServerNameDuplicate(userId, request.getName());
 
@@ -150,6 +154,9 @@ public class ServerService {
         serverMapper.updateServerFromDto(request, server);
 
         serverRepository.save(server);
+
+        if (request.getAvatar() != null) fileService.claimFile(request.getAvatar());
+        if (request.getBanner() != null) fileService.claimFile(request.getBanner());
 
         return serverMapper.toServerUpdateResponse(server);
     }
