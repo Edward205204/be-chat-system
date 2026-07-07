@@ -6,7 +6,6 @@ import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -24,8 +23,7 @@ public class FileService {
     UploadedFileRepository uploadedFileRepository;
 
     public String upload(MultipartFile file) {
-        String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
-        storageService.store(file, filename);
+        String filename = storageService.store(file);
         String url = "/files/" + filename;
 
         uploadedFileRepository.save(

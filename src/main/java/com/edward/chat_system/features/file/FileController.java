@@ -1,6 +1,7 @@
 package com.edward.chat_system.features.file;
 
 import com.edward.chat_system.infrastructure.storage.StorageService;
+import com.edward.chat_system.shared.aop.annotation.SafeFilename;
 import com.edward.chat_system.shared.dto.ApiResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -8,9 +9,11 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+@Validated
 @RestController
 @RequestMapping("/files")
 @RequiredArgsConstructor
@@ -26,7 +29,7 @@ public class FileController {
     }
 
     @GetMapping("/{filename:.+}")
-    ResponseEntity<Resource> serve(@PathVariable String filename) {
+    ResponseEntity<Resource> serve(@PathVariable @SafeFilename String filename) {
         Resource resource = storageService.loadAsResource(filename);
         return ResponseEntity.ok()
                 .header(
