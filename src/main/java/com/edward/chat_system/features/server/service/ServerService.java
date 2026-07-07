@@ -161,12 +161,14 @@ public class ServerService {
         return serverMapper.toServerUpdateResponse(server);
     }
 
+    @Transactional
     @RequiresOwner
     public void deleteServer(@ServerId String serverId) {
         serverRepository.deleteById(serverId);
     }
 
     // AFTER Page Offset
+    @Transactional
     @RequiresServerMember
     public ServerMemberResponse getServerMember(@ServerId String serverId, Pageable pageable) {
         //        @PathVariable String serverId,
@@ -220,11 +222,13 @@ public class ServerService {
                 .build();
     }
 
+    @Transactional
     @RequiresServerPermission(ServerPermissionKeyEnum.KICK_MEMBER)
     public void kickMember(@ServerId String serverId, String memberId) {
         serverMemberRepository.deleteByIdAndServerId(memberId, serverId);
     }
 
+    @Transactional
     @RequiresOwner
     public void transferOwner(@ServerId String serverId, String newOwnerMemberId) {
         ServerMember newOwnerMemberInfo =
@@ -235,11 +239,13 @@ public class ServerService {
         serverRepository.updateOwner(serverId, newOwnerUserId);
     }
 
+    @Transactional
     @RequiresServerMember
     public void leaveServer(@ServerId String serverId, String userId) {
         serverMemberRepository.deleteByServerIdAndUserId(serverId, userId);
     }
 
+    @Transactional
     @RequiresServerPermission(ServerPermissionKeyEnum.MUTE_MEMBER)
     public void muteMember(@ServerId String serverId, String memberId, MuteMemberRequest request) {
         serverMemberRepository.muteOrUnmuteServerMember(serverId, memberId, request.isMute());
@@ -268,6 +274,7 @@ public class ServerService {
                         .build());
     }
 
+    @Transactional
     @RequiresServerPermission(ServerPermissionKeyEnum.BAN_MEMBER)
     public void unbanMember(@ServerId String serverId, String bannedUserId) {
         serverBanRepository.deleteByServerIdAndUserId(serverId, bannedUserId);
@@ -354,6 +361,7 @@ public class ServerService {
                 .build();
     }
 
+    @Transactional
     @RequiresServerPermission(ServerPermissionKeyEnum.MANAGE_SERVER)
     public void revokeInviteLink(@ServerId String serverId, String inviteLinkId) {
         inviteLinkRepository.deleteByIdAndServerId(inviteLinkId, serverId);

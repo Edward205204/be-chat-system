@@ -56,6 +56,7 @@ public class ServerPermissionService {
                 ServerRolePermission.builder().role(role).permission(permission).build());
     }
 
+    @Transactional
     @RequiresServerPermission(ServerPermissionKeyEnum.MANAGE_ROLES)
     public void removePermissionForRole(
             @ServerId String serverId, String roleId, String permission) {

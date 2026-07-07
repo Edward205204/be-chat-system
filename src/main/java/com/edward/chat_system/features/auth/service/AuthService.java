@@ -247,6 +247,7 @@ public class AuthService {
         userRepo.save(user);
     }
 
+    @Transactional
     public void logout(String refreshToken) {
         refreshTokenRepository.deleteByToken(refreshToken);
     }

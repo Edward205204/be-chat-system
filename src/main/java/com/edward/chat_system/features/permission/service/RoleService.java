@@ -22,6 +22,7 @@ import com.edward.chat_system.infrastructure.aop.annotation.RequiresServerPermis
 import com.edward.chat_system.infrastructure.aop.annotation.ServerId;
 import com.edward.chat_system.shared.exception.AppException;
 import com.edward.chat_system.shared.exception.ErrorCode;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -98,6 +99,7 @@ public class RoleService {
         return roleMapper.toRoleResponse(roleRepository.save(role));
     }
 
+    @Transactional
     @RequiresServerPermission(ServerPermissionKeyEnum.MANAGE_ROLES)
     public void deleteRole(@ServerId String serverId, String roleId) {
         checkRoleExist(serverId, roleId);
@@ -129,6 +131,7 @@ public class RoleService {
                         .build());
     }
 
+    @Transactional
     @RequiresServerPermission(ServerPermissionKeyEnum.MANAGE_ROLES)
     public void removeRoleMember(@ServerId String serverId, String roleId, String memberId) {
         checkRoleExist(serverId, roleId);

@@ -24,6 +24,7 @@ import com.edward.chat_system.infrastructure.aop.annotation.RequiresChannelPermi
 import com.edward.chat_system.infrastructure.aop.annotation.ServerId;
 import com.edward.chat_system.shared.exception.AppException;
 import com.edward.chat_system.shared.exception.ErrorCode;
+import jakarta.transaction.Transactional;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -135,6 +136,7 @@ public class ChannelPermissionService {
                         .build());
     }
 
+    @Transactional
     @RequiresChannelPermission(ChannelPermissionKeyEnum.MANAGE_CHANNEL_PERMISSIONS)
     public void removeChannelPermissionForRole(
             @ServerId String serverId,
@@ -146,6 +148,7 @@ public class ChannelPermissionService {
                 channelId, roleId, ChannelPermissionKeyEnum.valueOf(permission));
     }
 
+    @Transactional
     @RequiresChannelPermission(ChannelPermissionKeyEnum.MANAGE_CHANNEL_PERMISSIONS)
     public void updateChannelPermissionForRole(
             @ServerId String serverId,
@@ -198,6 +201,7 @@ public class ChannelPermissionService {
                         .build());
     }
 
+    @Transactional
     @RequiresChannelPermission(ChannelPermissionKeyEnum.MANAGE_CHANNEL_PERMISSIONS)
     public void removeChannelPermissionForUser(
             @ServerId String serverId,
@@ -209,6 +213,7 @@ public class ChannelPermissionService {
                 channelId, memberId, ChannelPermissionKeyEnum.valueOf(permission));
     }
 
+    @Transactional
     @RequiresChannelPermission(ChannelPermissionKeyEnum.MANAGE_CHANNEL_PERMISSIONS)
     public void updateChannelPermissionForUser(
             @ServerId String serverId,

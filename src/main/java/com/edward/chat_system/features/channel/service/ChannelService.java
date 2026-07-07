@@ -24,6 +24,7 @@ import com.edward.chat_system.shared.dto.CursorPageResponse;
 import com.edward.chat_system.shared.exception.AppException;
 import com.edward.chat_system.shared.exception.ErrorCode;
 import com.edward.chat_system.shared.utils.CursorUtils;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -124,6 +125,7 @@ public class ChannelService {
                 .build();
     }
 
+    @Transactional
     @RequiresChannelPermission(ChannelPermissionKeyEnum.MANAGE_CHANNEL)
     public void deleteChannel(@ServerId String serverId, @ChannelId String channelId) {
         //  cascade delete
