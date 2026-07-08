@@ -12,6 +12,7 @@ import com.edward.chat_system.features.server.dto.request.ServerPatchUpdateReque
 import com.edward.chat_system.features.server.dto.response.*;
 import com.edward.chat_system.features.server.service.ServerService;
 import com.edward.chat_system.shared.dto.ApiResponse;
+import com.edward.chat_system.shared.dto.CursorPageRequest;
 import com.edward.chat_system.shared.dto.CursorPageResponse;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -23,8 +24,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+@Validated
 @RestController
 @RequestMapping("/servers")
 @RequiredArgsConstructor
@@ -55,7 +58,6 @@ public class ServerController {
                 .build();
     }
 
-    // AFTER
     @GetMapping("/{serverId}")
     ApiResponse<ServerResponse> getServerById(
             @AuthenticationPrincipal Jwt principal, @PathVariable String serverId) {
@@ -65,7 +67,6 @@ public class ServerController {
                 .build();
     }
 
-    // AFTER
     @PatchMapping("/{serverId}")
     ApiResponse<ServerPatchUpdateResponse> updateServer(
             @AuthenticationPrincipal Jwt principal,
@@ -79,7 +80,6 @@ public class ServerController {
                 .build();
     }
 
-    // AFTER
     @DeleteMapping("/{serverId}")
     ApiResponse<Void> deleteServer(@PathVariable String serverId) {
         serverService.deleteServer(serverId);
@@ -88,7 +88,6 @@ public class ServerController {
 
     // ─── 2. Server Members ────────────────────────────────────────────────────
 
-    // AFTER
     @GetMapping("/{serverId}/members")
     ApiResponse<ServerMemberResponse> getServerMembers(
             @PathVariable String serverId, @PageableDefault(size = 50) Pageable pageable) {
@@ -98,21 +97,18 @@ public class ServerController {
                 .build();
     }
 
-    // AFTER
     @DeleteMapping("/{serverId}/members/{memberId}")
     ApiResponse<Void> kickMember(@PathVariable String serverId, @PathVariable String memberId) {
         serverService.kickMember(serverId, memberId);
         return ApiResponse.<Void>builder().message("Kick member successfully").build();
     }
 
-    // AFTER
     @PatchMapping("/{serverId}/owner/{memberId}")
     ApiResponse<Void> transferOwner(@PathVariable String serverId, @PathVariable String memberId) {
         serverService.transferOwner(serverId, memberId);
         return ApiResponse.<Void>builder().message("Transfer ownership successfully").build();
     }
 
-    // AFTER
     @DeleteMapping("/{serverId}/members/me")
     ApiResponse<Void> leaveServer(
             @AuthenticationPrincipal Jwt principal, @PathVariable String serverId) {
@@ -120,7 +116,6 @@ public class ServerController {
         return ApiResponse.<Void>builder().message("Leave server successfully").build();
     }
 
-    // AFTER
     @PatchMapping("/{serverId}/members/{memberId}/mute")
     ApiResponse<Void> muteMember(
             @PathVariable String serverId,
@@ -132,7 +127,6 @@ public class ServerController {
 
     // ─── 3. Ban ───────────────────────────────────────────────────────────────
 
-    // AFTER
     @PostMapping("/{serverId}/bans/{userId}")
     ApiResponse<Void> banMember(
             @AuthenticationPrincipal Jwt principal,
@@ -143,14 +137,13 @@ public class ServerController {
         return ApiResponse.<Void>builder().message("Ban user successfully").build();
     }
 
-    // AFTER
     @DeleteMapping("/{serverId}/bans/{userId}")
     ApiResponse<Void> unbanMember(@PathVariable String serverId, @PathVariable String userId) {
         serverService.unbanMember(serverId, userId);
         return ApiResponse.<Void>builder().message("Unban user successfully").build();
     }
 
-    // AFTER
+    // AFTER pageable
     @GetMapping("/{serverId}/bans")
     ApiResponse<List<ServerBanResponse>> getBanList(
             @PathVariable String serverId, @PageableDefault(size = 50) Pageable pageable) {
@@ -162,7 +155,6 @@ public class ServerController {
 
     // ─── 4. Invite Link ───────────────────────────────────────────────────────
 
-    // AFTER
     @PostMapping("/{serverId}/links")
     ApiResponse<InviteLinkResponse> createInviteLink(
             @AuthenticationPrincipal Jwt principal, @PathVariable String serverId) {
@@ -172,19 +164,17 @@ public class ServerController {
                 .build();
     }
 
-    // AFTER
     @GetMapping("/{serverId}/links")
     ApiResponse<CursorPageResponse<InviteLinkResponse>> getAllInviteLinks(
-            @PathVariable String serverId,
-            @RequestParam(required = false) String cursor,
-            @RequestParam(defaultValue = "20") int size) {
+            @PathVariable String serverId, @Valid CursorPageRequest pageRequest) {
         return ApiResponse.<CursorPageResponse<InviteLinkResponse>>builder()
                 .message("Get invite links successfully")
-                .result(serverService.getAllInviteLink(serverId, cursor, size))
+                .result(
+                        serverService.getAllInviteLink(
+                                serverId, pageRequest.getCursor(), pageRequest.getSize()))
                 .build();
     }
 
-    // AFTER
     @PatchMapping("/{serverId}/links/{linkId}/revoke")
     ApiResponse<Void> revokeInviteLink(@PathVariable String serverId, @PathVariable String linkId) {
         serverService.revokeInviteLink(serverId, linkId);
@@ -193,7 +183,6 @@ public class ServerController {
 
     // ─── 4.4 Join by Invite Link ──────────────────────────────────────────────
 
-    // AFTER
     @PostMapping("/join/{token}")
     ApiResponse<UserJoinServerByLinkResponse> joinByLink(
             @AuthenticationPrincipal Jwt principal, @PathVariable String token) {
@@ -212,22 +201,22 @@ public class ServerController {
 
     // ─── 6. Channel ────────────────────────────────────────────────────────────
 
-    // AFTER
     @GetMapping("/{serverId}/channels")
     ApiResponse<CursorPageResponse<ChannelResponse>> getChannels(
             @AuthenticationPrincipal Jwt principal,
             @PathVariable String serverId,
-            @RequestParam(required = false) String cursor,
-            @RequestParam(defaultValue = "50") int size) {
+            @Valid CursorPageRequest pageRequest) {
         return ApiResponse.<CursorPageResponse<ChannelResponse>>builder()
                 .message("Get channels successfully")
                 .result(
                         channelService.getChannelList(
-                                serverId, principal.getSubject(), cursor, size))
+                                serverId,
+                                principal.getSubject(),
+                                pageRequest.getCursor(),
+                                pageRequest.getSize()))
                 .build();
     }
 
-    // AFTER
     @PostMapping("/{serverId}/channels")
     ApiResponse<ChannelResponse> createChannel(
             @PathVariable String serverId, @RequestBody @Valid CreateChannelRequest request) {
@@ -237,7 +226,6 @@ public class ServerController {
                 .build();
     }
 
-    // AFTER
     @PatchMapping("/{serverId}/channels/{channelId}")
     ApiResponse<ChannelResponse> updateChannel(
             @PathVariable String serverId,
@@ -249,14 +237,12 @@ public class ServerController {
                 .build();
     }
 
-    // AFTER
     @DeleteMapping("/{serverId}/channels/{channelId}")
     ApiResponse<Void> deleteChannel(@PathVariable String serverId, @PathVariable String channelId) {
         channelService.deleteChannel(serverId, channelId);
         return ApiResponse.<Void>builder().message("Delete channel successfully").build();
     }
 
-    // AFTER
     @PostMapping("/{serverId}/channels/{channelId}/invite")
     ApiResponse<Void> addMemberToChannel(
             @PathVariable String serverId,

@@ -13,6 +13,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,10 +21,10 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
+@Validated
 public class RoleController {
     RoleService roleService;
 
-    // AFTER
     @GetMapping("/{serverId}/roles")
     ApiResponse<List<RoleResponse>> getServerRoles(@PathVariable String serverId) {
         return ApiResponse.<List<RoleResponse>>builder()
@@ -32,7 +33,6 @@ public class RoleController {
                 .build();
     }
 
-    // AFTER
     @PostMapping("/{serverId}/roles")
     ApiResponse<RoleResponse> createRole(
             @PathVariable String serverId, @RequestBody @Valid CreateRoleRequest request) {
@@ -42,7 +42,6 @@ public class RoleController {
                 .build();
     }
 
-    // AFTER
     @PatchMapping("/{serverId}/roles/{roleId}")
     ApiResponse<RoleResponse> patchUpdateRole(
             @PathVariable String serverId,
@@ -54,14 +53,12 @@ public class RoleController {
                 .build();
     }
 
-    // AFTER
     @DeleteMapping("/{serverId}/roles/{roleId}")
     ApiResponse<Void> deleteRole(@PathVariable String serverId, @PathVariable String roleId) {
         roleService.deleteRole(serverId, roleId);
         return ApiResponse.<Void>builder().message("Delete role successfully").build();
     }
 
-    // AFTER
     @GetMapping("/{serverId}/roles/{roleId}/members")
     ApiResponse<List<RoleMemberResponse>> getRoleMember(
             @PathVariable String serverId, @PathVariable String roleId) {
@@ -71,7 +68,6 @@ public class RoleController {
                 .build();
     }
 
-    // AFTER
     @PostMapping("/{serverId}/roles/{roleId}/members")
     ApiResponse<Void> addRoleMember(
             @PathVariable String serverId,
@@ -81,7 +77,6 @@ public class RoleController {
         return ApiResponse.<Void>builder().message("Assign role successfully").build();
     }
 
-    // AFTER
     @DeleteMapping("/{serverId}/roles/{roleId}/members/{memberId}")
     ApiResponse<Void> removeRoleMember(
             @PathVariable String serverId,
