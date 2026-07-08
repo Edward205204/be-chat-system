@@ -14,6 +14,7 @@ public class ChatMessageResponse {
     String channelId;
     String senderId;
     String senderName;
+    String senderAvatar;
     String content;
     LocalDateTime createdAt;
 }

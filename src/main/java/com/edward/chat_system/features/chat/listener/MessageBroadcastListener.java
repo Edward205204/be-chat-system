@@ -24,6 +24,7 @@ public class MessageBroadcastListener {
                         .id(event.getMessageId())
                         .channelId(event.getChannelId())
                         .senderId(event.getSenderId())
+                        .senderAvatar(event.getSenderAvatar())
                         .content(event.getContent())
                         .createdAt(event.getCreatedAt())
                         .senderName(event.getSenderName())

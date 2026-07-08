@@ -16,6 +16,7 @@ public class MessageCreatedEvent {
     String messageId;
     String channelId;
     String senderId;
+    String senderAvatar;
     String senderName;
     String content;
     LocalDateTime createdAt;
