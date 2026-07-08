@@ -11,8 +11,9 @@ import org.hibernate.annotations.CreationTimestamp;
 @Table(
         name = "messages",
         indexes = {
-            @Index(name = "idx_message_channel_created_at", columnList = "channel_id, created_at"),
-            @Index(name = "idx_message_sender", columnList = "sender_id")
+            @Index(
+                    name = "idx_messages_channel_cursor",
+                    columnList = "channel_id, created_at DESC, id DESC")
         })
 @Entity
 @Getter

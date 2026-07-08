@@ -29,7 +29,6 @@ import org.springframework.stereotype.Service;
 @Transactional
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ChatService {
-    MessageRepository repository;
     ApplicationEventPublisher publisher;
     UserRepository userRepository;
     ChannelRepository channelRepository;
@@ -44,9 +43,9 @@ public class ChatService {
                         .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         Channel channel = channelRepository.getReferenceById(channelId);
         Message message =
-                repository.save(
+                messageRepository.save(
                         Message.builder().content(content).sender(sender).channel(channel).build());
-        repository.flush();
+        messageRepository.flush();
         publisher.publishEvent(
                 MessageCreatedEvent.builder()
                         .messageId(message.getId())
