@@ -250,6 +250,7 @@ public class AuthService {
         refreshTokenRepository.deleteByToken(refreshToken);
     }
 
+    @Transactional
     public TokenResponse refreshToken(String oldToken) {
         RefreshToken refreshToken =
                 refreshTokenRepository
@@ -257,7 +258,9 @@ public class AuthService {
                         .orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
         if (DateTimeUtils.now().isAfter(refreshToken.getExpiresAt()))
             throw new AppException(ErrorCode.UNAUTHENTICATED);
-        User user = refreshToken.getUser();
+        User user = userRepo.findById(refreshToken.getUser().getId()).orElseThrow(
+                () -> new AppException(ErrorCode.USER_NOT_FOUND)
+        );
         JwtClaimObject claim =
                 JwtClaimObject.builder()
                         .email(user.getEmail())
