@@ -43,7 +43,9 @@ spring:
 logging:
   pattern:
     console: "%clr(%d{HH:mm:ss.SSS}){blue} %clr(%5p) %clr(---){faint} %clr([%t]){cyan} %clr(%-40.40logger{39}){magenta} %clr(:){faint} %m%n%wEx"
-
+  level:
+      org.springframework.security: TRACE
+      org.springframework.security.web.FilterChainProxy: DEBUG
 jwt:
   signerKey: ${SIGNER_KEY}
   access-token-duration: 600
