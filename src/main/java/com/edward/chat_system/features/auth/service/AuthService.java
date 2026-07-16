@@ -131,14 +131,6 @@ public class AuthService {
     }
 
     private void validateCanSendCode(@NonNull VerificationCode code) {
-        VerificationCodeStatusEnum codeStatus = code.getStatus();
-        if (codeStatus == VerificationCodeStatusEnum.VERIFIED)
-            throw new AppException(ErrorCode.OTP_HAS_BEEN_USED);
-        if ((codeStatus == VerificationCodeStatusEnum.PENDING)
-                || (codeStatus == VerificationCodeStatusEnum.REVOKED)) validateCoolDown(code);
-    }
-
-    private void validateCoolDown(@NonNull VerificationCode code) {
         LocalDateTime now = DateTimeUtils.now();
         if (now.isBefore(code.getLastSentAt().plusSeconds(cooldown)))
             throw new OtpCooldownException(ErrorCode.OTP_COOLDOWN, code.getLastSentAt());
@@ -146,7 +138,11 @@ public class AuthService {
 
     public void sendOtpVerifyEmail(String userId, String email) {
         VerificationCode code =
-                verificationCodeRepository.findByUserId(userId).orElseGet(VerificationCode::new);
+                verificationCodeRepository
+                        .findByUserIdAndType(userId, VerificationCodeTypeEnum.EMAIL_VERIFY)
+                        .orElseGet(VerificationCode::new);
+        boolean isVerified = userRepo.getUserStatusByUserId(userId);
+        if (isVerified) throw new AppException(ErrorCode.USER_VERIFIED);
         if (code.getId() != null) validateCanSendCode(code);
         String otp = OtpUtils.generateOtp();
 
@@ -181,6 +177,7 @@ public class AuthService {
         return code;
     }
 
+    @Transactional
     public TokenResponse verifyEmailOtp(String userId, String otp) {
         VerificationCode code =
                 verificationCodeRepository

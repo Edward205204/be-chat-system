@@ -20,6 +20,7 @@ public enum ErrorCode {
     USER_ALREADY_A_MEMBER("USER_ALREADY_A_MEMBER", "User is already a member", HttpStatus.CONFLICT),
     JWT_SIGNING_FAILED(
             "JWT_SIGNING_FAILED", "JWT signing failed", HttpStatus.INTERNAL_SERVER_ERROR),
+    USER_VERIFIED("USER_VERIFIED", "User is already verified", HttpStatus.CONFLICT),
 
     UNAUTHENTICATED("UNAUTHENTICATED", "Unauthenticated", HttpStatus.UNAUTHORIZED),
     UNAUTHORIZED(

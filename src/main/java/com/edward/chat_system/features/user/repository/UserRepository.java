@@ -19,4 +19,10 @@ public interface UserRepository extends JpaRepository<User, String> {
             """)
     Optional<User> searchByUsernameOrEmail(
             @Param("q") String q, @Param("currentUserId") String currentUserId);
+
+    @Query(
+            """
+        SELECT u.isVerified FROM User u WHERE u.id = :userId
+""")
+    boolean getUserStatusByUserId(@Param("userId") String userId);
 }
