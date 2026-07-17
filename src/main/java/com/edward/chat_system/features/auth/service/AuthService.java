@@ -258,9 +258,9 @@ public class AuthService {
                         .orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
         if (DateTimeUtils.now().isAfter(refreshToken.getExpiresAt()))
             throw new AppException(ErrorCode.UNAUTHENTICATED);
-        User user = userRepo.findById(refreshToken.getUser().getId()).orElseThrow(
-                () -> new AppException(ErrorCode.USER_NOT_FOUND)
-        );
+        User user =
+                userRepo.findById(refreshToken.getUser().getId())
+                        .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         JwtClaimObject claim =
                 JwtClaimObject.builder()
                         .email(user.getEmail())

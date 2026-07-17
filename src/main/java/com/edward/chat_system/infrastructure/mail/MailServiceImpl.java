@@ -10,10 +10,16 @@ import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.resilience.annotation.Retryable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+/**
+ * Cấu hình thread pool riêng cho @Async.
+ * Mặc định Spring sẽ tìm bean tên "taskExecutor" để xử lý các method @Async.
+ * Nếu không có, nó fallback về SimpleAsyncTaskExecutor — tạo thread mới mỗi lần gọi,
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -22,6 +28,7 @@ public class MailServiceImpl implements MailService {
     JavaMailSender mailSender;
     TemplateEngine templateEngine;
 
+    @Async
     @Override
     @Retryable(value = MailException.class, maxRetries = 3, delay = 500)
     public void sendOtp(String to, String otpCode, MailTemplate template) {
@@ -29,11 +36,6 @@ public class MailServiceImpl implements MailService {
         context.setVariable("otpCode", otpCode);
         context.setVariable("expiryMinutes", 5);
 
-        sendHtmlMail(to, template, context);
-    }
-
-    private void sendHtmlMail(String to, MailTemplate template, Context context)
-            throws MailException {
         try {
             String html = templateEngine.process(template.getTemplateName(), context);
 
