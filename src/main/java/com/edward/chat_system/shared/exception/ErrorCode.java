@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatusCode;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public enum ErrorCode {
+    INVALID_JSON(
+            "INVALID_JSON", "Request body contains invalid JSON format", HttpStatus.BAD_REQUEST),
     CHANNEL_IS_NOT_EXIST("CHANNEL_IS_NOT_EXIST", "Channel is not exist", HttpStatus.BAD_REQUEST),
     EMAIL_NOT_FOUND("EMAIL_NOT_FOUND", "Email not found", HttpStatus.NOT_FOUND),
     EMAIL_EXISTED("EMAIL_EXISTED", "Email existed", HttpStatus.CONFLICT),

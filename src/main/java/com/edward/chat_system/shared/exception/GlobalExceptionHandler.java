@@ -1,10 +1,12 @@
 package com.edward.chat_system.shared.exception;
 
 import com.edward.chat_system.shared.dto.ApiResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.constraints.Null;
 import java.util.Map;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -56,19 +58,13 @@ public class GlobalExceptionHandler {
         FieldError fieldError = exception.getFieldError();
 
         if (fieldError != null && fieldError.getDefaultMessage() != null) {
-            try {
-                String message = fieldError.getDefaultMessage();
+            String message = fieldError.getDefaultMessage();
 
-                ConstraintViolation<?> violation = fieldError.unwrap(ConstraintViolation.class);
+            ConstraintViolation<?> violation = fieldError.unwrap(ConstraintViolation.class);
 
-                Map<String, Object> attributes =
-                        violation.getConstraintDescriptor().getAttributes();
+            Map<String, Object> attributes = violation.getConstraintDescriptor().getAttributes();
 
-                errorCode = ErrorCode.valueOf(mapAttribute(message, attributes));
-
-            } catch (Exception e) {
-                errorCode = ErrorCode.UNCATEGORIZED;
-            }
+            errorCode = ErrorCode.valueOf(mapAttribute(message, attributes));
         }
 
         ApiResponse<Void> response = new ApiResponse<>();
@@ -81,5 +77,28 @@ public class GlobalExceptionHandler {
     private String mapAttribute(String message, Map<String, Object> attr) {
         String value = String.valueOf(attr.get(ERROR_CODE_KEY));
         return message.replace("{" + value + "}", value);
+    }
+
+    @ExceptionHandler(value = HttpMessageNotReadableException.class)
+    ResponseEntity<ApiResponse<Null>> handlingMessageNotReadableException(
+            HttpMessageNotReadableException exception) {
+
+        ApiResponse<Null> apiResponse = new ApiResponse<>();
+
+        apiResponse.setStatus(ErrorCode.INVALID_JSON.getCode());
+        apiResponse.setMessage(
+                ErrorCode.INVALID_JSON.getMessage() + ": " + getParseErrorMessage(exception));
+
+        return ResponseEntity.badRequest().body(apiResponse);
+    }
+
+    private String getParseErrorMessage(HttpMessageNotReadableException exception) {
+        Throwable cause = exception.getMostSpecificCause();
+
+        if (cause instanceof JsonProcessingException jsonException) {
+            return jsonException.getOriginalMessage();
+        }
+
+        return cause.getMessage();
     }
 }
