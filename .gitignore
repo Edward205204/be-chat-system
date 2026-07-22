@@ -35,3 +35,8 @@ build/
 .env
 .direnv/
 docs
+
+
+# Logs
+*.log
+logs/
