@@ -1,0 +1,21 @@
+info:
+  name: add_to_private_channel
+  type: http
+  seq: 5
+
+http:
+  method: POST
+  url: "{{path}}/servers/{{serverId}}/channels/{{channelId}}/invite"
+  body:
+    type: json
+    data: |-
+      {
+        "memberId": ""
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

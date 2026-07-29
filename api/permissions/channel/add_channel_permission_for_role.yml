@@ -1,0 +1,22 @@
+info:
+  name: add_channel_permission_for_role
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{path}}/servers/{{serverId}}/channels/{{channels}}/permissions/roles"
+  body:
+    type: json
+    data: |-
+      {
+        "roleId": "",
+        "permission": ""
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

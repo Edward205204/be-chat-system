@@ -1,0 +1,15 @@
+info:
+  name: kick_member
+  type: http
+  seq: 15
+
+http:
+  method: DELETE
+  url: "{{path}}/servers/{{serverId}}/members/{{kickMemberId}}"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

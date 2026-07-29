@@ -1,0 +1,21 @@
+info:
+  name: update_channel_permissions_for_role
+  type: http
+  seq: 1
+
+http:
+  method: PUT
+  url: "{{path}}/servers/{{serverId}}/channels/{{channelId}}/permissions/roles/{{roleId}}"
+  body:
+    type: json
+    data: |-
+      {
+        "permission": []
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,22 @@
+info:
+  name: add_channel_permission_for_user
+  type: http
+  seq: 5
+
+http:
+  method: POST
+  url: "{{path}}/servers/{{serverId}}/channels/{{channelId}}/permissions/users"
+  body:
+    type: json
+    data: |-
+      {
+        "memberId": "",
+        "permission": ""
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

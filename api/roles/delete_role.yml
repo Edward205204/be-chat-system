@@ -1,0 +1,15 @@
+info:
+  name: delete_role
+  type: http
+  seq: 3
+
+http:
+  method: DELETE
+  url: "{{path}}/servers/{{serverId}}/roles/{{roleId}}"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

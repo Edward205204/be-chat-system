@@ -1,0 +1,21 @@
+info:
+  name: logout
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: "{{path}}/auth/logout"
+  body:
+    type: json
+    data: |-
+      {
+        "refreshToken": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjMTk4Yzg3Mi1mNTI3LTQyZmItYmQwMy1jYjk4Y2NiNjIxYzQiLCJpc3MiOiJlZHdhcmQuY29tIiwiZXhwIjoxNzg0MjE1NDQyLCJ0b2tlblR5cGUiOiJBQ0NFU1NfVE9LRU4iLCJpYXQiOjE3ODQyMTQ4NDIsImp0aSI6ImRmZDA3NTlhLTczNTgtNDk4OS05NDg3LWMyMjFlNzQ2NDdmOCIsImVtYWlsIjoibmd1eWVudG1pbmhraG9hMUBnbWFpbC5jb20iLCJ1c2VybmFtZSI6ImVkd2FyZCJ9.NQIGdO4XbeOM8TeevCAHAvNdy4dPzZ3JPCOo_tCYv6HCL3_UVF1YDGmmGxFCaNod7Ym3QgBF3BfKj4CDqS2Q4w"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,15 @@
+info:
+  name: remove_channel_permission_for_user
+  type: http
+  seq: 7
+
+http:
+  method: DELETE
+  url: "{{path}}/servers/{{serverId}}/channels/{{channelId}}/permissions/users/{{memberId}}/permission/{{permission}}"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

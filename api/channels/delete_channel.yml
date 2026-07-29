@@ -1,0 +1,15 @@
+info:
+  name: delete_channel
+  type: http
+  seq: 4
+
+http:
+  method: DELETE
+  url: "{{path}}/servers/{{serverId}}/channels/{{channelId}}"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

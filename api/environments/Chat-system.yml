@@ -1,0 +1,30 @@
+name: Chat-system
+variables:
+  - secret: true
+    name: accessToken
+  - name: refreshToken
+    value: ""
+  - name: path
+    value: http://localhost:8080/rchat
+  - name: userIdOrEmail
+    value: khoa123kd56cn@gmail.com
+  - name: userId
+    value: 59978a3d-6e41-4b9d-ac22-af8b80a86111
+  - name: inviteToken
+    value: ""
+  - name: serverId
+    value: fa7c8c62-7cd7-421b-a453-d38bb92acc0d
+  - name: banMemberId
+    value: ""
+  - name: channelId
+    value: ""
+  - name: linkId
+    value: ""
+  - name: kickMemberId
+    value: ""
+  - name: newOwnerId
+    value: ""
+  - name: roleId
+    value: ""
+  - name: permission
+    value: ""

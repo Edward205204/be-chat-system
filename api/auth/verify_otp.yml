@@ -1,0 +1,23 @@
+info:
+  name: verify_otp
+  type: http
+  seq: 6
+
+http:
+  method: POST
+  url: "{{path}}/auth/verify/email-otp"
+  body:
+    type: json
+    data: |-
+      {
+        "otp": "503460"
+      }
+  auth:
+    type: bearer
+    token: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1OTk3OGEzZC02ZTQxLTRiOWQtYWMyMi1hZjhiODBhODYxMTEiLCJpc3MiOiJlZHdhcmQuY29tIiwiZXhwIjoxNzg0NDUwNjgyLCJ0b2tlblR5cGUiOiJUTVBfVE9LRU4iLCJpYXQiOjE3ODQzNjQyODIsImp0aSI6ImEyZGFhMTllLTY3NmItNDA0Ny1hMzYxLTEyYzI0OTcxZGQ4MiIsImVtYWlsIjoia2hvYTEyM2tkNTZjbkBnbWFpbC5jb20iLCJ1c2VybmFtZSI6ImVkd2FyZDEifQ.yFl9gXitRSYh078uMMDRsdGP6iFIGyYxk1YpNBBlr4Ws3M_RVmkYvguyyMLlFgsk9dD9o6XioXamG0fqlIVOmw
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

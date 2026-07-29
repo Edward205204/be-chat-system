@@ -1,0 +1,22 @@
+info:
+  name: create_server
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{path}}/servers"
+  body:
+    type: json
+    data: |-
+      {
+        "name": "CN-Sv",
+        "avatar": ""
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

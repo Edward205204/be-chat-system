@@ -1,0 +1,23 @@
+info:
+  name: server_patch_update
+  type: http
+  seq: 5
+
+http:
+  method: PATCH
+  url: "{{path}}/servers/{{serverId}}"
+  body:
+    type: json
+    data: |-
+      {
+        "name": "Eddy1",
+      //   ,"avatar": ""
+      //   ,"banner": ""
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

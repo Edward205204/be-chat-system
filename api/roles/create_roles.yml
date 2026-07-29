@@ -1,0 +1,22 @@
+info:
+  name: create_roles
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{path}}/servers/{{serverId}}/roles"
+  body:
+    type: json
+    data: |-
+      {
+        "name": "",
+        "color": ""
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,15 @@
+info:
+  name: out_server
+  type: http
+  seq: 14
+
+http:
+  method: DELETE
+  url: "{{path}}/servers/{{serverId}}/members/me"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

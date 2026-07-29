@@ -1,0 +1,21 @@
+info:
+  name: add_permission_for_role
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{path}}/servers/{{serverId}}/roles/{{roleId}}/permissions"
+  body:
+    type: json
+    data: |-
+      {
+        "permission": ""
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

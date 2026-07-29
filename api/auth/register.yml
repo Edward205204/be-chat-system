@@ -1,0 +1,32 @@
+info:
+  name: register
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{path}}/auth/register"
+  body:
+    type: json
+    data: |-
+      // {
+      //   "email": "nguyentminhkhoa1@gmail.com",
+      //   "password": "Mk@123123",
+      //   "username": "edward",
+      //   "displayName": "HeheBoy",
+      //   "dateOfBirth": "2004-05-20"
+      // }
+
+      {
+        "email": "khoa123kd56cn2@gmail.com",
+        "password": "Mk@123123",
+        "username": "edward2",
+        "displayName": "HeheBoy",
+        "dateOfBirth": "2004-05-20"
+      }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

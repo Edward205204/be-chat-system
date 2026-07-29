@@ -1,0 +1,21 @@
+info:
+  name: remove_permission_for_role
+  type: http
+  seq: 1
+
+http:
+  method: DELETE
+  url: "{{path}}/servers/{{serverId}}/roles/{{roleId}}/permissions/{{permission}}"
+  body:
+    type: json
+    data: |-
+      {
+        "permission": ""
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
