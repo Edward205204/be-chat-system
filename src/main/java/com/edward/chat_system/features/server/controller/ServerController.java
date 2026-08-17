@@ -197,16 +197,19 @@ public class ServerController {
     // ─── 5. Direct Invitation ─────────────────────────────────────────────────
 
     @PostMapping("/{serverId}/invitations")
-    ApiResponse<CreateDirectInviteResponse> createDirectInvite(@AuthenticationPrincipal Jwt principal,@Valid @RequestBody DirectInviteRequest request, @PathVariable String serverId){
+    ApiResponse<CreateDirectInviteResponse> createDirectInvite(
+            @AuthenticationPrincipal Jwt principal,
+            @Valid @RequestBody DirectInviteRequest request,
+            @PathVariable String serverId) {
         return ApiResponse.<CreateDirectInviteResponse>builder()
                 .message("Create invite successfully")
-                .result(serverService.createDirectInvite(principal.getSubject(),serverId, request 
-                ))
+                .result(serverService.createDirectInvite(principal.getSubject(), serverId, request))
                 .build();
     }
 
     @GetMapping("/invitations")
-    ApiResponse<List<DirectInvitationResponse>> getDirectInvitations(@AuthenticationPrincipal Jwt principal){
+    ApiResponse<List<DirectInvitationResponse>> getDirectInvitations(
+            @AuthenticationPrincipal Jwt principal) {
         return ApiResponse.<List<DirectInvitationResponse>>builder()
                 .message("Get Direct Invitations successfully")
                 .result(serverService.getDirectInvitation(principal.getSubject()))
@@ -214,20 +217,22 @@ public class ServerController {
     }
 
     @PatchMapping("/invitations/{invitationId}")
-    ApiResponse<Void> responseDirectInvite(@AuthenticationPrincipal Jwt principal, @Valid @RequestBody ResponseDirectInvite body, @PathVariable String invitationId){
+    ApiResponse<Void> responseDirectInvite(
+            @AuthenticationPrincipal Jwt principal,
+            @Valid @RequestBody ResponseDirectInvite body,
+            @PathVariable String invitationId) {
         serverService.responseToServerDirectInvite(principal.getSubject(), invitationId, body);
-        return ApiResponse.<Void>builder()
-                .message("Accept or Reject successfully")
-                .build();
+        return ApiResponse.<Void>builder().message("Accept or Reject successfully").build();
     }
 
     // AFTER: Endpoint 5.4 — DELETE /{serverId}/invitations/{invitationId} (cancel)
     @DeleteMapping("/{serverId}/invitations/{invitationId}")
-    ApiResponse<Void> cancelDirectInvite(@AuthenticationPrincipal Jwt principal, @PathVariable String serverId, @PathVariable String invitationId){
-       serverService.cancelDirectInvite(principal.getSubject(), serverId, invitationId); 
-        return ApiResponse.<Void>builder()
-                .message("Cancel Invite succesfully")
-                .build();
+    ApiResponse<Void> cancelDirectInvite(
+            @AuthenticationPrincipal Jwt principal,
+            @PathVariable String serverId,
+            @PathVariable String invitationId) {
+        serverService.cancelDirectInvite(principal.getSubject(), serverId, invitationId);
+        return ApiResponse.<Void>builder().message("Cancel Invite succesfully").build();
     }
 
     // ─── 6. Channel ────────────────────────────────────────────────────────────

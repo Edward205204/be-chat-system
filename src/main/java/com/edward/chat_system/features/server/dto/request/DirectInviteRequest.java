@@ -16,6 +16,6 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class DirectInviteRequest {
-  @NotBlank(message = "Invitee is required")
-  String inviteeId;
+    @NotBlank(message = "Invitee is required")
+    String inviteeId;
 }

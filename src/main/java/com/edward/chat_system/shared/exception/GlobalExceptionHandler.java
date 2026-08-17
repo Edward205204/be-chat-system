@@ -4,9 +4,8 @@ import com.edward.chat_system.shared.dto.ApiResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.constraints.Null;
-import lombok.extern.slf4j.Slf4j;
-
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
@@ -24,7 +23,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = Exception.class)
     ResponseEntity<ApiResponse<Null>> handlingException(Exception exception) {
         ApiResponse<Null> apiResponse = new ApiResponse<>();
-        log.error(exception.toString()); 
+        log.error(exception.toString());
         apiResponse.setStatus(ErrorCode.UNCATEGORIZED.getCode());
         apiResponse.setMessage(ErrorCode.UNCATEGORIZED.getMessage());
         return ResponseEntity.internalServerError().body(apiResponse);

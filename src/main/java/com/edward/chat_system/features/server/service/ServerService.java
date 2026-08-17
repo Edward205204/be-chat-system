@@ -49,9 +49,7 @@ import com.edward.chat_system.shared.utils.CursorUtils;
 import com.edward.chat_system.shared.utils.DateTimeUtils;
 import com.edward.chat_system.shared.utils.InviteUrlBuilder;
 import com.edward.chat_system.shared.utils.SecureTokenGenerator;
-
 import jakarta.transaction.Transactional;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +58,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -384,7 +381,7 @@ public class ServerService {
         inviteLinkRepository.deleteByIdAndServerId(inviteLinkId, serverId);
     }
 
-    ServerMember joinServer(String serverId,String userId){
+    ServerMember joinServer(String serverId, String userId) {
         if (serverMemberRepository.existsByServerIdAndUserId(serverId, userId))
             throw new AppException(ErrorCode.USER_ALREADY_A_MEMBER);
         if (serverBanRepository.existsByServer_IdAndUser_Id(serverId, userId))
@@ -405,14 +402,14 @@ public class ServerService {
                         .orElseThrow(() -> new AppException(ErrorCode.INVITE_LINK_NOT_FOUND));
         Server server = inviteLink.getServer();
         // User user = userRepository.getReferenceById(userId);
-/*         if (serverMemberRepository.existsByServerIdAndUserId(server.getId(), userId))
-            throw new AppException(ErrorCode.USER_ALREADY_A_MEMBER);
-        if (serverBanRepository.existsByServer_IdAndUser_Id(server.getId(), userId))
-            throw new AppException(ErrorCode.USER_BANNED);
-        ServerMember serverMember =
-                serverMemberRepository.save(
-                        ServerMember.builder().server(server).user(user).build());
- */
+        /*         if (serverMemberRepository.existsByServerIdAndUserId(server.getId(), userId))
+                   throw new AppException(ErrorCode.USER_ALREADY_A_MEMBER);
+               if (serverBanRepository.existsByServer_IdAndUser_Id(server.getId(), userId))
+                   throw new AppException(ErrorCode.USER_BANNED);
+               ServerMember serverMember =
+                       serverMemberRepository.save(
+                               ServerMember.builder().server(server).user(user).build());
+        */
         ServerMember serverMember = joinServer(server.getId(), userId);
         inviteLink.setUseCount(inviteLink.getUseCount() + 1);
         inviteLinkRepository.save(inviteLink);
@@ -424,100 +421,141 @@ public class ServerService {
     }
 
     @RequiresServerPermission(ServerPermissionKeyEnum.CREATE_INVITE)
-    public CreateDirectInviteResponse createDirectInvite(String inviterId,@ServerId String serverId, DirectInviteRequest request){
+    public CreateDirectInviteResponse createDirectInvite(
+            String inviterId, @ServerId String serverId, DirectInviteRequest request) {
         String inviteeId = request.getInviteeId();
-        ServerInvitation serverInvitation = serverInvitationRepository.findByInviteeIdAndServerIdAndInviterId(inviteeId, serverId, inviterId).orElseGet(ServerInvitation::new);
-        if(serverMemberRepository.existsByServerIdAndUserId(serverId, inviteeId)){
+        ServerInvitation serverInvitation =
+                serverInvitationRepository
+                        .findByInviteeIdAndServerIdAndInviterId(inviteeId, serverId, inviterId)
+                        .orElseGet(ServerInvitation::new);
+        if (serverMemberRepository.existsByServerIdAndUserId(serverId, inviteeId)) {
             throw new AppException(ErrorCode.USER_ALREADY_A_MEMBER);
-        };
+        }
+        ;
 
-        if(serverInvitation.getStatus().equals(InviteStatusEnum.PENDING) && serverInvitation.getExpiresAt() != null && DateTimeUtils.now().isBefore(serverInvitation.getExpiresAt())) {
-           throw new AppException(ErrorCode.DIRECT_INVITE_ALREADY_PENDING);
+        if (serverInvitation.getStatus().equals(InviteStatusEnum.PENDING)
+                && serverInvitation.getExpiresAt() != null
+                && DateTimeUtils.now().isBefore(serverInvitation.getExpiresAt())) {
+            throw new AppException(ErrorCode.DIRECT_INVITE_ALREADY_PENDING);
         }
 
-        Server server = serverRepository.findById(serverId).orElseThrow(() -> new AppException(ErrorCode.SERVER_NOT_EXIST));
-        User inviter = userRepository.findById(inviterId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        User invitee = userRepository.findById(inviteeId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND)); 
+        Server server =
+                serverRepository
+                        .findById(serverId)
+                        .orElseThrow(() -> new AppException(ErrorCode.SERVER_NOT_EXIST));
+        User inviter =
+                userRepository
+                        .findById(inviterId)
+                        .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        User invitee =
+                userRepository
+                        .findById(inviteeId)
+                        .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         // Expiration is hardcoded to 3 days for now
         LocalDateTime expTime = DateTimeUtils.now().plusDays(3);
         serverInvitation.setExpiresAt(expTime);
         serverInvitation.setInvitee(invitee);
         serverInvitation.setInviter(inviter);
-        serverInvitation.setServer(server); 
+        serverInvitation.setServer(server);
         serverInvitation.setStatus(InviteStatusEnum.PENDING);
 
         serverInvitation = serverInvitationRepository.save(serverInvitation);
 
         return CreateDirectInviteResponse.builder()
                 .id(serverInvitation.getId())
-                .server(ServerBasicInfoResponse.builder().id(server.getId()).name(server.getName()).avatar(server.getAvatar()).build())
-                .invitee(UserBasicInfoResponse.builder()
-                        .id(invitee.getId())
-                        .username(invitee.getUsername())
-                        .displayName(invitee.getDisplayName())
-                        .avatar(invitee.getAvatar()).build())
-                .inviter(UserBasicInfoResponse.builder()
-                        .id(inviter.getId())
-                        .username(inviter.getUsername())
-                        .displayName(inviter.getDisplayName())
-                        .avatar(inviter.getAvatar()).build())
+                .server(
+                        ServerBasicInfoResponse.builder()
+                                .id(server.getId())
+                                .name(server.getName())
+                                .avatar(server.getAvatar())
+                                .build())
+                .invitee(
+                        UserBasicInfoResponse.builder()
+                                .id(invitee.getId())
+                                .username(invitee.getUsername())
+                                .displayName(invitee.getDisplayName())
+                                .avatar(invitee.getAvatar())
+                                .build())
+                .inviter(
+                        UserBasicInfoResponse.builder()
+                                .id(inviter.getId())
+                                .username(inviter.getUsername())
+                                .displayName(inviter.getDisplayName())
+                                .avatar(inviter.getAvatar())
+                                .build())
                 .status(serverInvitation.getStatus())
                 .expiresAt(serverInvitation.getExpiresAt())
                 .createdAt(serverInvitation.getCreatedAt())
                 .build();
     }
 
-    public List<DirectInvitationResponse> getDirectInvitation(String userId){
-        List<UserDirectInviteProjection> serverInvitation = serverInvitationRepository.findUserInvitationByInviteeId(userId); 
-        return serverInvitation.stream().<DirectInvitationResponse>map(item -> DirectInvitationResponse.builder()
-                        .id(item.getId()) 
-                        .server(ServerBasicInfoResponse.builder()
-                                .id(item.getServerId())
-                                .name(item.getServerName())
-                                .avatar(item.getServerAvater())
-                                .build())
-                        .inviter(UserBasicInfoResponse.builder()
-                                .id(item.getInviterId())
-                                .username(item.getInviterUserName())
-                                .displayName(item.getInviterDisplayName())
-                                .avatar(item.getInviterAvatar())
-                                .build())
-                        .status(item.getStatus())
-                        .expiresAt(item.getExpiresAt())
-                        .createdAt(item.getCreatedAt())
-                        .build()).toList();
-    } 
+    public List<DirectInvitationResponse> getDirectInvitation(String userId) {
+        List<UserDirectInviteProjection> serverInvitation =
+                serverInvitationRepository.findUserInvitationByInviteeId(userId);
+        return serverInvitation.stream()
+                .<DirectInvitationResponse>map(
+                        item ->
+                                DirectInvitationResponse.builder()
+                                        .id(item.getId())
+                                        .server(
+                                                ServerBasicInfoResponse.builder()
+                                                        .id(item.getServerId())
+                                                        .name(item.getServerName())
+                                                        .avatar(item.getServerAvater())
+                                                        .build())
+                                        .inviter(
+                                                UserBasicInfoResponse.builder()
+                                                        .id(item.getInviterId())
+                                                        .username(item.getInviterUserName())
+                                                        .displayName(item.getInviterDisplayName())
+                                                        .avatar(item.getInviterAvatar())
+                                                        .build())
+                                        .status(item.getStatus())
+                                        .expiresAt(item.getExpiresAt())
+                                        .createdAt(item.getCreatedAt())
+                                        .build())
+                .toList();
+    }
 
     // PATCH /invitations/{invitationId} (accept/reject)
     @Transactional
-    public void responseToServerDirectInvite(String userId, String invitationId, ResponseDirectInvite request){
-        ServerInvitation serverInvitation = serverInvitationRepository.findByIdAndInviteeId(invitationId, userId).orElseThrow(
-                        () -> new AppException(ErrorCode.DIRECT_INVITE_NOT_FOUND_OR_EXPIRATED)
-        );
+    public void responseToServerDirectInvite(
+            String userId, String invitationId, ResponseDirectInvite request) {
+        ServerInvitation serverInvitation =
+                serverInvitationRepository
+                        .findByIdAndInviteeId(invitationId, userId)
+                        .orElseThrow(
+                                () ->
+                                        new AppException(
+                                                ErrorCode.DIRECT_INVITE_NOT_FOUND_OR_EXPIRATED));
 
-        if(!DateTimeUtils.now().isBefore(serverInvitation.getExpiresAt()))
+        if (!DateTimeUtils.now().isBefore(serverInvitation.getExpiresAt()))
             throw new AppException(ErrorCode.DIRECT_INVITE_NOT_FOUND_OR_EXPIRATED);
 
-        if(!serverInvitation.getStatus().equals(InviteStatusEnum.PENDING))
+        if (!serverInvitation.getStatus().equals(InviteStatusEnum.PENDING))
             throw new AppException(ErrorCode.DIRECT_INVITE_HAS_USED);
 
         InviteStatusEnum status = inviteEnumMapper.map(request.getAction());
 
-        if(request.getAction().equals(InviteAction.REJECT)){
+        if (request.getAction().equals(InviteAction.REJECT)) {
             serverInvitationRepository.updateStatusById(invitationId, status);
             return;
         }
 
         joinServer(serverInvitation.getServer().getId(), userId);
-        serverInvitationRepository.updateAllPendingByInviteeIdAndServerId(status, userId, serverInvitation.getServer().getId());
+        serverInvitationRepository.updateAllPendingByInviteeIdAndServerId(
+                status, userId, serverInvitation.getServer().getId());
     }
 
     // AFTER: Endpoint 5.4 — DELETE /{serverId}/invitations/{invitationId} (cancel)
     @Transactional
-    public void cancelDirectInvite(String userId, String serverId, String invitationId){
-        ServerInvitation serverInvitation = serverInvitationRepository.findByIdAndServerIdAndInviterId(invitationId,serverId, userId).
-                        orElseThrow(() -> new AppException(ErrorCode.CANNOT_CANCEL_INVITE));
-        if(!serverInvitation.getStatus().equals(InviteStatusEnum.PENDING)) throw new AppException(ErrorCode.CANNOT_CANCEL_INVITE);
+    public void cancelDirectInvite(String userId, String serverId, String invitationId) {
+        ServerInvitation serverInvitation =
+                serverInvitationRepository
+                        .findByIdAndServerIdAndInviterId(invitationId, serverId, userId)
+                        .orElseThrow(() -> new AppException(ErrorCode.CANNOT_CANCEL_INVITE));
+        if (!serverInvitation.getStatus().equals(InviteStatusEnum.PENDING))
+            throw new AppException(ErrorCode.CANNOT_CANCEL_INVITE);
 
         serverInvitationRepository.deleteDirectInviteById(invitationId);
     }

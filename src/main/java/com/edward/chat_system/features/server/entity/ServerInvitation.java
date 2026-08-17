@@ -16,8 +16,11 @@ import org.hibernate.annotations.CreationTimestamp;
 @Builder
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 @Table(
-    name = "server_invitations",
-    indexes = @Index(name = "idx_invitation_invitee_server_status", columnList = "invitee_id, server_id, status"))
+        name = "server_invitations",
+        indexes =
+                @Index(
+                        name = "idx_invitation_invitee_server_status",
+                        columnList = "invitee_id, server_id, status"))
 public class ServerInvitation {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
