@@ -40,3 +40,4 @@ docs
 # Logs
 *.log
 logs/
+log.txt

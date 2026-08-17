@@ -1,4 +1,6 @@
-package com.edward.chat_system.features.server.dto.response;
+package com.edward.chat_system.features.server.dto.request;
+
+import com.edward.chat_system.features.server.enums.InviteAction;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -8,14 +10,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ServerBasicInfoResponse {
-    String id;
-    String name;
-    String avatar;
+public class ResponseDirectInvite {
+    InviteAction action;
 }

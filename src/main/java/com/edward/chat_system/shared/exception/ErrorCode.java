@@ -92,6 +92,11 @@ public enum ErrorCode {
     FILE_STORAGE_ERROR(
             "FILE_STORAGE_ERROR", "File storage error", HttpStatus.INTERNAL_SERVER_ERROR),
     FILE_NOT_FOUND("FILE_NOT_FOUND", "File is not found", HttpStatus.NOT_FOUND),
+
+    DIRECT_INVITE_NOT_FOUND_OR_EXPIRATED("DIRECT_INVITE_NOT_FOUND", "Direct invite not found", HttpStatus.NOT_FOUND),
+    DIRECT_INVITE_HAS_USED("DIRECT_INVITE_HAS_USED", "The invitation has already been used", HttpStatus.BAD_REQUEST),
+    CANNOT_CANCEL_INVITE("CANNOT_CANCEL_INVITE", "Invite not found or has been used", HttpStatus.BAD_REQUEST),
+    DIRECT_INVITE_ALREADY_PENDING("DIRECT_INVITE_ALREADY_PENDING", "An active invitation already exists for this user", HttpStatus.CONFLICT)
     ;
     // INVALID_DOB("Age of user must be at least {value}",
     // HttpStatus.UNPROCESSABLE_CONTENT),

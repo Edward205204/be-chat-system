@@ -2,7 +2,6 @@ package com.edward.chat_system.features.server.entity;
 
 import com.edward.chat_system.features.server.enums.InviteStatusEnum;
 import com.edward.chat_system.features.user.entity.User;
-import com.edward.chat_system.shared.utils.DateTimeUtils;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.*;
@@ -17,8 +16,8 @@ import org.hibernate.annotations.CreationTimestamp;
 @Builder
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 @Table(
-        name = "server_invitations",
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"server_id", "invitee_id"})})
+    name = "server_invitations",
+    indexes = @Index(name = "idx_invitation_invitee_server_status", columnList = "invitee_id, server_id, status"))
 public class ServerInvitation {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -37,6 +36,7 @@ public class ServerInvitation {
     @JoinColumn(name = "invitee_id", nullable = false)
     User invitee;
 
+    // this field will be delete, user approve or reject will del this row
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
@@ -48,15 +48,4 @@ public class ServerInvitation {
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     LocalDateTime createdAt;
-
-    @PrePersist
-    void prePersist() {
-        if (createdAt == null) {
-            createdAt = DateTimeUtils.now();
-        }
-
-        if (expiresAt == null) {
-            expiresAt = createdAt.plusDays(3);
-        }
-    }
 }

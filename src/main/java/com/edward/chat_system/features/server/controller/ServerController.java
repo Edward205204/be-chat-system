@@ -7,7 +7,9 @@ import com.edward.chat_system.features.channel.dto.response.ChannelResponse;
 import com.edward.chat_system.features.channel.service.ChannelService;
 import com.edward.chat_system.features.server.dto.request.BanMemberRequest;
 import com.edward.chat_system.features.server.dto.request.CreateServerRequest;
+import com.edward.chat_system.features.server.dto.request.DirectInviteRequest;
 import com.edward.chat_system.features.server.dto.request.MuteMemberRequest;
+import com.edward.chat_system.features.server.dto.request.ResponseDirectInvite;
 import com.edward.chat_system.features.server.dto.request.ServerPatchUpdateRequest;
 import com.edward.chat_system.features.server.dto.response.*;
 import com.edward.chat_system.features.server.service.ServerService;
@@ -194,10 +196,39 @@ public class ServerController {
 
     // ─── 5. Direct Invitation ─────────────────────────────────────────────────
 
-    // AFTER: Endpoint 5.1 — POST /{serverId}/invitations (CREATE_INVITE)
-    // AFTER: Endpoint 5.2 — GET /invitations (get received invitations)
-    // AFTER: Endpoint 5.3 — PATCH /invitations/{invitationId} (accept/reject)
+    @PostMapping("/{serverId}/invitations")
+    ApiResponse<CreateDirectInviteResponse> createDirectInvite(@AuthenticationPrincipal Jwt principal,@Valid @RequestBody DirectInviteRequest request, @PathVariable String serverId){
+        return ApiResponse.<CreateDirectInviteResponse>builder()
+                .message("Create invite successfully")
+                .result(serverService.createDirectInvite(principal.getSubject(),serverId, request 
+                ))
+                .build();
+    }
+
+    @GetMapping("/invitations")
+    ApiResponse<List<DirectInvitationResponse>> getDirectInvitations(@AuthenticationPrincipal Jwt principal){
+        return ApiResponse.<List<DirectInvitationResponse>>builder()
+                .message("Get Direct Invitations successfully")
+                .result(serverService.getDirectInvitation(principal.getSubject()))
+                .build();
+    }
+
+    @PatchMapping("/invitations/{invitationId}")
+    ApiResponse<Void> responseDirectInvite(@AuthenticationPrincipal Jwt principal, @Valid @RequestBody ResponseDirectInvite body, @PathVariable String invitationId){
+        serverService.responseToServerDirectInvite(principal.getSubject(), invitationId, body);
+        return ApiResponse.<Void>builder()
+                .message("Accept or Reject successfully")
+                .build();
+    }
+
     // AFTER: Endpoint 5.4 — DELETE /{serverId}/invitations/{invitationId} (cancel)
+    @DeleteMapping("/{serverId}/invitations/{invitationId}")
+    ApiResponse<Void> cancelDirectInvite(@AuthenticationPrincipal Jwt principal, @PathVariable String serverId, @PathVariable String invitationId){
+       serverService.cancelDirectInvite(principal.getSubject(), serverId, invitationId); 
+        return ApiResponse.<Void>builder()
+                .message("Cancel Invite succesfully")
+                .build();
+    }
 
     // ─── 6. Channel ────────────────────────────────────────────────────────────
 
