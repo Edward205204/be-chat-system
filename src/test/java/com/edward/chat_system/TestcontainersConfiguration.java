@@ -12,6 +12,6 @@ class TestcontainersConfiguration {
     @Bean
     @ServiceConnection
     PostgreSQLContainer mysqlContainer() {
-        return new PostgreSQLContainer(DockerImageName.parse("mysql:latest"));
+        return new PostgreSQLContainer(DockerImageName.parse("postgres:latest"));
     }
 }

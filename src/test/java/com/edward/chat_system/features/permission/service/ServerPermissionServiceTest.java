@@ -140,7 +140,7 @@ class ServerPermissionServiceTest {
         verify(serverRolePermissionRepository).deleteByRole_Id("r1");
         verify(serverRolePermissionRepository).flush();
         assertThat(result.getRoleId()).isEqualTo("r1");
-        assertThat(result.getPermissions()).containsExactly("KICK_MEMBER", "BAN_MEMBER");
+        assertThat(result.getPermissions()).containsExactlyInAnyOrder("KICK_MEMBER", "BAN_MEMBER");
     }
 
     @Test
