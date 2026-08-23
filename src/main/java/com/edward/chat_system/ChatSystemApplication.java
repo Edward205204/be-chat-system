@@ -9,8 +9,10 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.resilience.annotation.EnableResilientMethods;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableAsync
+@EnableScheduling
 @EnableResilientMethods
 @SpringBootApplication
 @EnableConfigurationProperties(StorageProperties.class)
