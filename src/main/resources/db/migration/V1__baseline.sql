@@ -2,8 +2,6 @@
 -- PostgreSQL database dump
 --
 
-\restrict vWjVK7F5McJTBUI9mQb6uVMLE4GhydPSAnX7I4eSBLN476AcNza0rri0xZ9admq
-
 -- Dumped from database version 16.14
 -- Dumped by pg_dump version 16.14
 
@@ -824,5 +822,4 @@ ALTER TABLE ONLY public.server_bans
 -- PostgreSQL database dump complete
 --
 
-\unrestrict vWjVK7F5McJTBUI9mQb6uVMLE4GhydPSAnX7I4eSBLN476AcNza0rri0xZ9admq
 

@@ -20,7 +20,8 @@ public class RequiresOwnerPermission {
         ServerMemberInfoProjection memberInfo =
                 serverMemberRepository
                         .findServerMemberInfo(serverId, userId)
-                        .orElseThrow(() -> new AppException(ErrorCode.UNCATEGORIZED));
-        if (!memberInfo.getIsOwner()) throw new AppException(ErrorCode.UNCATEGORIZED);
+                        .orElseThrow(() -> new AppException(ErrorCode.NOT_A_MEMBER));
+
+        if (!memberInfo.getIsOwner()) throw new AppException(ErrorCode.NOW_DO_NOT_HAVE_PERMISSION);
     }
 }

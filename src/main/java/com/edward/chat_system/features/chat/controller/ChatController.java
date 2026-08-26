@@ -10,13 +10,15 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.security.Principal;
+
+@Slf4j
 @Controller
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -24,8 +26,9 @@ public class ChatController {
     ChatService service;
 
     @MessageMapping("/chat.send")
-    public void send(@AuthenticationPrincipal Jwt principal, SendMessageRequest request) {
-        service.send(principal.getSubject(), request.getChannelId(), request.getContent());
+    public void send(Principal principal, SendMessageRequest request) {
+        log.info("Ok");
+        service.send(principal.getName(), request.getChannelId(), request.getContent());
     }
 
     @GetMapping("/chat/{channelId}/messages")

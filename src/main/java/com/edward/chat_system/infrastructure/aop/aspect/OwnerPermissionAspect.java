@@ -1,6 +1,6 @@
 package com.edward.chat_system.infrastructure.aop.aspect;
 
-import com.edward.chat_system.infrastructure.security.permission.RequiresServerMemberComponent;
+import com.edward.chat_system.infrastructure.security.permission.RequiresOwnerPermission;
 import com.edward.chat_system.shared.utils.JoinPointParameterUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
 public class OwnerPermissionAspect {
-    RequiresServerMemberComponent permissionComponent;
+    RequiresOwnerPermission permissionComponent;
 
     @Before("@annotation(com.edward.chat_system.infrastructure.aop.annotation.RequiresOwner)")
     public void check(JoinPoint jp) {

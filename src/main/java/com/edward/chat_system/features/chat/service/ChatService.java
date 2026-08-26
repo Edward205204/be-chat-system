@@ -35,6 +35,7 @@ public class ChatService {
     MessageRepository messageRepository;
     CursorUtils cursorUtils;
 
+    @Transactional
     @RequiresChannelPermission(ChannelPermissionKeyEnum.VIEW_CHANNEL)
     public void send(String senderId, @ChannelId String channelId, String content) {
         User sender =

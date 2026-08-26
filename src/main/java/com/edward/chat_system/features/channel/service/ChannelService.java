@@ -16,10 +16,7 @@ import com.edward.chat_system.features.server.entity.ServerMember;
 import com.edward.chat_system.features.server.enums.ServerPermissionKeyEnum;
 import com.edward.chat_system.features.server.repository.ServerMemberRepository;
 import com.edward.chat_system.features.server.repository.ServerRepository;
-import com.edward.chat_system.infrastructure.aop.annotation.ChannelId;
-import com.edward.chat_system.infrastructure.aop.annotation.RequiresChannelPermission;
-import com.edward.chat_system.infrastructure.aop.annotation.RequiresServerPermission;
-import com.edward.chat_system.infrastructure.aop.annotation.ServerId;
+import com.edward.chat_system.infrastructure.aop.annotation.*;
 import com.edward.chat_system.shared.dto.CursorPageResponse;
 import com.edward.chat_system.shared.exception.AppException;
 import com.edward.chat_system.shared.exception.ErrorCode;
@@ -41,8 +38,9 @@ public class ChannelService {
     ChannelUserPermissionRepository channelUserPermissionRepository;
     private final ServerMemberRepository serverMemberRepository;
 
+    @RequiresServerMember
     public CursorPageResponse<ChannelResponse> getChannelList(
-            String serverId, String userId, String cursor, int size) {
+           @ServerId String serverId, String userId, String cursor, int size) {
         int fetchSize = size + 1;
 
         List<ChannelInfoRaw> channelInfoRaw;
@@ -136,7 +134,7 @@ public class ChannelService {
     public void addMemberToPrivateChannel(
             @ServerId String serverId, @ChannelId String channelId, AddToChannelRequest request) {
         final ChannelPermissionKeyEnum permissionKeyEnum = ChannelPermissionKeyEnum.VIEW_CHANNEL;
-        if (serverMemberRepository.existsByIdAndServerId(request.getMemberId(), serverId))
+        if (!serverMemberRepository.existsByIdAndServerId(request.getMemberId(), serverId))
             throw new AppException(ErrorCode.NOT_A_MEMBER);
 
         if (channelUserPermissionRepository.existsByUniqueConstraint(
