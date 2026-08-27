@@ -42,23 +42,23 @@ class RequiresOwnerPermissionTest {
     }
 
     @Test
-    void check_userIsNotOwner_throwsUncategorized() {
+    void check_userIsNotOwner_throwsNowDoNotHavePermission() {
         when(currentUserProvider.getUserId()).thenReturn("user-1");
         when(serverMemberRepository.findServerMemberInfo("srv-1", "user-1"))
                 .thenReturn(Optional.of(memberInfo(false)));
 
         assertThatThrownBy(() -> requiresOwnerPermission.check("srv-1"))
                 .isInstanceOf(AppException.class)
-                .satisfies(e -> assertThat(((AppException) e).getErrorCode()).isEqualTo(ErrorCode.UNCATEGORIZED));
+                .satisfies(e -> assertThat(((AppException) e).getErrorCode()).isEqualTo(ErrorCode.NOW_DO_NOT_HAVE_PERMISSION));
     }
 
     @Test
-    void check_notAMember_throwsUncategorized() {
+    void check_notAMember_notAMember() {
         when(currentUserProvider.getUserId()).thenReturn("user-1");
         when(serverMemberRepository.findServerMemberInfo("srv-1", "user-1")).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> requiresOwnerPermission.check("srv-1"))
                 .isInstanceOf(AppException.class)
-                .satisfies(e -> assertThat(((AppException) e).getErrorCode()).isEqualTo(ErrorCode.UNCATEGORIZED));
+                .satisfies(e -> assertThat(((AppException) e).getErrorCode()).isEqualTo(ErrorCode.NOT_A_MEMBER));
     }
 }
