@@ -4,22 +4,24 @@ import com.edward.chat_system.features.channel.enums.ChannelPermissionKeyEnum;
 import com.edward.chat_system.infrastructure.security.permission.RequiresChannelPermissionComponent;
 import com.edward.chat_system.shared.exception.AppException;
 import com.edward.chat_system.shared.exception.ErrorCode;
-import java.util.List;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.MessageHandler;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
-import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.messaging.support.ExecutorChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 
 @Component
-public class JwtChannelInterceptor implements ChannelInterceptor {
+public class JwtChannelInterceptor implements ExecutorChannelInterceptor {
     JwtDecoder jwtDecoder;
     RequiresChannelPermissionComponent permissionComponent;
 
@@ -43,7 +45,8 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
             if (authHeader != null && authHeader.startsWith("Bearer ")) {
                 String token = authHeader.substring(7);
                 Jwt jwt = jwtDecoder.decode(token);
-                accessor.setUser(new UsernamePasswordAuthenticationToken(jwt, null, List.of()));
+                // JwtAuthenticationToken.getName() returns the subject (userId)
+                accessor.setUser(new JwtAuthenticationToken(jwt));
             }
         }
 
@@ -60,13 +63,34 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
         return message;
     }
 
+    // @MessageMapping handlers run on clientInboundChannel worker threads, where the
+    // SecurityContext is empty; expose the STOMP session user so CurrentUserProvider works.
+    @Override
+    public Message<?> beforeHandle(
+            @NonNull Message<?> message,
+            @NonNull MessageChannel channel,
+            @NonNull MessageHandler handler) {
+        StompHeaderAccessor accessor =
+                MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+        if (accessor != null && accessor.getUser() instanceof Authentication auth) {
+            SecurityContextHolder.getContext().setAuthentication(auth);
+        }
+        return message;
+    }
+
+    @Override
+    public void afterMessageHandled(
+            @NonNull Message<?> message,
+            @NonNull MessageChannel channel,
+            @NonNull MessageHandler handler,
+            Exception ex) {
+        SecurityContextHolder.clearContext();
+    }
+
     private String extractUserId(StompHeaderAccessor accessor) {
-        UsernamePasswordAuthenticationToken auth =
-                (UsernamePasswordAuthenticationToken) accessor.getUser();
-        if (auth == null) throw new AppException(ErrorCode.UNAUTHENTICATED);
-        Jwt jwt = (Jwt) auth.getPrincipal();
-        if (jwt == null) throw new AppException(ErrorCode.UNAUTHENTICATED);
-        return jwt.getSubject();
+        if (!(accessor.getUser() instanceof JwtAuthenticationToken auth))
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        return auth.getName();
     }
 
     private String extractChannelId(String destination) {

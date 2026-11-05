@@ -242,7 +242,8 @@ POST /rchat/auth/reset-password
 | Destination         | Mô tả                        |
 |---------------------|------------------------------|
 | `/app/chat.send`    | Gửi tin nhắn vào channel     |
-| `/topic/channel.*`  | Subscribe nhận tin nhắn      |
+| `/topic/channel/{channelId}` | Subscribe nhận tin nhắn |
+| `/user/queue/errors` | Nhận lỗi khi gửi tin thất bại |
 
 ---
 
