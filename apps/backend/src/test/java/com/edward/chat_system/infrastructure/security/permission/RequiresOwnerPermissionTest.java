@@ -53,7 +53,7 @@ class RequiresOwnerPermissionTest {
     }
 
     @Test
-    void check_userIsNotOwner_throwsNoPermission() {
+    void check_userIsNotOwner_throwsNowDoNotHavePermission() {
         when(currentUserProvider.getUserId()).thenReturn("user-1");
         when(serverMemberRepository.findServerMemberInfo("srv-1", "user-1"))
                 .thenReturn(Optional.of(memberInfo(false)));
@@ -67,7 +67,7 @@ class RequiresOwnerPermissionTest {
     }
 
     @Test
-    void check_notAMember_throwsNotAMember() {
+    void check_notAMember_notAMember() {
         when(currentUserProvider.getUserId()).thenReturn("user-1");
         when(serverMemberRepository.findServerMemberInfo("srv-1", "user-1"))
                 .thenReturn(Optional.empty());
