@@ -1,6 +1,3 @@
-# docker-compose.yml (root)
-# Giữ nguyên project name "chat_system" để dùng lại volume dữ liệu cũ
-# (chat_system_postgres_data). Đổi tên này = Postgres mới, trống.
 name: chat_system
 
 services:
@@ -13,7 +10,8 @@ services:
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "5432:5432"
+      # Chỉ mở cho máy này, không lộ Postgres ra mạng LAN
+      - "127.0.0.1:5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
