@@ -1,0 +1,27 @@
+#!/bin/sh
+# Pre-commit: chỉ kiểm tra file đang được commit. Bật bằng `pnpm bootstrap`
+# (git config core.hooksPath .githooks). Bỏ qua khi thật cần: git commit --no-verify
+set -e
+root=$(git rev-parse --show-toplevel)
+cd "$root"
+
+# Frontend: ESLint cho file .ts/.tsx đã stage
+fe_files=$(git diff --cached --name-only --diff-filter=ACMR -- 'apps/frontend/*.ts' 'apps/frontend/*.tsx' |
+  grep -v 'routeTree\.gen\.ts$' | sed 's#^apps/frontend/##' || true)
+if [ -n "$fe_files" ]; then
+  if [ -d apps/frontend/node_modules ]; then
+    echo 'pre-commit: ESLint (frontend)'
+    (cd apps/frontend && printf '%s\n' "$fe_files" | xargs pnpm exec eslint --no-warn-ignored)
+  else
+    echo 'pre-commit: bỏ qua ESLint vì chưa có apps/frontend/node_modules (chạy pnpm bootstrap)'
+  fi
+fi
+
+# Backend: Spotless cho file .java đã stage
+be_files=$(git diff --cached --name-only --diff-filter=ACMR -- 'apps/backend/*.java' || true)
+if [ -n "$be_files" ]; then
+  echo 'pre-commit: Spotless (backend). Sửa tự động: cd apps/backend && ./mvnw spotless:apply'
+  # spotlessFiles nhận danh sách regex; chỉ lấy tên file để không phụ thuộc dấu / hay \ của hệ điều hành
+  patterns=$(printf '%s\n' "$be_files" | sed 's#.*/#.*#; s#\.java$#\\.java#' | paste -sd, -)
+  (cd apps/backend && ./mvnw -q spotless:check "-DspotlessFiles=$patterns")
+fi

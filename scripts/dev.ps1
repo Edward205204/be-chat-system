@@ -6,16 +6,17 @@
   3. Mở 1 cửa sổ chạy Frontend (apps/frontend, pnpm dev, port 3000)
 
   Tuỳ chọn:
-    -Only db|be|fe   chỉ chạy 1 phần
-    -Stop            tắt Postgres (BE/FE: đóng cửa sổ của chúng)
+    db|be|fe        chỉ chạy 1 phần (vd: pwsh scripts/dev.ps1 be)
+    stop            tắt Postgres (BE/FE: đóng cửa sổ của chúng)
 #>
 param(
-  [ValidateSet('all', 'db', 'be', 'fe')]
+  [ValidateSet('all', 'db', 'be', 'fe', 'stop')]
   [string]$Only = 'all',
   [switch]$Stop
 )
 
 $ErrorActionPreference = 'Stop'
+[Console]::OutputEncoding = [Text.Encoding]::UTF8
 $Root = Split-Path -Parent $PSScriptRoot
 $Backend = Join-Path $Root 'apps/backend'
 $Frontend = Join-Path $Root 'apps/frontend'
@@ -29,7 +30,7 @@ function Invoke-Docker {
 }
 
 function Import-DotEnv([string]$Path) {
-  if (-not (Test-Path $Path)) { throw "Thiếu file $Path (xem apps/backend/README.md, mục Biến môi trường)" }
+  if (-not (Test-Path $Path)) { throw "Thiếu file $Path. Chạy trước: pnpm bootstrap" }
   foreach ($line in Get-Content $Path) {
     $l = $line.Trim()
     if ($l -eq '' -or $l.StartsWith('#') -or -not $l.Contains('=')) { continue }
@@ -41,7 +42,7 @@ function Import-DotEnv([string]$Path) {
 
 Push-Location $Root
 try {
-  if ($Stop) {
+  if ($Stop -or $Only -eq 'stop') {
     Invoke-Docker compose --env-file apps/backend/.env stop
     Write-Host 'Đã tắt Postgres. Đóng cửa sổ BE/FE để tắt chúng.' -ForegroundColor Yellow
     return

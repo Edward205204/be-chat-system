@@ -2,13 +2,19 @@
   "name": "chat-system",
   "private": true,
   "description": "Monorepo: apps/backend (Spring Boot) + apps/frontend (React/Vite). Script ở đây chỉ là lối tắt, không phải pnpm workspace.",
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=22.12"
+  },
   "scripts": {
-    "dev": "pwsh -NoProfile -File scripts/dev.ps1",
-    "dev:db": "pwsh -NoProfile -File scripts/dev.ps1 -Only db",
-    "dev:be": "pwsh -NoProfile -File scripts/dev.ps1 -Only be",
-    "dev:fe": "pwsh -NoProfile -File scripts/dev.ps1 -Only fe",
-    "db:stop": "pwsh -NoProfile -File scripts/dev.ps1 -Stop",
-    "build": "pwsh -NoProfile -File scripts/build.ps1",
-    "test:be": "cd apps/backend && mvnw.cmd -B test"
+    "bootstrap": "node scripts/run.mjs setup",
+    "dev": "node scripts/run.mjs dev",
+    "dev:db": "node scripts/run.mjs dev db",
+    "dev:be": "node scripts/run.mjs dev be",
+    "dev:fe": "node scripts/run.mjs dev fe",
+    "db:stop": "node scripts/run.mjs dev stop",
+    "build": "node scripts/run.mjs build",
+    "test:be": "node scripts/run.mjs mvnw -B test",
+    "format:be": "node scripts/run.mjs mvnw -q spotless:apply"
   }
 }

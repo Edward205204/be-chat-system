@@ -5,3 +5,6 @@
 *.ps1 text eol=crlf
 # Flyway migrations: giữ nguyên byte để checksum không đổi
 /apps/backend/src/main/resources/db/migration/*.sql -text
+
+# Script shell và git hook phải là LF để chạy được trên Linux/WSL
+/.githooks/* text eol=lf

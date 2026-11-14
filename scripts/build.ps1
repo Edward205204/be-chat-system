@@ -1,9 +1,10 @@
 ﻿<#
   Build cả dự án (giống những gì CI sẽ chạy):  pnpm build   hoặc   pwsh scripts/build.ps1
-  - Backend : mvnw package (bỏ test vì test cần Docker/Testcontainers; chạy riêng: pnpm test:be)
+  - Backend : mvnw verify (compile + unit test, không cần Docker hay .env)
   - Frontend: pnpm install --frozen-lockfile, lint, build
 #>
 $ErrorActionPreference = 'Stop'
+[Console]::OutputEncoding = [Text.Encoding]::UTF8
 $Root = Split-Path -Parent $PSScriptRoot
 
 function Step([string]$Name, [string]$Dir, [scriptblock]$Cmd) {
@@ -16,7 +17,7 @@ function Step([string]$Name, [string]$Dir, [scriptblock]$Cmd) {
   finally { Pop-Location }
 }
 
-Step 'Backend build' 'apps/backend' { .\mvnw.cmd -B -q package -DskipTests }
+Step 'Backend verify' 'apps/backend' { .\mvnw.cmd -B -q verify }
 Step 'Frontend install' 'apps/frontend' { pnpm install --frozen-lockfile --config.confirmModulesPurge=false }
 Step 'Frontend lint' 'apps/frontend' { pnpm lint }
 Step 'Frontend build' 'apps/frontend' { pnpm build }
