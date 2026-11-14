@@ -1,0 +1,66 @@
+server:
+    port: 8080
+    servlet: 
+        context-path: /rchat
+
+app:
+    frontend-url: http://localhost:3000
+
+spring:
+    config:
+        # Tự nạp apps/backend/.env (nếu có) khi chạy từ thư mục apps/backend: không cần direnv hay IDE inject.
+        # Biến môi trường thật của hệ thống vẫn được ưu tiên hơn giá trị trong .env.
+        import: "optional:file:.env[.properties]"
+    application:
+        name: chat_system
+    datasource:
+        url: ${DB_URL}
+        driverClassName: "org.postgresql.Driver"
+        username: ${DB_USERNAME}
+        password: ${DB_PASSWORD}
+    jpa:
+        open-in-view: false
+        hibernate:
+            ddl-auto: validate
+        show-sql: true
+        properties:
+            hibernate:
+                dialect: org.hibernate.dialect.PostgreSQLDialect
+                jdbc:
+                    batch_size: 50
+                order_inserts: true
+    flyway:
+        enabled: true
+        baseline-on-migrate: true
+        locations: classpath:db/migration
+    mail:
+        host: "smtp.gmail.com"
+        port: 587
+        username: ${EMAIL_ACCOUNT}
+        password: ${EMAIL_APP_PASSWORD}
+        properties:
+            mail:
+                smtp:
+                    auth: true
+                    starttls:
+                        enable: true
+    output:
+        ansi:
+            enabled: ALWAYS
+        
+logging:
+  pattern:
+    console: "%clr(%d{HH:mm:ss.SSS}){blue} %clr(%5p) %clr(---){faint} %clr([%t]){cyan} %clr(%-40.40logger{39}){magenta} %clr(:){faint} %m%n%wEx"
+  level:
+#      org.springframework.security: TRACE
+#      org.springframework.security.web.FilterChainProxy: DEBUG
+      org.flywaydb: DEBUG
+jwt:
+  signerKey: ${SIGNER_KEY}
+  access-token-duration: 600
+  tmp-token-duration: 86400
+  refresh-token-duration: 864000
+
+otp:
+    cooldown: 120
+    valid_duration: 600

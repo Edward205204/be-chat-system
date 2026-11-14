@@ -1,396 +1,121 @@
-<div align="center">
+# Chat System
 
-# 💬 be-chat-system
+Ứng dụng chat kiểu Discord: server, channel, role/permission, chat realtime qua STOMP.
 
-Backend của một ứng dụng chat thời gian thực lấy cảm hứng từ Discord.
+| Phần | Công nghệ | Thư mục |
+|------|-----------|---------|
+| Backend | Spring Boot 4, Java 21, PostgreSQL, Flyway | [`apps/backend`](apps/backend) |
+| Frontend | React 19, Vite, TanStack Router/Query, pnpm | [`apps/frontend`](apps/frontend) |
+| Database | Postgres 16 (Docker) | [`docker-compose.yml`](docker-compose.yml) |
 
-[![Java](https://img.shields.io/badge/Java_21-ED8B00?style=flat-square&logo=openjdk&logoColor=white)](https://openjdk.org/projects/jdk/21/)
-[![Spring Boot](https://img.shields.io/badge/Spring_Boot_4.1-6DB33F?style=flat-square&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
-[![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white)](https://www.docker.com/)
+## Cần cài trước
 
-[![GitHub commit activity](https://img.shields.io/github/commit-activity/m/Edward205204/be-chat-system?style=flat-square&label=commits%2Fmonth&color=302b63)](https://github.com/Edward205204/be-chat-system/commits/main)
-[![GitHub last commit](https://img.shields.io/github/last-commit/Edward205204/be-chat-system?style=flat-square&color=6c63ff)](https://github.com/Edward205204/be-chat-system/commits/main)
-[![Java 98.5%](https://img.shields.io/badge/Java-98.5%25-ED8B00?style=flat-square&logo=openjdk&logoColor=white)](https://github.com/Edward205204/be-chat-system)
+Chạy được trên Windows, Linux, macOS và WSL. `pnpm bootstrap` sẽ kiểm tra giúp từng món trong bảng bắt buộc.
 
-</div>
+### Bắt buộc
 
----
+| Công cụ | Phiên bản | Dùng để | Kiểm tra |
+|---------|-----------|---------|----------|
+| Git | bất kỳ bản gần đây | mã nguồn, git hook | `git --version` |
+| JDK | 21 trở lên (CI dùng Temurin 21) | build và chạy backend | `java -version` |
+| Node.js | 22.12 trở lên, khuyên dùng 24 | frontend và các script ở thư mục gốc | `node -v` |
+| pnpm | 10 (ghi ở `packageManager`) | cài dependency frontend, chạy lệnh | `pnpm -v` |
+| Docker + plugin compose | bất kỳ bản gần đây | Postgres cho môi trường dev | `docker compose version` |
 
-> Dự án được xây dựng với Java / Spring Boot, tập trung vào các khía cạnh của một backend enterprise: security, realtime communication, RBAC và data modeling.
+Ghi chú cài đặt:
 
----
+- **pnpm**: cách gọn nhất là `corepack enable` (corepack đi kèm Node), nó tự lấy đúng bản ghi trong `package.json`. Hoặc `npm i -g pnpm@10`.
+- **Maven**: không cần cài. `apps/backend/mvnw` tự tải Maven 3.9 ở lần chạy đầu (cần mạng).
+- **Docker trên Windows**: dùng Docker Desktop, hoặc Docker Engine cài bên trong WSL. Với cách thứ hai, `pnpm dev` mở thêm một cửa sổ WSL để giữ Postgres sống, đừng đóng nó khi đang dev.
+- **PowerShell 7** (`pwsh`, chỉ Windows): khuyên dùng. Không có thì script tự dùng Windows PowerShell có sẵn.
 
-## 📌 Tổng quan
+### Tuỳ chọn
 
-`be-chat-system` là backend của một ứng dụng chat theo phong cách **Discord**, bao gồm các tính năng:
+| Công cụ | Khi nào cần |
+|---------|-------------|
+| [direnv](https://direnv.net) | Muốn biến trong `.env` có sẵn trong shell khi `cd apps/backend`. Backend tự đọc `.env` nên không bắt buộc. Nếu dùng: `direnv allow apps/backend`. |
+| [Bruno](https://www.usebruno.com) | Mở bộ request API có sẵn ở `apps/backend/api`. |
+| Plugin Lombok cho IDE | IntelliJ / VS Code hiểu code sinh bởi Lombok và MapStruct. Build bằng Maven thì không cần. |
+| Gmail App Password | Tính năng gửi OTP và quên mật khẩu. Thiếu thì các luồng khác vẫn chạy. |
 
-- Đăng ký / đăng nhập với xác thực email OTP
-- JWT stateless authentication (Access token + Refresh token)
-- Quản lý Server (guild), Channel, thành viên
-- Phân quyền RBAC theo Server và Channel
-- Chat realtime qua **WebSocket (STOMP)**
-- Gửi email (OTP, thông báo) qua SMTP + Thymeleaf templates
-
----
-
-## 🛠 Tech Stack
-
-| Layer         | Technology                                                                 |
-|---------------|----------------------------------------------------------------------------|
-| Language      | Java 21                                                                    |
-| Framework     | Spring Boot 4.1                                                            |
-| Web           | Spring MVC (REST) + Spring WebSocket (STOMP)                               |
-| Security      | Spring Security · OAuth2 Resource Server · JWT (`nimbus-jose-jwt` HS512)  |
-| ORM           | Spring Data JPA · Hibernate · PostgreSQL dialect                           |
-| Database      | PostgreSQL 16 (prod) · H2 (dev/test)                                       |
-| Mapping       | MapStruct 1.5.5 + Lombok                                                   |
-| Mail          | Spring Mail (SMTP Gmail) + Thymeleaf email templates                       |
-| Testing       | JUnit 5 · Testcontainers · JaCoCo · Spring Boot Test slices                |
-| Code style    | Spotless — Google Java Format AOSP 1.25.2                                  |
-| Container     | Docker Compose (PostgreSQL 16-alpine)                                      |
-| Build tool    | Maven (mvnw wrapper)                                                       |
-
----
-
-## 📁 Cấu trúc dự án
-
-```
-src/main/java/com/edward/chat_system/
-│
-├── ChatSystemApplication.java
-│
-├── features/                      # Tổ chức theo feature (vertical slice)
-│   ├── auth/                      # Xác thực & phân quyền truy cập
-│   │   ├── controller/            # AuthController
-│   │   ├── dto/                   # Request / Response DTOs
-│   │   ├── entity/                # RefreshToken, VerificationCode
-│   │   ├── enums/
-│   │   ├── exception/
-│   │   ├── repository/
-│   │   └── service/               # AuthService
-│   │
-│   ├── user/                      # Quản lý người dùng
-│   │   ├── controller/            # UserController
-│   │   ├── dto/
-│   │   ├── entity/                # User
-│   │   ├── mapper/
-│   │   ├── repository/
-│   │   └── service/
-│   │
-│   ├── server/                    # Server (Discord-style guild)
-│   │   ├── controller/            # ServerController
-│   │   ├── dto/
-│   │   ├── entity/                # Server, ServerMember, ServerBan, InviteLink, ServerInvitation
-│   │   ├── enums/
-│   │   ├── mapper/
-│   │   ├── projection/
-│   │   ├── repository/
-│   │   └── service/
-│   │
-│   ├── channel/                   # Kênh chat trong Server
-│   │   ├── constant/
-│   │   ├── dto/
-│   │   ├── entity/                # Channel
-│   │   ├── enums/
-│   │   ├── mapper/
-│   │   ├── projection/
-│   │   ├── repository/
-│   │   └── service/               # ChannelService
-│   │
-│   ├── permission/                # Hệ thống phân quyền RBAC
-│   │   ├── constant/              # RoleConstants
-│   │   ├── controller/            # RoleController, ServerPermissionController, ChannelPermissionController
-│   │   ├── dto/
-│   │   ├── entity/                # Role, RoleMember, ServerRolePermission, ChannelRolePermission, ChannelUserPermission
-│   │   ├── mapper/
-│   │   ├── projection/
-│   │   ├── repository/
-│   │   └── service/
-│   │
-│   └── chat/                      # Nhắn tin realtime
-│       ├── controller/            # ChatController (WebSocket STOMP)
-│       ├── dto/
-│       ├── entity/                # Message
-│       ├── event/
-│       ├── listener/
-│       ├── repository/
-│       ├── service/
-│       └── websocket/             # ChannelDestination
-│
-├── infrastructure/                # Cơ sở hạ tầng kỹ thuật
-│   ├── aop/                       # Aspect-Oriented Programming
-│   │   ├── annotation/
-│   │   ├── aspect/
-│   │   └── validator/
-│   ├── configuration/             # SecurityConfig, WebConfig, WebSocketConfig
-│   ├── mail/                      # Mail service
-│   └── security/
-│       ├── jwt/                   # JwtSigner, JwtDecoderConfig, JwtChannelInterceptor
-│       └── permission/            # Permission checkers
-│
-└── shared/                        # Dùng chung toàn dự án
-    ├── aop/
-    ├── dto/                       # ApiResponse<T>, CursorPageResponse<T>
-    ├── exception/                 # AppException, ErrorCode, GlobalExceptionHandler
-    └── utils/
-```
-
----
-
-## 🔐 Authentication Flow
-
-```
-POST /rchat/auth/register
-  └─► Tạo User (isVerified=false)
-  └─► Trả về temp token (JWT ngắn hạn)
-
-POST /rchat/auth/send/email-otp   [cần temp token]
-  └─► Gửi OTP qua Gmail SMTP (Thymeleaf template)
-
-POST /rchat/auth/verify/email-otp [cần temp token]
-  └─► Xác thực OTP → isVerified=true
-  └─► Trả về { accessToken, refreshToken }
-
-POST /rchat/auth/login
-  └─► Email + Password → { accessToken, refreshToken }
-
-POST /rchat/auth/refresh
-  └─► refreshToken → { accessToken mới, refreshToken mới }
-
-POST /rchat/auth/logout
-  └─► Xoá refreshToken khỏi DB
-
-POST /rchat/auth/send/forgot-password
-POST /rchat/auth/reset-password
-  └─► OTP qua email → đặt lại mật khẩu
-```
-
-**JWT**: ký bằng `HS512`, payload chứa `sub` (userId), `email`, `username`.  
-**Token TTL**:
-- Access token: `600s` (10 phút)
-- Temp token: `86400s` (1 ngày)
-- Refresh token: `864000s` (10 ngày)
-
-**OTP**:
-- Cooldown: `120s` giữa 2 lần gửi
-- Hết hạn sau: `600s`
-- Tối đa `5` lần nhập sai → OTP bị thu hồi
-
----
-
-## 🌐 API Endpoints
-
-> Base path: `http://localhost:8080/rchat`  
-> Tất cả response bọc trong `ApiResponse<T>` với cấu trúc `{ message, result }`.
-
-### Auth — `/auth`
-
-| Method | Path                       | Mô tả                             |
-|--------|----------------------------|------------------------------------|
-| POST   | `/auth/register`           | Đăng ký tài khoản                  |
-| POST   | `/auth/login`              | Đăng nhập                          |
-| POST   | `/auth/send/email-otp`     | Gửi OTP xác thực email             |
-| POST   | `/auth/verify/email-otp`   | Xác thực email bằng OTP            |
-| POST   | `/auth/send/forgot-password` | Gửi OTP quên mật khẩu           |
-| POST   | `/auth/reset-password`     | Đặt lại mật khẩu                  |
-| POST   | `/auth/refresh`            | Làm mới Access Token               |
-| POST   | `/auth/logout`             | Đăng xuất                          |
-
-### Server — `/servers`
-
-| Method | Path                                       | Mô tả                          |
-|--------|--------------------------------------------|--------------------------------|
-| GET    | `/servers`                                 | Lấy danh sách server của tôi  |
-| POST   | `/servers`                                 | Tạo server mới                 |
-| GET    | `/servers/{serverId}`                      | Chi tiết server                |
-| PATCH  | `/servers/{serverId}`                      | Cập nhật server                |
-| DELETE | `/servers/{serverId}`                      | Xoá server                     |
-| GET    | `/servers/{serverId}/members`              | Danh sách thành viên           |
-| DELETE | `/servers/{serverId}/members/{memberId}`   | Kick thành viên                |
-| DELETE | `/servers/{serverId}/members/me`           | Rời server                     |
-| PATCH  | `/servers/{serverId}/owner/{memberId}`     | Chuyển quyền chủ               |
-| PATCH  | `/servers/{serverId}/members/{memberId}/mute` | Mute thành viên             |
-| POST   | `/servers/{serverId}/bans/{userId}`        | Ban người dùng                 |
-| DELETE | `/servers/{serverId}/bans/{userId}`        | Unban người dùng               |
-| GET    | `/servers/{serverId}/bans`                 | Danh sách bị ban               |
-| POST   | `/servers/{serverId}/links`                | Tạo invite link                |
-| GET    | `/servers/{serverId}/links`                | Lấy danh sách invite link      |
-| PATCH  | `/servers/{serverId}/links/{linkId}/revoke` | Thu hồi invite link           |
-| POST   | `/servers/join/{token}`                    | Tham gia server qua invite link |
-
-### Channel — `/servers/{serverId}/channels`
-
-| Method | Path                                                  | Mô tả                      |
-|--------|-------------------------------------------------------|----------------------------|
-| GET    | `/servers/{serverId}/channels`                        | Danh sách channel          |
-| POST   | `/servers/{serverId}/channels`                        | Tạo channel mới            |
-| PATCH  | `/servers/{serverId}/channels/{channelId}`            | Cập nhật channel           |
-| DELETE | `/servers/{serverId}/channels/{channelId}`            | Xoá channel                |
-| POST   | `/servers/{serverId}/channels/{channelId}/invite`     | Thêm thành viên vào channel private |
-
-### Permission — `/roles`, `/servers/{id}/permissions`, `/channels/{id}/permissions`
-
-| Controller                    | Mô tả                                   |
-|-------------------------------|-----------------------------------------|
-| `RoleController`              | CRUD Role trong server                  |
-| `ServerPermissionController`  | Gán/thu hồi permission cấp Server      |
-| `ChannelPermissionController` | Gán/thu hồi permission cấp Channel     |
-
-### Chat — WebSocket (STOMP)
-
-| Destination         | Mô tả                        |
-|---------------------|------------------------------|
-| `/app/chat.send`    | Gửi tin nhắn vào channel     |
-| `/topic/channel.*`  | Subscribe nhận tin nhắn      |
-
----
-
-## 🗄 Domain Model
-
-```
-User
- ├─── Server (owner)
- │     ├─── ServerMember (User N:N)
- │     ├─── ServerBan
- │     ├─── InviteLink
- │     ├─── ServerInvitation
- │     └─── Channel
- │            ├─── Message (sender: User)
- │            ├─── ChannelRolePermission
- │            └─── ChannelUserPermission
- │
- ├─── Role (per Server)
- │     ├─── RoleMember
- │     └─── ServerRolePermission
- │
- ├─── RefreshToken
- └─── VerificationCode (OTP)
-```
-
----
-
-## ⚙️ Cấu hình
-
-### Biến môi trường (`.env`)
-
-```env
-# JWT
-SIGNER_KEY=<chuỗi >= 64 bytes cho HS512>
-
-# Database
-DB_URL=jdbc:postgresql://localhost:5432/chat_system
-DB_USERNAME=postgres
-DB_PASSWORD=postgres
-
-# Gmail SMTP
-EMAIL_ACCOUNT=your@gmail.com
-EMAIL_APP_PASSWORD_NAME=RChat
-EMAIL_APP_PASSWORD=your_app_password
-```
-
-### `application.yaml` (tóm tắt)
-
-```yaml
-server:
-  port: 8080
-  servlet.context-path: /rchat
-
-jwt:
-  access-token-duration: 600       # giây
-  tmp-token-duration: 86400
-  refresh-token-duration: 864000
-
-otp:
-  cooldown: 120                    # giây
-  valid_duration: 600
-```
-
----
-
-## 🚀 Chạy local
-
-**Yêu cầu**: Docker, Java 21, Maven (hoặc dùng `mvnw`)
+## Bắt đầu trên máy mới
 
 ```bash
-# 1. Khởi động PostgreSQL
-docker compose up -d
-
-# 2. Chạy ứng dụng
-./mvnw spring-boot:run
+git clone git@github.com:Edward205204/be-chat-system.git chat_system
+cd chat_system
+pnpm bootstrap   # kiểm tra công cụ, tạo apps/backend/.env, cài dependency FE, bật git hook
+pnpm dev         # Postgres + Backend (:8080) + Frontend (:3000)
 ```
 
-**H2 Console** (dev): `http://localhost:8080/rchat/h2-console`  
-**Actuator**: `http://localhost:8080/rchat/actuator`
+Mở http://localhost:3000.
 
----
+`pnpm bootstrap` tạo `apps/backend/.env` từ [`.env.example`](apps/backend/.env.example) với `SIGNER_KEY` sinh ngẫu nhiên và tài khoản Postgres mặc định, nên chạy được ngay. Chỉ cần sửa file này khi muốn gửi email OTP (`EMAIL_ACCOUNT`, `EMAIL_APP_PASSWORD`).
 
-## 🧪 Testing
+## Lệnh thường dùng
+
+Tất cả chạy từ thư mục gốc, giống nhau trên mọi hệ điều hành.
+
+| Lệnh | Việc |
+|------|------|
+| `pnpm bootstrap` | chuẩn bị máy (chạy lại bao nhiêu lần cũng được) |
+| `pnpm dev` | DB + BE + FE |
+| `pnpm dev:db` / `dev:be` / `dev:fe` | chỉ chạy 1 phần |
+| `pnpm db:stop` | tắt Postgres |
+| `pnpm build` | BE verify (compile + unit test) và FE lint + build, giống CI |
+| `pnpm test:be` | unit test backend (không cần Docker hay `.env`) |
+| `pnpm format:be` | format code Java bằng Spotless |
+
+Trên Windows, `pnpm dev` mở cửa sổ riêng cho BE và FE. Trên Linux/macOS/WSL, BE và FE chạy chung terminal, Ctrl+C để tắt cả hai.
+
+## Biến môi trường
+
+- Chỉ backend cần file env: `apps/backend/.env` (không commit, mẫu ở `.env.example`). Frontend không cần biến nào, Vite proxy `/rchat` sang `:8080`.
+- Backend tự nạp `.env` khi khởi động từ `apps/backend` (`spring.config.import` trong `application.yaml`), nên chạy bằng `pnpm dev`, `./mvnw spring-boot:run` hay IDE đều giống nhau. Biến môi trường thật của hệ thống được ưu tiên hơn giá trị trong `.env`.
+- Viết `.env` dạng `KEY=value`, không bọc ngoặc kép và không có `export`, vì Spring đọc nguyên văn phần sau dấu `=`.
+- `docker-compose.yml` đọc `DB_USERNAME` / `DB_PASSWORD` từ cùng file đó.
+
+## Chạy bằng Docker (production)
+
+Dùng khi muốn chạy thử hoặc triển khai mà máy chỉ có Docker. Không dùng cho dev hằng ngày, vì mỗi lần đổi code hay dependency phải build lại image.
 
 ```bash
-# Chạy toàn bộ test
-./mvnw test
-
-# Báo cáo JaCoCo coverage
-./mvnw verify
-# Xem tại: target/site/jacoco/index.html
+docker compose -f docker-compose.prod.yml --env-file apps/backend/.env up -d --build
 ```
 
-> Test dùng **Testcontainers** để spin up PostgreSQL thật trong Docker khi chạy integration test.  
-> JaCoCo loại trừ `dto/`, `entity/`, `mapper/` khỏi báo cáo coverage.
+Mở http://localhost:8088. Image backend chỉ có JRE 21 và file jar, image frontend chỉ có nginx và file tĩnh; JDK, Maven, Node, pnpm chỉ tồn tại ở stage build. Chỉ nginx mở cổng ra ngoài, nó proxy `/rchat` (REST và WebSocket) sang backend.
 
----
+| Biến (đặt trong file env hoặc shell) | Mặc định | Ý nghĩa |
+|------|----------|---------|
+| `APP_PORT` | `8088` | cổng mở trên máy host |
+| `APP_FRONTEND_URL` | `http://localhost:8088` | origin người dùng truy cập, backend dùng cho WebSocket và link mời |
 
-## 🎨 Code Style
+Khi triển khai thật, hãy dùng file env riêng với `SIGNER_KEY` và mật khẩu DB mạnh, và đặt HTTPS ở phía trước.
 
-Dự án dùng **Spotless** với Google Java Format (style AOSP):
-
-```bash
-# Kiểm tra format
-./mvnw spotless:check
-
-# Tự động format
-./mvnw spotless:apply
-```
-
----
-
-## 📈 Tiến độ
+## Cấu trúc
 
 ```
-[████████░░░░░░░░░░░░] ~40%
+.
+├── apps/
+│   ├── backend/          Spring Boot API  (http://localhost:8080/rchat)
+│   └── frontend/         React SPA        (http://localhost:3000)
+├── scripts/              setup / dev / build (.ps1 cho Windows, .sh cho Linux/macOS/WSL), run.mjs chọn theo hệ điều hành
+├── .githooks/            pre-commit: ESLint và Spotless cho file đang commit
+├── .github/              CI, PR template, CODEOWNERS
+├── docker-compose.yml    Postgres cho môi trường dev
+├── docker-compose.prod.yml  DB + BE + FE bằng image production
+└── package.json          lối tắt lệnh: pnpm dev, pnpm build, ...
 ```
 
-- [x] Project setup — Spring Boot 4.1, Maven, Docker Compose
-- [x] Entity design — domain model, relationships, DB indexes
-- [x] Authentication — JWT (HS512), Spring Security, OAuth2 Resource Server
-- [x] Email OTP — đăng ký, forgot password (SMTP Gmail + Thymeleaf)
-- [x] Server CRUD — tạo, sửa, xoá, xem
-- [x] Server Members — join, kick, leave, mute, transfer owner
-- [x] Ban system — ban / unban, danh sách ban
-- [x] Invite Link — tạo link, revoke, join qua token
-- [x] Channel CRUD — tạo, sửa, xoá, danh sách (cursor pagination)
-- [x] RBAC — Role, ServerRolePermission, ChannelRolePermission, ChannelUserPermission
-- [x] WebSocket setup — STOMP config, JWT channel interceptor
-- [x] Chat — gửi & nhận tin nhắn realtime qua WebSocket
-- [ ] Direct Invitation (server invite by user ID)
-- [ ] File upload (avatar, banner, attachment)
-- [ ] Direct Message (DM giữa 2 người dùng)
-- [ ] Read receipts / Typing indicator
-- [ ] Notification service
-- [ ] ...
+## Quy ước làm việc
 
----
+- **Nhánh**: không commit thẳng vào `main`. Tạo nhánh `feat/...`, `fix/...`, `chore/...` rồi mở Pull Request.
+- **Commit**: theo [Conventional Commits](https://www.conventionalcommits.org), ví dụ `fix(chat): ...`, `feat(server): ...`, `chore(monorepo): ...`.
+- **Trước khi mở PR**: `pnpm build` phải sạch. CI chạy đúng những bước đó.
+- **Pre-commit hook**: bật sẵn sau `pnpm bootstrap`. Nó chạy ESLint cho file FE và Spotless cho file Java đang commit. Lỗi format Java sửa bằng `pnpm format:be`.
+- **Database**: thay đổi schema bằng file Flyway mới `V<n>__mo_ta.sql`, không sửa migration đã có.
+- **Secret**: không commit `.env`, key hay mật khẩu. Thêm biến mới thì cập nhật `.env.example`.
 
-## 💡 Mục tiêu
+## Tài liệu
 
-Chat system là một bài toán phù hợp để thực hành đồng thời nhiều khía cạnh của backend: **authentication**, **realtime communication**, **RBAC**, và **relational data modeling** — thay vì một CRUD app đơn thuần.
-
-Stack Java / Spring Boot được chọn vì tính phổ biến trong môi trường enterprise và hệ sinh thái trưởng thành xung quanh (Security, JPA, WebSocket, Testing).
-
----
-
-## 🔗 Liên quan
-
-- 👤 [GitHub Profile](https://github.com/Edward205204)
-- 📦 [BE_Learn_Proof](https://github.com/Edward205204/BE_Learn_Proof) — Dự án capstone NestJS trước đó
+- Backend: [`apps/backend/README.md`](apps/backend/README.md).
+- Frontend: [`apps/frontend/CONVENTIONS.md`](apps/frontend/CONVENTIONS.md).

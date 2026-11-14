@@ -1,43 +1,11 @@
-HELP.md
-target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
-
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-### VS Code ###
-# ở môi trường dev, dùng chính env của vscode(đọc từ file .env) để inject vào application.yaml thay thế cho biến env của system.
-.vscode/
+# Root .gitignore — mỗi app còn .gitignore riêng trong apps/<app>/
 .env
-.direnv/
-docs
-
-
-# Logs
-*.log
+.env.*
+!.env.example
+node_modules/
 logs/
-log.txt
+*.log
+.DS_Store
+Thumbs.db
+.idea/
+.tanstack/
