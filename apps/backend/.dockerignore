@@ -1,0 +1,13 @@
+target
+upload-dir
+.env
+.envrc
+.direnv
+.idea
+.vscode
+.sonarlint
+docs
+api
+*.md
+*.iml
+*.log

@@ -74,6 +74,23 @@ Trên Windows, `pnpm dev` mở cửa sổ riêng cho BE và FE. Trên Linux/macO
 - Viết `.env` dạng `KEY=value`, không bọc ngoặc kép và không có `export`, vì Spring đọc nguyên văn phần sau dấu `=`.
 - `docker-compose.yml` đọc `DB_USERNAME` / `DB_PASSWORD` từ cùng file đó.
 
+## Chạy bằng Docker (production)
+
+Dùng khi muốn chạy thử hoặc triển khai mà máy chỉ có Docker. Không dùng cho dev hằng ngày, vì mỗi lần đổi code hay dependency phải build lại image.
+
+```bash
+docker compose -f docker-compose.prod.yml --env-file apps/backend/.env up -d --build
+```
+
+Mở http://localhost:8088. Image backend chỉ có JRE 21 và file jar, image frontend chỉ có nginx và file tĩnh; JDK, Maven, Node, pnpm chỉ tồn tại ở stage build. Chỉ nginx mở cổng ra ngoài, nó proxy `/rchat` (REST và WebSocket) sang backend.
+
+| Biến (đặt trong file env hoặc shell) | Mặc định | Ý nghĩa |
+|------|----------|---------|
+| `APP_PORT` | `8088` | cổng mở trên máy host |
+| `APP_FRONTEND_URL` | `http://localhost:8088` | origin người dùng truy cập, backend dùng cho WebSocket và link mời |
+
+Khi triển khai thật, hãy dùng file env riêng với `SIGNER_KEY` và mật khẩu DB mạnh, và đặt HTTPS ở phía trước.
+
 ## Cấu trúc
 
 ```
@@ -85,6 +102,7 @@ Trên Windows, `pnpm dev` mở cửa sổ riêng cho BE và FE. Trên Linux/macO
 ├── .githooks/            pre-commit: ESLint và Spotless cho file đang commit
 ├── .github/              CI, PR template, CODEOWNERS
 ├── docker-compose.yml    Postgres cho môi trường dev
+├── docker-compose.prod.yml  DB + BE + FE bằng image production
 └── package.json          lối tắt lệnh: pnpm dev, pnpm build, ...
 ```
 
