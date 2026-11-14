@@ -311,14 +311,14 @@ otp:
 
 ## 🚀 Chạy local
 
-**Yêu cầu**: Docker, Java 21, Maven (hoặc dùng `mvnw`)
+**Yêu cầu**: xem mục "Cần cài trước" ở `../../README.md`. Máy mới chạy `pnpm bootstrap` ở thư mục gốc để tạo `.env`.
 
 Cách nhanh nhất là chạy từ **thư mục gốc monorepo** (xem `../../README.md`):
 
 ```bash
 pnpm dev        # Postgres + Backend + Frontend
 pnpm dev:db     # chỉ Postgres
-pnpm dev:be     # chỉ Backend (tự nạp apps/backend/.env)
+pnpm dev:be     # chỉ Backend
 ```
 
 Chạy tay:
@@ -327,7 +327,7 @@ Chạy tay:
 # 1. Khởi động PostgreSQL (docker-compose.yml nằm ở thư mục gốc)
 cd ../.. && docker compose --env-file apps/backend/.env up -d
 
-# 2. Chạy ứng dụng (cần nạp biến trong .env)
+# 2. Chạy ứng dụng (backend tự đọc apps/backend/.env, không cần direnv)
 cd apps/backend && ./mvnw spring-boot:run
 ```
 
