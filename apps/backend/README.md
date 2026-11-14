@@ -313,12 +313,22 @@ otp:
 
 **Yêu cầu**: Docker, Java 21, Maven (hoặc dùng `mvnw`)
 
-```bash
-# 1. Khởi động PostgreSQL
-docker compose up -d
+Cách nhanh nhất là chạy từ **thư mục gốc monorepo** (xem `../../README.md`):
 
-# 2. Chạy ứng dụng
-./mvnw spring-boot:run
+```bash
+pnpm dev        # Postgres + Backend + Frontend
+pnpm dev:db     # chỉ Postgres
+pnpm dev:be     # chỉ Backend (tự nạp apps/backend/.env)
+```
+
+Chạy tay:
+
+```bash
+# 1. Khởi động PostgreSQL (docker-compose.yml nằm ở thư mục gốc)
+cd ../.. && docker compose --env-file apps/backend/.env up -d
+
+# 2. Chạy ứng dụng (cần nạp biến trong .env)
+cd apps/backend && ./mvnw spring-boot:run
 ```
 
 **H2 Console** (dev): `http://localhost:8080/rchat/h2-console`  

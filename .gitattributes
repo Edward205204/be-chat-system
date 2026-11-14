@@ -1,2 +1,7 @@
-/mvnw text eol=lf
+* text=auto
+/apps/backend/mvnw text eol=lf
+*.sh text eol=lf
 *.cmd text eol=crlf
+*.ps1 text eol=crlf
+# Flyway migrations: giữ nguyên byte để checksum không đổi
+/apps/backend/src/main/resources/db/migration/*.sql -text

@@ -1,0 +1,11 @@
+# Root .gitignore — mỗi app còn .gitignore riêng trong apps/<app>/
+.env
+.env.*
+!.env.example
+node_modules/
+logs/
+*.log
+.DS_Store
+Thumbs.db
+.idea/
+.tanstack/

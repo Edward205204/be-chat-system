@@ -1,4 +1,8 @@
-# docker-compose.yml
+# docker-compose.yml (root)
+# Giữ nguyên project name "chat_system" để dùng lại volume dữ liệu cũ
+# (chat_system_postgres_data). Đổi tên này = Postgres mới, trống.
+name: chat_system
+
 services:
   postgres:
     image: postgres:16-alpine
