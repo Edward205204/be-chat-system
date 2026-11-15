@@ -26,6 +26,15 @@ const setStatus = (status: StompStatus) =>
 
 let client: Client | null = null
 
+type StompErrorListener = (error: ApiError) => void
+const errorListeners = new Set<StompErrorListener>()
+
+/** Nghe lỗi `/user/queue/errors` (lỗi của `chat.send`). Toast chung vẫn hiện ở đây. */
+export function addStompErrorListener(listener: StompErrorListener) {
+  errorListeners.add(listener)
+  return () => void errorListeners.delete(listener)
+}
+
 const wsUrl = () =>
   `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}${STOMP.endpoint}`
 
@@ -46,9 +55,9 @@ export function connectStomp() {
       setStatus('connected')
       client?.subscribe(STOMP.errors, (frame) => {
         const payload = JSON.parse(frame.body) as StompErrorPayload
-        toast.error(
-          getErrorMessage(new ApiError(payload.status, payload.message))
-        )
+        const error = new ApiError(payload.status, payload.message)
+        toast.error(getErrorMessage(error))
+        errorListeners.forEach((listener) => listener(error))
       })
     },
     onWebSocketClose: () => {

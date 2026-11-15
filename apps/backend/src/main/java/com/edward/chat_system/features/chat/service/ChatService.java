@@ -7,6 +7,7 @@ import com.edward.chat_system.features.chat.dto.response.ChatMessageResponse;
 import com.edward.chat_system.features.chat.entity.Message;
 import com.edward.chat_system.features.chat.event.MessageCreatedEvent;
 import com.edward.chat_system.features.chat.repository.MessageRepository;
+import com.edward.chat_system.features.server.repository.ServerMemberRepository;
 import com.edward.chat_system.features.user.entity.User;
 import com.edward.chat_system.features.user.repository.UserRepository;
 import com.edward.chat_system.infrastructure.aop.annotation.ChannelId;
@@ -34,6 +35,7 @@ public class ChatService {
     ChannelRepository channelRepository;
     MessageRepository messageRepository;
     CursorUtils cursorUtils;
+    ServerMemberRepository serverMemberRepository;
 
     @Transactional
     @RequiresChannelPermission(ChannelPermissionKeyEnum.VIEW_CHANNEL)
@@ -42,6 +44,16 @@ public class ChatService {
                 userRepository
                         .findById(senderId)
                         .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        boolean isMuted =
+                serverMemberRepository
+                        .findMutedStatusByUserIdAndChannelId(senderId, channelId)
+                        .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        if (isMuted) {
+            throw new AppException(ErrorCode.MEMBER_IS_MUTED);
+        }
+
         Channel channel = channelRepository.getReferenceById(channelId);
         Message message =
                 messageRepository.save(

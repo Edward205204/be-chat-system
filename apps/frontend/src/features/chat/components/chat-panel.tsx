@@ -14,7 +14,7 @@ export function ChatPanel({
   serverId: string
   channel: ChannelResponse
 }) {
-  useChannelRealtime(channel.id)
+  useChannelRealtime(serverId, channel.id)
   const status = useStompStatus((s) => s.status)
   const myMember = useMyMember(serverId)
   const Icon = channel.private ? LockIcon : HashIcon
@@ -34,6 +34,7 @@ export function ChatPanel({
       </header>
       <MessageList channelId={channel.id} />
       <MessageComposer
+        serverId={serverId}
         channelId={channel.id}
         channelName={channel.name}
         isMuted={Boolean(myMember?.muted)}

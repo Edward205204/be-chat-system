@@ -52,32 +52,42 @@ public interface ServerMemberRepository extends JpaRepository<ServerMember, Stri
     @Modifying
     @Query(
             """
-    DELETE FROM ServerMember sm WHERE sm.id = :memberId AND sm.server.id = :serverId
-""")
+                DELETE FROM ServerMember sm WHERE sm.id = :memberId AND sm.server.id = :serverId
+            """)
     void deleteByIdAndServerId(
             @Param("memberId") String memberId, @Param("serverId") String serverId);
 
     @Modifying
     @Query(
             """
-DELETE FROM ServerMember sm WHERE sm.server.id = :serverId AND sm.user.id = :userId
-""")
+            DELETE FROM ServerMember sm WHERE sm.server.id = :serverId AND sm.user.id = :userId
+            """)
     void deleteByServerIdAndUserId(
             @Param("serverId") String serverId, @Param("userId") String userId);
 
     @Modifying
     @Query(
             """
-    UPDATE ServerMember sm
-    SET sm.isMuted = :mute
-    WHERE sm.id = :memberId
-    AND sm.server.id = :serverId
-""")
+                UPDATE ServerMember sm
+                SET sm.isMuted = :mute
+                WHERE sm.id = :memberId
+                AND sm.server.id = :serverId
+            """)
     void muteOrUnmuteServerMember(
             @Param("serverId") String serverId,
             @Param("memberId") String memberId,
             @Param("mute") boolean mute);
 
-    //    OPTIMIZATION
+    // OPTIMIZATION
     Optional<ServerMember> findByIdAndServerId(String memberId, String serverId);
+
+    @Query(
+            """
+                SELECT sm.isMuted
+                FROM ServerMember sm
+                WHERE sm.user.id = :memberId
+                AND sm.server.id = (SELECT c.server.id FROM Channel c WHERE c.id = :channelId)
+            """)
+    Optional<Boolean> findMutedStatusByUserIdAndChannelId(
+            @Param("memberId") String memberId, @Param("channelId") String channelId);
 }

@@ -1,0 +1,14 @@
+{
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Spring Boot-TestChatSystemApplication<chat_system>",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "mainClass": "com.edward.chat_system.TestChatSystemApplication",
+      "projectName": "chat_system",
+      "args": "",
+      "envFile": "${workspaceFolder}/.env"
+    }
+  ]
+}

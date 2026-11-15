@@ -39,6 +39,8 @@ const MESSAGES: Record<string, string> = {
   MISSING_PERMISSION: 'Bạn thiếu quyền trong channel này.',
   NOW_DO_NOT_HAVE_PERMISSION: 'Bạn không có quyền thực hiện thao tác này.',
   USER_BANNED: 'Bạn đã bị cấm khỏi server này.',
+  MEMBER_IS_MUTED:
+    'Bạn đang bị mute trong server này, không gửi được tin nhắn.',
   EMAIL_NOT_FOUND: 'Email không tồn tại.',
   USER_NOT_FOUND: 'Không tìm thấy người dùng.',
   SERVER_NOT_EXIST: 'Server không tồn tại.',

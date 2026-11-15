@@ -52,6 +52,12 @@ public enum ErrorCode {
     OTP_HAS_BEEN_USED("OTP_HAS_BEEN_USED", "Otp has been used", HttpStatus.BAD_REQUEST),
 
     NOT_A_MEMBER("NOT_A_MEMBER", "User is not a member of a server", HttpStatus.FORBIDDEN),
+
+    MEMBER_IS_MUTED(
+            "MEMBER_IS_MUTED",
+            "Member is muted, temporarily unable to chat in this server",
+            HttpStatus.FORBIDDEN),
+
     MISSING_PERMISSION(
             "MISSING_PERMISSION",
             "User isn't allowed to perform this action",
@@ -105,6 +111,7 @@ public enum ErrorCode {
             "DIRECT_INVITE_ALREADY_PENDING",
             "An active invitation already exists for this user",
             HttpStatus.CONFLICT);
+
     // INVALID_DOB("Age of user must be at least {value}",
     // HttpStatus.UNPROCESSABLE_CONTENT),
     String code;

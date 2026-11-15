@@ -1,11 +1,24 @@
-import { useEffect } from 'react'
+import { useEffect, useEffectEvent } from 'react'
 import {
   useInfiniteQuery,
   useQueryClient,
-  type InfiniteData
+  type InfiniteData,
+  type QueryClient
 } from '@tanstack/react-query'
-import { STOMP, type ChatMessage, type CursorPage } from '@/types/api'
-import { publishJson, subscribeJson, useStompStatus } from '@/lib/stomp'
+import {
+  STOMP,
+  type ChatMessage,
+  type CursorPage,
+  type ServerMemberResponse
+} from '@/types/api'
+import {
+  addStompErrorListener,
+  publishJson,
+  subscribeJson,
+  useStompStatus
+} from '@/lib/stomp'
+import { useSession } from '@/lib/session'
+import { serverKeys } from '@/features/servers/queries'
 import { chatApi } from './api'
 
 type MessagePages = InfiniteData<CursorPage<ChatMessage>, string | undefined>
@@ -44,8 +57,48 @@ function appendMessage(
   }
 }
 
+export const MUTED_ERROR_CODE = 'MEMBER_IS_MUTED'
+
+/** Sửa cờ `muted` của mình ngay trong cache member; lần refetch member sau sẽ ghi đè bằng dữ liệu BE. */
+function setMyMuted(
+  queryClient: QueryClient,
+  serverId: string,
+  muted: boolean
+) {
+  const userId = useSession.getState().user?.id
+  queryClient.setQueryData<ServerMemberResponse>(
+    serverKeys.members(serverId),
+    (data) =>
+      data && {
+        ...data,
+        items: data.items.map((m) =>
+          m.userId === userId && m.muted !== muted ? { ...m, muted } : m
+        )
+      }
+  )
+}
+
+/** Gửi tin bị BE chặn vì mute → khoá ô chat ngay (không chờ reload), rồi refetch member để đồng bộ. */
+export function useMutedSendError(serverId: string, onMuted: () => void) {
+  const queryClient = useQueryClient()
+  const handleMuted = useEffectEvent(onMuted)
+
+  useEffect(
+    () =>
+      addStompErrorListener((error) => {
+        if (error.code !== MUTED_ERROR_CODE) return
+        setMyMuted(queryClient, serverId, true)
+        queryClient.invalidateQueries({
+          queryKey: serverKeys.members(serverId)
+        })
+        handleMuted()
+      }),
+    [serverId, queryClient]
+  )
+}
+
 /** Subscribe topic của channel; tự subscribe lại sau mỗi lần STOMP reconnect. */
-export function useChannelRealtime(channelId: string) {
+export function useChannelRealtime(serverId: string, channelId: string) {
   const queryClient = useQueryClient()
   const connectionId = useStompStatus((s) =>
     s.status === 'connected' ? s.connectionId : 0
@@ -56,15 +109,19 @@ export function useChannelRealtime(channelId: string) {
     const key = chatKeys.messages(channelId)
     const unsubscribe = subscribeJson<ChatMessage>(
       STOMP.channelTopic(channelId),
-      (message) =>
+      (message) => {
         queryClient.setQueryData<MessagePages>(key, (data) =>
           appendMessage(data, message)
         )
+        // Tin của chính mình đi qua được → chắc chắn đã hết mute.
+        if (message.senderId === useSession.getState().user?.id)
+          setMyMuted(queryClient, serverId, false)
+      }
     )
     // Reconnect thì có thể lỡ tin trong lúc mất kết nối → tải lại.
     if (connectionId > 1) queryClient.invalidateQueries({ queryKey: key })
     return unsubscribe
-  }, [channelId, connectionId, queryClient])
+  }, [serverId, channelId, connectionId, queryClient])
 }
 
 /** Không có ack: tin hiện ra khi quay về qua topic. Trả false nếu chưa kết nối. */
