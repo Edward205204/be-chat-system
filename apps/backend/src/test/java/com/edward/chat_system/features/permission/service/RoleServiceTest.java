@@ -12,7 +12,6 @@ import com.edward.chat_system.features.permission.dto.response.RoleMemberRespons
 import com.edward.chat_system.features.permission.dto.response.RoleResponse;
 import com.edward.chat_system.features.permission.entity.Role;
 import com.edward.chat_system.features.permission.entity.RoleMember;
-import com.edward.chat_system.features.permission.entity.ServerRolePermission;
 import com.edward.chat_system.features.permission.mapper.RoleMapper;
 import com.edward.chat_system.features.permission.mapper.RoleMemberMapper;
 import com.edward.chat_system.features.permission.projection.RoleMemberProjection;
@@ -48,7 +47,8 @@ class RoleServiceTest {
     @Test
     void getServerRoles_returnsMappedList() {
         List<Role> roles = List.of(Role.builder().id("r1").name("Admin").build());
-        List<RoleResponse> expected = List.of(RoleResponse.builder().id("r1").name("Admin").build());
+        List<RoleResponse> expected =
+                List.of(RoleResponse.builder().id("r1").name("Admin").build());
 
         when(roleRepository.findAllByServerId("srv-1")).thenReturn(roles);
         when(roleMapper.toRoleResponseList(roles)).thenReturn(expected);
@@ -100,7 +100,8 @@ class RoleServiceTest {
 
         roleService.createDefaultEveryoneRoleWithDefaultPermission("srv-1");
 
-        verify(roleRepository).save(argThat(r -> r.getName().equals(RoleConstants.DEFAULT_ROLE_NAME)));
+        verify(roleRepository)
+                .save(argThat(r -> r.getName().equals(RoleConstants.DEFAULT_ROLE_NAME)));
         verify(serverRolePermissionRepository)
                 .save(argThat(p -> p.getPermission() == ServerPermissionKeyEnum.CREATE_INVITE));
     }
@@ -127,10 +128,15 @@ class RoleServiceTest {
     void patchUpdateRole_roleNotExist_throwsRoleNotExist() {
         when(roleRepository.findByIdAndServerId("r99", "srv-1")).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> roleService.patchUpdateRole("srv-1", "r99", new RolePatchUpdateRequest()))
+        assertThatThrownBy(
+                        () ->
+                                roleService.patchUpdateRole(
+                                        "srv-1", "r99", new RolePatchUpdateRequest()))
                 .isInstanceOf(AppException.class)
                 .satisfies(
-                        e -> assertThat(((AppException) e).getErrorCode()).isEqualTo(ErrorCode.ROLE_NOT_EXIST));
+                        e ->
+                                assertThat(((AppException) e).getErrorCode())
+                                        .isEqualTo(ErrorCode.ROLE_NOT_EXIST));
     }
 
     @Test
@@ -167,7 +173,9 @@ class RoleServiceTest {
         assertThatThrownBy(() -> roleService.deleteRole("srv-1", "r99"))
                 .isInstanceOf(AppException.class)
                 .satisfies(
-                        e -> assertThat(((AppException) e).getErrorCode()).isEqualTo(ErrorCode.ROLE_NOT_EXIST));
+                        e ->
+                                assertThat(((AppException) e).getErrorCode())
+                                        .isEqualTo(ErrorCode.ROLE_NOT_EXIST));
     }
 
     @Test
@@ -209,7 +217,10 @@ class RoleServiceTest {
 
         assertThatThrownBy(() -> roleService.addRoleMember("srv-1", "r1", "m1"))
                 .isInstanceOf(AppException.class)
-                .satisfies(e -> assertThat(((AppException) e).getErrorCode()).isEqualTo(ErrorCode.NOT_A_MEMBER));
+                .satisfies(
+                        e ->
+                                assertThat(((AppException) e).getErrorCode())
+                                        .isEqualTo(ErrorCode.NOT_A_MEMBER));
     }
 
     @Test

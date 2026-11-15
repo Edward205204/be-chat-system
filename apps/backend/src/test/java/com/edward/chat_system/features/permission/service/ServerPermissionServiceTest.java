@@ -54,7 +54,10 @@ class ServerPermissionServiceTest {
 
         assertThatThrownBy(() -> serverPermissionService.getServerPermission("srv-1", "r99"))
                 .isInstanceOf(AppException.class)
-                .satisfies(e -> assertThat(((AppException) e).getErrorCode()).isEqualTo(ErrorCode.ROLE_NOT_EXIST));
+                .satisfies(
+                        e ->
+                                assertThat(((AppException) e).getErrorCode())
+                                        .isEqualTo(ErrorCode.ROLE_NOT_EXIST));
     }
 
     @Test
@@ -84,7 +87,8 @@ class ServerPermissionServiceTest {
                         "r1", ServerPermissionKeyEnum.KICK_MEMBER))
                 .thenReturn(true);
 
-        assertThatThrownBy(() -> serverPermissionService.addPermissionForRole("srv-1", "r1", request))
+        assertThatThrownBy(
+                        () -> serverPermissionService.addPermissionForRole("srv-1", "r1", request))
                 .isInstanceOf(AppException.class)
                 .satisfies(
                         e ->
@@ -101,7 +105,10 @@ class ServerPermissionServiceTest {
                                 serverPermissionService.addPermissionForRole(
                                         "srv-1", "r99", new AddPermissionRequest()))
                 .isInstanceOf(AppException.class)
-                .satisfies(e -> assertThat(((AppException) e).getErrorCode()).isEqualTo(ErrorCode.ROLE_NOT_EXIST));
+                .satisfies(
+                        e ->
+                                assertThat(((AppException) e).getErrorCode())
+                                        .isEqualTo(ErrorCode.ROLE_NOT_EXIST));
     }
 
     @Test
@@ -120,9 +127,14 @@ class ServerPermissionServiceTest {
         when(roleRepository.findByIdAndServerId("r99", "srv-1")).thenReturn(Optional.empty());
 
         assertThatThrownBy(
-                        () -> serverPermissionService.removePermissionForRole("srv-1", "r99", "KICK_MEMBER"))
+                        () ->
+                                serverPermissionService.removePermissionForRole(
+                                        "srv-1", "r99", "KICK_MEMBER"))
                 .isInstanceOf(AppException.class)
-                .satisfies(e -> assertThat(((AppException) e).getErrorCode()).isEqualTo(ErrorCode.ROLE_NOT_EXIST));
+                .satisfies(
+                        e ->
+                                assertThat(((AppException) e).getErrorCode())
+                                        .isEqualTo(ErrorCode.ROLE_NOT_EXIST));
     }
 
     @Test
@@ -152,6 +164,9 @@ class ServerPermissionServiceTest {
                                 serverPermissionService.updatePermissionForRole(
                                         "srv-1", "r99", new ServerPermissionPutUpdateRequest()))
                 .isInstanceOf(AppException.class)
-                .satisfies(e -> assertThat(((AppException) e).getErrorCode()).isEqualTo(ErrorCode.ROLE_NOT_EXIST));
+                .satisfies(
+                        e ->
+                                assertThat(((AppException) e).getErrorCode())
+                                        .isEqualTo(ErrorCode.ROLE_NOT_EXIST));
     }
 }

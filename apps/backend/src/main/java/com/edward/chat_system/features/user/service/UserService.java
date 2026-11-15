@@ -43,6 +43,7 @@ public class UserService {
         userMapper.updateUserFromDto(request, user);
 
         if (request.getAvatar() != null) fileService.claimFile(request.getAvatar());
+        if (request.getBanner() != null) fileService.claimFile(request.getBanner());
 
         return userMapper.toUserResponse(userRepository.save(user));
     }

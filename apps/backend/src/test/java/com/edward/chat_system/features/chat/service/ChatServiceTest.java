@@ -72,7 +72,10 @@ class ChatServiceTest {
 
         assertThatThrownBy(() -> chatService.send("missing", "ch-1", "hello"))
                 .isInstanceOf(AppException.class)
-                .satisfies(e -> assertThat(((AppException) e).getErrorCode()).isEqualTo(ErrorCode.USER_NOT_FOUND));
+                .satisfies(
+                        e ->
+                                assertThat(((AppException) e).getErrorCode())
+                                        .isEqualTo(ErrorCode.USER_NOT_FOUND));
     }
 
     @Test
@@ -111,7 +114,8 @@ class ChatServiceTest {
 
     @Test
     void getMessages_withCursor_usesNextPageQuery() {
-        CursorUtils.CursorPayload payload = new CursorUtils.CursorPayload(LocalDateTime.now(), "msg-0");
+        CursorUtils.CursorPayload payload =
+                new CursorUtils.CursorPayload(LocalDateTime.now(), "msg-0");
         User sender = User.builder().id("u1").username("alice").build();
         Channel channel = Channel.builder().id("ch-1").build();
         Message msg = buildMessage("msg-1", sender, channel);
@@ -120,7 +124,8 @@ class ChatServiceTest {
         when(messageRepository.findNextPage("ch-1", payload.createdAt(), payload.id(), 2))
                 .thenReturn(List.of(msg));
 
-        CursorPageResponse<ChatMessageResponse> result = chatService.getMessages("ch-1", "some-cursor", 1);
+        CursorPageResponse<ChatMessageResponse> result =
+                chatService.getMessages("ch-1", "some-cursor", 1);
 
         assertThat(result.getData()).hasSize(1);
         assertThat(result.isHasNext()).isFalse();

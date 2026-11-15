@@ -59,7 +59,8 @@ class ChannelPermissionServiceTest {
         when(userRow.getDisplayName()).thenReturn("Alice");
         when(userRow.getPermission()).thenReturn(ChannelPermissionKeyEnum.SEND_MESSAGES);
 
-        when(channelRepository.findByIdAndServerId("ch-1", "srv-1")).thenReturn(Optional.of(channel));
+        when(channelRepository.findByIdAndServerId("ch-1", "srv-1"))
+                .thenReturn(Optional.of(channel));
         when(channelRolePermissionRepository.findRolePermissionsByChannelId("ch-1"))
                 .thenReturn(List.of(roleRow));
         when(channelUserPermissionRepository.findUserPermissionsByChannelId("ch-1"))
@@ -135,7 +136,8 @@ class ChannelPermissionServiceTest {
         Role role = Role.builder().id("r1").build();
         when(roleRepository.findByIdAndServerId("r1", "srv-1")).thenReturn(Optional.of(role));
 
-        channelPermissionService.removeChannelPermissionForRole("srv-1", "ch-1", "r1", "VIEW_CHANNEL");
+        channelPermissionService.removeChannelPermissionForRole(
+                "srv-1", "ch-1", "r1", "VIEW_CHANNEL");
 
         verify(channelRolePermissionRepository)
                 .deleteByUniqueConstraint("ch-1", "r1", ChannelPermissionKeyEnum.VIEW_CHANNEL);
@@ -150,7 +152,10 @@ class ChannelPermissionServiceTest {
                                 channelPermissionService.removeChannelPermissionForRole(
                                         "srv-1", "ch-1", "r99", "VIEW_CHANNEL"))
                 .isInstanceOf(AppException.class)
-                .satisfies(e -> assertThat(((AppException) e).getErrorCode()).isEqualTo(ErrorCode.ROLE_NOT_EXIST));
+                .satisfies(
+                        e ->
+                                assertThat(((AppException) e).getErrorCode())
+                                        .isEqualTo(ErrorCode.ROLE_NOT_EXIST));
     }
 
     @Test
@@ -200,7 +205,10 @@ class ChannelPermissionServiceTest {
                                 channelPermissionService.addChannelPermissionForUser(
                                         "srv-1", "ch-1", request))
                 .isInstanceOf(AppException.class)
-                .satisfies(e -> assertThat(((AppException) e).getErrorCode()).isEqualTo(ErrorCode.NOT_A_MEMBER));
+                .satisfies(
+                        e ->
+                                assertThat(((AppException) e).getErrorCode())
+                                        .isEqualTo(ErrorCode.NOT_A_MEMBER));
     }
 
     @Test
@@ -229,7 +237,8 @@ class ChannelPermissionServiceTest {
     void removeChannelPermissionForUser_memberExists_deletesPermission() {
         when(serverMemberRepository.existsByIdAndServerId("m1", "srv-1")).thenReturn(true);
 
-        channelPermissionService.removeChannelPermissionForUser("srv-1", "ch-1", "m1", "VIEW_CHANNEL");
+        channelPermissionService.removeChannelPermissionForUser(
+                "srv-1", "ch-1", "m1", "VIEW_CHANNEL");
 
         verify(channelUserPermissionRepository)
                 .deleteByUniqueConstraint("ch-1", "m1", ChannelPermissionKeyEnum.VIEW_CHANNEL);
@@ -244,7 +253,10 @@ class ChannelPermissionServiceTest {
                                 channelPermissionService.removeChannelPermissionForUser(
                                         "srv-1", "ch-1", "m99", "VIEW_CHANNEL"))
                 .isInstanceOf(AppException.class)
-                .satisfies(e -> assertThat(((AppException) e).getErrorCode()).isEqualTo(ErrorCode.NOT_A_MEMBER));
+                .satisfies(
+                        e ->
+                                assertThat(((AppException) e).getErrorCode())
+                                        .isEqualTo(ErrorCode.NOT_A_MEMBER));
     }
 
     @Test
@@ -274,6 +286,9 @@ class ChannelPermissionServiceTest {
                                         "m99",
                                         new ChannelPermissionPutUpdateRequest()))
                 .isInstanceOf(AppException.class)
-                .satisfies(e -> assertThat(((AppException) e).getErrorCode()).isEqualTo(ErrorCode.NOT_A_MEMBER));
+                .satisfies(
+                        e ->
+                                assertThat(((AppException) e).getErrorCode())
+                                        .isEqualTo(ErrorCode.NOT_A_MEMBER));
     }
 }

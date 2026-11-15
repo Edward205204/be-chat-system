@@ -69,10 +69,10 @@ class ChannelServiceTest {
 
     @Test
     void getChannelList_hasNextPage_setsNextCursor() {
-        List<ChannelInfoRaw> items = List.of(
-                mockChannelInfo("ch-1", "general", false),
-                mockChannelInfo("ch-2", "random", false)
-        );
+        List<ChannelInfoRaw> items =
+                List.of(
+                        mockChannelInfo("ch-1", "general", false),
+                        mockChannelInfo("ch-2", "random", false));
 
         when(channelRepository.findFirstPageVisibleChannels("srv-1", "user-1", 2))
                 .thenReturn(items);
@@ -96,7 +96,8 @@ class ChannelServiceTest {
         savedChannel.setPrivate(false);
 
         when(channelRepository.existsByNameAndServer_Id("srv-1", "new-channel")).thenReturn(false);
-        when(serverRepository.getReferenceById("srv-1")).thenReturn(Server.builder().id("srv-1").build());
+        when(serverRepository.getReferenceById("srv-1"))
+                .thenReturn(Server.builder().id("srv-1").build());
         when(channelRepository.save(any())).thenReturn(savedChannel);
 
         ChannelResponse result = channelService.createChannel("srv-1", request);
@@ -110,7 +111,8 @@ class ChannelServiceTest {
         CreateChannelRequest request = new CreateChannelRequest();
         request.setName("existing-channel");
 
-        when(channelRepository.existsByNameAndServer_Id("srv-1", "existing-channel")).thenReturn(true);
+        when(channelRepository.existsByNameAndServer_Id("srv-1", "existing-channel"))
+                .thenReturn(true);
 
         assertThatThrownBy(() -> channelService.createChannel("srv-1", request))
                 .isInstanceOf(AppException.class)
@@ -126,7 +128,8 @@ class ChannelServiceTest {
         channel.setPrivate(false);
         ChannelPatchUpdateRequest request = new ChannelPatchUpdateRequest();
 
-        when(channelRepository.findByIdAndServerId("ch-1", "srv-1")).thenReturn(Optional.of(channel));
+        when(channelRepository.findByIdAndServerId("ch-1", "srv-1"))
+                .thenReturn(Optional.of(channel));
         when(channelRepository.save(channel)).thenReturn(channel);
 
         ChannelResponse result = channelService.channelPatchUpdate("srv-1", "ch-1", request);
@@ -140,7 +143,9 @@ class ChannelServiceTest {
         when(channelRepository.findByIdAndServerId("ch-99", "srv-1")).thenReturn(Optional.empty());
 
         assertThatThrownBy(
-                        () -> channelService.channelPatchUpdate("srv-1", "ch-99", new ChannelPatchUpdateRequest()))
+                        () ->
+                                channelService.channelPatchUpdate(
+                                        "srv-1", "ch-99", new ChannelPatchUpdateRequest()))
                 .isInstanceOf(AppException.class)
                 .satisfies(
                         e ->

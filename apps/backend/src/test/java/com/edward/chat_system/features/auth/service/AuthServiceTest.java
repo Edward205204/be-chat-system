@@ -23,7 +23,6 @@ import com.edward.chat_system.features.user.entity.User;
 import com.edward.chat_system.features.user.mapper.UserMapper;
 import com.edward.chat_system.features.user.repository.UserRepository;
 import com.edward.chat_system.infrastructure.mail.MailServiceImpl;
-import com.edward.chat_system.infrastructure.security.jwt.JwtClaimObject;
 import com.edward.chat_system.infrastructure.security.jwt.JwtSigner;
 import com.edward.chat_system.infrastructure.security.jwt.JwtSignerResponse;
 import com.edward.chat_system.shared.exception.AppException;
@@ -65,7 +64,13 @@ class AuthServiceTest {
 
     @Test
     void login_validCredentials_verifiedUser_returnsAuthSuccessResponse() {
-        User user = User.builder().id("u1").email("a@b.com").username("alice").password("hashed").build();
+        User user =
+                User.builder()
+                        .id("u1")
+                        .email("a@b.com")
+                        .username("alice")
+                        .password("hashed")
+                        .build();
         user.setVerified(true);
 
         JwtSignerResponse accessJwt = mockJwtResponse("access-token");
@@ -100,7 +105,10 @@ class AuthServiceTest {
 
         assertThatThrownBy(() -> authService.login(request))
                 .isInstanceOf(AppException.class)
-                .satisfies(e -> assertThat(((AppException) e).getErrorCode()).isEqualTo(ErrorCode.LOGIN_FAILED));
+                .satisfies(
+                        e ->
+                                assertThat(((AppException) e).getErrorCode())
+                                        .isEqualTo(ErrorCode.LOGIN_FAILED));
     }
 
     @Test
@@ -115,12 +123,21 @@ class AuthServiceTest {
 
         assertThatThrownBy(() -> authService.login(request))
                 .isInstanceOf(AppException.class)
-                .satisfies(e -> assertThat(((AppException) e).getErrorCode()).isEqualTo(ErrorCode.LOGIN_FAILED));
+                .satisfies(
+                        e ->
+                                assertThat(((AppException) e).getErrorCode())
+                                        .isEqualTo(ErrorCode.LOGIN_FAILED));
     }
 
     @Test
     void login_unverifiedUser_returnsTmpToken() {
-        User user = User.builder().id("u1").email("a@b.com").username("alice").password("hashed").build();
+        User user =
+                User.builder()
+                        .id("u1")
+                        .email("a@b.com")
+                        .username("alice")
+                        .password("hashed")
+                        .build();
         user.setVerified(false);
 
         when(userRepo.findByEmail("a@b.com")).thenReturn(Optional.of(user));
@@ -166,7 +183,10 @@ class AuthServiceTest {
 
         assertThatThrownBy(() -> authService.register(request))
                 .isInstanceOf(AppException.class)
-                .satisfies(e -> assertThat(((AppException) e).getErrorCode()).isEqualTo(ErrorCode.USERNAME_EXISTED));
+                .satisfies(
+                        e ->
+                                assertThat(((AppException) e).getErrorCode())
+                                        .isEqualTo(ErrorCode.USERNAME_EXISTED));
     }
 
     @Test
@@ -183,7 +203,10 @@ class AuthServiceTest {
 
         assertThatThrownBy(() -> authService.register(request))
                 .isInstanceOf(AppException.class)
-                .satisfies(e -> assertThat(((AppException) e).getErrorCode()).isEqualTo(ErrorCode.EMAIL_EXISTED));
+                .satisfies(
+                        e ->
+                                assertThat(((AppException) e).getErrorCode())
+                                        .isEqualTo(ErrorCode.EMAIL_EXISTED));
     }
 
     @Test
@@ -198,7 +221,10 @@ class AuthServiceTest {
                                 ReflectionTestUtils.invokeMethod(
                                         authService, "validateOtp", code, "123456"))
                 .isInstanceOf(AppException.class)
-                .satisfies(e -> assertThat(((AppException) e).getErrorCode()).isEqualTo(ErrorCode.OTP_EXPIRED));
+                .satisfies(
+                        e ->
+                                assertThat(((AppException) e).getErrorCode())
+                                        .isEqualTo(ErrorCode.OTP_EXPIRED));
     }
 
     @Test
@@ -213,7 +239,10 @@ class AuthServiceTest {
                                 ReflectionTestUtils.invokeMethod(
                                         authService, "validateOtp", code, "123456"))
                 .isInstanceOf(AppException.class)
-                .satisfies(e -> assertThat(((AppException) e).getErrorCode()).isEqualTo(ErrorCode.OTP_REVOKED));
+                .satisfies(
+                        e ->
+                                assertThat(((AppException) e).getErrorCode())
+                                        .isEqualTo(ErrorCode.OTP_REVOKED));
     }
 
     @Test
@@ -228,7 +257,10 @@ class AuthServiceTest {
                                 ReflectionTestUtils.invokeMethod(
                                         authService, "validateOtp", code, "123456"))
                 .isInstanceOf(AppException.class)
-                .satisfies(e -> assertThat(((AppException) e).getErrorCode()).isEqualTo(ErrorCode.OTP_HAS_BEEN_USED));
+                .satisfies(
+                        e ->
+                                assertThat(((AppException) e).getErrorCode())
+                                        .isEqualTo(ErrorCode.OTP_HAS_BEEN_USED));
     }
 
     @Test
@@ -246,7 +278,10 @@ class AuthServiceTest {
                                 ReflectionTestUtils.invokeMethod(
                                         authService, "validateOtp", code, "999999"))
                 .isInstanceOf(AppException.class)
-                .satisfies(e -> assertThat(((AppException) e).getErrorCode()).isEqualTo(ErrorCode.OTP_INCORRECT));
+                .satisfies(
+                        e ->
+                                assertThat(((AppException) e).getErrorCode())
+                                        .isEqualTo(ErrorCode.OTP_INCORRECT));
 
         assertThat(code.getAttemptCount()).isEqualTo(1);
     }
@@ -277,13 +312,17 @@ class AuthServiceTest {
     @Test
     void sendOtpVerifyEmail_alreadyVerified_throwsUserVerified() {
         injectOtpProps();
-        when(verificationCodeRepository.findByUserIdAndType("u1", VerificationCodeTypeEnum.EMAIL_VERIFY))
+        when(verificationCodeRepository.findByUserIdAndType(
+                        "u1", VerificationCodeTypeEnum.EMAIL_VERIFY))
                 .thenReturn(Optional.empty());
         when(userRepo.getUserStatusByUserId("u1")).thenReturn(true);
 
         assertThatThrownBy(() -> authService.sendOtpVerifyEmail("u1", "a@b.com"))
                 .isInstanceOf(AppException.class)
-                .satisfies(e -> assertThat(((AppException) e).getErrorCode()).isEqualTo(ErrorCode.USER_VERIFIED));
+                .satisfies(
+                        e ->
+                                assertThat(((AppException) e).getErrorCode())
+                                        .isEqualTo(ErrorCode.USER_VERIFIED));
     }
 
     @Test
@@ -293,7 +332,8 @@ class AuthServiceTest {
         code.setId("vc-1");
         code.setLastSentAt(LocalDateTime.now().minusSeconds(30));
 
-        when(verificationCodeRepository.findByUserIdAndType("u1", VerificationCodeTypeEnum.EMAIL_VERIFY))
+        when(verificationCodeRepository.findByUserIdAndType(
+                        "u1", VerificationCodeTypeEnum.EMAIL_VERIFY))
                 .thenReturn(Optional.of(code));
         when(userRepo.getUserStatusByUserId("u1")).thenReturn(false);
 
@@ -337,7 +377,10 @@ class AuthServiceTest {
 
         assertThatThrownBy(() -> authService.refreshToken("bad-token"))
                 .isInstanceOf(AppException.class)
-                .satisfies(e -> assertThat(((AppException) e).getErrorCode()).isEqualTo(ErrorCode.UNAUTHENTICATED));
+                .satisfies(
+                        e ->
+                                assertThat(((AppException) e).getErrorCode())
+                                        .isEqualTo(ErrorCode.UNAUTHENTICATED));
     }
 
     @Test
@@ -350,11 +393,15 @@ class AuthServiceTest {
                         .expiresAt(LocalDateTime.now().minusHours(1))
                         .build();
 
-        when(refreshTokenRepository.findByToken("expired-token")).thenReturn(Optional.of(refreshToken));
+        when(refreshTokenRepository.findByToken("expired-token"))
+                .thenReturn(Optional.of(refreshToken));
 
         assertThatThrownBy(() -> authService.refreshToken("expired-token"))
                 .isInstanceOf(AppException.class)
-                .satisfies(e -> assertThat(((AppException) e).getErrorCode()).isEqualTo(ErrorCode.UNAUTHENTICATED));
+                .satisfies(
+                        e ->
+                                assertThat(((AppException) e).getErrorCode())
+                                        .isEqualTo(ErrorCode.UNAUTHENTICATED));
     }
 
     @Test
@@ -363,6 +410,9 @@ class AuthServiceTest {
 
         assertThatThrownBy(() -> authService.resetPassword("x@x.com", "123456", "newpass"))
                 .isInstanceOf(AppException.class)
-                .satisfies(e -> assertThat(((AppException) e).getErrorCode()).isEqualTo(ErrorCode.EMAIL_NOT_FOUND));
+                .satisfies(
+                        e ->
+                                assertThat(((AppException) e).getErrorCode())
+                                        .isEqualTo(ErrorCode.EMAIL_NOT_FOUND));
     }
 }

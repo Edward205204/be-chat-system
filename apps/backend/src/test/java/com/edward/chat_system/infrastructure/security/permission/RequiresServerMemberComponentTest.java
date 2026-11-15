@@ -37,6 +37,9 @@ class RequiresServerMemberComponentTest {
 
         assertThatThrownBy(() -> serverMemberComponent.check("srv-1"))
                 .isInstanceOf(AppException.class)
-                .satisfies(e -> assertThat(((AppException) e).getErrorCode()).isEqualTo(ErrorCode.NOT_A_MEMBER));
+                .satisfies(
+                        e ->
+                                assertThat(((AppException) e).getErrorCode())
+                                        .isEqualTo(ErrorCode.NOT_A_MEMBER));
     }
 }

@@ -2,8 +2,8 @@ package com.edward.chat_system.features.permission.dto.request;
 
 import com.edward.chat_system.shared.aop.annotation.AtLeastOneField;
 import com.edward.chat_system.shared.aop.annotation.ValidServerPermission;
-import java.util.Set;
 import jakarta.validation.constraints.NotEmpty;
+import java.util.Set;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

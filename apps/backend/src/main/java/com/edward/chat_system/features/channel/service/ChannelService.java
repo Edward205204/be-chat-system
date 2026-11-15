@@ -40,7 +40,7 @@ public class ChannelService {
 
     @RequiresServerMember
     public CursorPageResponse<ChannelResponse> getChannelList(
-           @ServerId String serverId, String userId, String cursor, int size) {
+            @ServerId String serverId, String userId, String cursor, int size) {
         int fetchSize = size + 1;
 
         List<ChannelInfoRaw> channelInfoRaw;

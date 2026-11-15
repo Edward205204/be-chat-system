@@ -70,7 +70,8 @@ public class SecurityConfig {
                         req ->
                                 req.requestMatchers(PUBLIC_ENDPOINTS)
                                         .permitAll()
-                                        .requestMatchers("/ws/**").permitAll()
+                                        .requestMatchers("/ws/**")
+                                        .permitAll()
                                         .anyRequest()
                                         .authenticated())
                 .oauth2ResourceServer(

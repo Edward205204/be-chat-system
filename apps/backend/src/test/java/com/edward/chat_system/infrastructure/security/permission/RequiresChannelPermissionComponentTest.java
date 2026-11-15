@@ -34,9 +34,20 @@ class RequiresChannelPermissionComponentTest {
 
     private ServerMemberInfoProjection memberInfo(String userId, boolean isOwner) {
         return new ServerMemberInfoProjection() {
-            @Override public String getUserId() { return userId; }
-            @Override public String getServerId() { return "srv-1"; }
-            @Override public boolean getIsOwner() { return isOwner; }
+            @Override
+            public String getUserId() {
+                return userId;
+            }
+
+            @Override
+            public String getServerId() {
+                return "srv-1";
+            }
+
+            @Override
+            public boolean getIsOwner() {
+                return isOwner;
+            }
         };
     }
 
@@ -82,7 +93,9 @@ class RequiresChannelPermissionComponentTest {
         assertThatCode(
                         () ->
                                 channelPermissionComponent.check(
-                                        "srv-1", "ch-1", ChannelPermissionKeyEnum.MANAGE_CHANNEL_PERMISSIONS))
+                                        "srv-1",
+                                        "ch-1",
+                                        ChannelPermissionKeyEnum.MANAGE_CHANNEL_PERMISSIONS))
                 .doesNotThrowAnyException();
 
         verifyNoInteractions(channelRepository);
@@ -126,7 +139,8 @@ class RequiresChannelPermissionComponentTest {
         when(serverMemberRepository.findServerMemberInfo("srv-1", "user-1"))
                 .thenReturn(Optional.of(memberInfo("user-1", false)));
         when(channelRepository.findById("ch-1")).thenReturn(Optional.of(privateChannel("ch-1")));
-        when(channelUserPermissionRepository.hasPermission("user-1", "ch-1", ChannelPermissionKeyEnum.VIEW_CHANNEL))
+        when(channelUserPermissionRepository.hasPermission(
+                        "user-1", "ch-1", ChannelPermissionKeyEnum.VIEW_CHANNEL))
                 .thenReturn(true);
 
         assertThatCode(
@@ -142,9 +156,11 @@ class RequiresChannelPermissionComponentTest {
         when(serverMemberRepository.findServerMemberInfo("srv-1", "user-1"))
                 .thenReturn(Optional.of(memberInfo("user-1", false)));
         when(channelRepository.findById("ch-1")).thenReturn(Optional.of(privateChannel("ch-1")));
-        when(channelUserPermissionRepository.hasPermission("user-1", "ch-1", ChannelPermissionKeyEnum.VIEW_CHANNEL))
+        when(channelUserPermissionRepository.hasPermission(
+                        "user-1", "ch-1", ChannelPermissionKeyEnum.VIEW_CHANNEL))
                 .thenReturn(false);
-        when(channelRolePermissionRepository.hasPermission("user-1", ChannelPermissionKeyEnum.VIEW_CHANNEL))
+        when(channelRolePermissionRepository.hasPermission(
+                        "user-1", ChannelPermissionKeyEnum.VIEW_CHANNEL))
                 .thenReturn(true);
 
         assertThatCode(
@@ -160,9 +176,11 @@ class RequiresChannelPermissionComponentTest {
         when(serverMemberRepository.findServerMemberInfo("srv-1", "user-1"))
                 .thenReturn(Optional.of(memberInfo("user-1", false)));
         when(channelRepository.findById("ch-1")).thenReturn(Optional.of(privateChannel("ch-1")));
-        when(channelUserPermissionRepository.hasPermission("user-1", "ch-1", ChannelPermissionKeyEnum.VIEW_CHANNEL))
+        when(channelUserPermissionRepository.hasPermission(
+                        "user-1", "ch-1", ChannelPermissionKeyEnum.VIEW_CHANNEL))
                 .thenReturn(false);
-        when(channelRolePermissionRepository.hasPermission("user-1", ChannelPermissionKeyEnum.VIEW_CHANNEL))
+        when(channelRolePermissionRepository.hasPermission(
+                        "user-1", ChannelPermissionKeyEnum.VIEW_CHANNEL))
                 .thenReturn(false);
 
         assertThatThrownBy(
@@ -179,14 +197,18 @@ class RequiresChannelPermissionComponentTest {
     @Test
     void check_notAMember_throwsNotAMember() {
         when(currentUserProvider.getUserId()).thenReturn("user-1");
-        when(serverMemberRepository.findServerMemberInfo("srv-1", "user-1")).thenReturn(Optional.empty());
+        when(serverMemberRepository.findServerMemberInfo("srv-1", "user-1"))
+                .thenReturn(Optional.empty());
 
         assertThatThrownBy(
                         () ->
                                 channelPermissionComponent.check(
                                         "srv-1", "ch-1", ChannelPermissionKeyEnum.VIEW_CHANNEL))
                 .isInstanceOf(AppException.class)
-                .satisfies(e -> assertThat(((AppException) e).getErrorCode()).isEqualTo(ErrorCode.NOT_A_MEMBER));
+                .satisfies(
+                        e ->
+                                assertThat(((AppException) e).getErrorCode())
+                                        .isEqualTo(ErrorCode.NOT_A_MEMBER));
     }
 
     @Test

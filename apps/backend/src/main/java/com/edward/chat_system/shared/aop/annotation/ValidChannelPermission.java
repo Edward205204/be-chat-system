@@ -1,6 +1,6 @@
 package com.edward.chat_system.shared.aop.annotation;
 
-import com.edward.chat_system.shared.aop.aspect.ValidServerPermissionValidator;
+import com.edward.chat_system.shared.aop.aspect.ValidChannelPermissionValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 import java.lang.annotation.ElementType;
@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.FIELD, ElementType.TYPE_USE, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = ValidServerPermissionValidator.class)
+@Constraint(validatedBy = ValidChannelPermissionValidator.class)
 public @interface ValidChannelPermission {
     String message() default "Invalid permission";
 

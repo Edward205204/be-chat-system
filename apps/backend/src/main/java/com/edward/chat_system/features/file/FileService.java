@@ -39,8 +39,11 @@ public class FileService {
     }
 
     public void claimFile(String url) {
+        if (url == null) return;
+        int idx = url.indexOf("/files/");
+        String path = idx >= 0 ? url.substring(idx) : url;
         uploadedFileRepository
-                .findByUrl(url)
+                .findByUrl(path)
                 .ifPresent(
                         f -> {
                             f.setClaimed(true);

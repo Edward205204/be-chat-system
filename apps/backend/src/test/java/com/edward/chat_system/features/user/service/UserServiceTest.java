@@ -2,7 +2,6 @@ package com.edward.chat_system.features.user.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import com.edward.chat_system.features.file.FileService;
@@ -51,7 +50,9 @@ class UserServiceTest {
         assertThatThrownBy(() -> userService.getMe("missing"))
                 .isInstanceOf(AppException.class)
                 .satisfies(
-                        e -> assertThat(((AppException) e).getErrorCode()).isEqualTo(ErrorCode.USER_NOT_FOUND));
+                        e ->
+                                assertThat(((AppException) e).getErrorCode())
+                                        .isEqualTo(ErrorCode.USER_NOT_FOUND));
     }
 
     @Test
@@ -111,11 +112,12 @@ class UserServiceTest {
     void updateProfile_userNotFound_throwsAppException() {
         when(userRepository.findById("missing")).thenReturn(Optional.empty());
 
-        assertThatThrownBy(
-                        () -> userService.updateProfile("missing", new UserPatchUpdateRequest()))
+        assertThatThrownBy(() -> userService.updateProfile("missing", new UserPatchUpdateRequest()))
                 .isInstanceOf(AppException.class)
                 .satisfies(
-                        e -> assertThat(((AppException) e).getErrorCode()).isEqualTo(ErrorCode.USER_NOT_FOUND));
+                        e ->
+                                assertThat(((AppException) e).getErrorCode())
+                                        .isEqualTo(ErrorCode.USER_NOT_FOUND));
     }
 
     @Test
@@ -134,7 +136,8 @@ class UserServiceTest {
 
     @Test
     void searchUser_notFound_returnsNull() {
-        when(userRepository.searchByUsernameOrEmail("nobody", "user-1")).thenReturn(Optional.empty());
+        when(userRepository.searchByUsernameOrEmail("nobody", "user-1"))
+                .thenReturn(Optional.empty());
 
         UserResponse result = userService.searchUser("user-1", "nobody");
 
@@ -161,6 +164,8 @@ class UserServiceTest {
         assertThatThrownBy(() -> userService.getOtherUserProfile("missing"))
                 .isInstanceOf(AppException.class)
                 .satisfies(
-                        e -> assertThat(((AppException) e).getErrorCode()).isEqualTo(ErrorCode.USER_NOT_FOUND));
+                        e ->
+                                assertThat(((AppException) e).getErrorCode())
+                                        .isEqualTo(ErrorCode.USER_NOT_FOUND));
     }
 }

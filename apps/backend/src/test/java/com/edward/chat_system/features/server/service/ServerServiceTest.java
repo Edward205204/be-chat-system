@@ -64,25 +64,72 @@ class ServerServiceTest {
 
     private ServerProjection mockProjection(String ownerId, String userId) {
         return new ServerProjection() {
-            @Override public String getServerId() { return "srv-1"; }
-            @Override public String getName() { return "Test Server"; }
-            @Override public String getAvatar() { return null; }
-            @Override public String getBanner() { return null; }
-            @Override public String getOwnerId() { return ownerId; }
-            @Override public java.time.LocalDateTime getJoinedAt() { return LocalDateTime.now(); }
+            @Override
+            public String getServerId() {
+                return "srv-1";
+            }
+
+            @Override
+            public String getName() {
+                return "Test Server";
+            }
+
+            @Override
+            public String getAvatar() {
+                return null;
+            }
+
+            @Override
+            public String getBanner() {
+                return null;
+            }
+
+            @Override
+            public String getOwnerId() {
+                return ownerId;
+            }
+
+            @Override
+            public java.time.LocalDateTime getJoinedAt() {
+                return LocalDateTime.now();
+            }
         };
     }
 
     @Test
     void getMyServers_returnsServerList() {
-        ServerProjection proj = new ServerProjection() {
-            @Override public String getServerId() { return "srv-1"; }
-            @Override public String getName() { return "My Server"; }
-            @Override public String getAvatar() { return null; }
-            @Override public String getBanner() { return null; }
-            @Override public String getOwnerId() { return "user-1"; }
-            @Override public LocalDateTime getJoinedAt() { return LocalDateTime.now(); }
-        };
+        ServerProjection proj =
+                new ServerProjection() {
+                    @Override
+                    public String getServerId() {
+                        return "srv-1";
+                    }
+
+                    @Override
+                    public String getName() {
+                        return "My Server";
+                    }
+
+                    @Override
+                    public String getAvatar() {
+                        return null;
+                    }
+
+                    @Override
+                    public String getBanner() {
+                        return null;
+                    }
+
+                    @Override
+                    public String getOwnerId() {
+                        return "user-1";
+                    }
+
+                    @Override
+                    public LocalDateTime getJoinedAt() {
+                        return LocalDateTime.now();
+                    }
+                };
 
         when(serverRepository.findAllServerUserJoined("user-1")).thenReturn(List.of(proj));
 
@@ -112,7 +159,10 @@ class ServerServiceTest {
 
         assertThatThrownBy(() -> serverService.getServerById("srv-1", "user-2"))
                 .isInstanceOf(AppException.class)
-                .satisfies(e -> assertThat(((AppException) e).getErrorCode()).isEqualTo(ErrorCode.NOT_A_MEMBER));
+                .satisfies(
+                        e ->
+                                assertThat(((AppException) e).getErrorCode())
+                                        .isEqualTo(ErrorCode.NOT_A_MEMBER));
     }
 
     @Test
@@ -123,8 +173,12 @@ class ServerServiceTest {
 
         User user = User.builder().id("user-1").build();
         Server savedServer = Server.builder().id("srv-1").name("NewServer").build();
-        ServerMember savedMember = ServerMember.builder().server(savedServer).user(user)
-                .joinedAt(LocalDateTime.now()).build();
+        ServerMember savedMember =
+                ServerMember.builder()
+                        .server(savedServer)
+                        .user(user)
+                        .joinedAt(LocalDateTime.now())
+                        .build();
 
         when(serverRepository.existsByUserIdAndName("user-1", "NewServer")).thenReturn(false);
         when(userRepository.getReferenceById("user-1")).thenReturn(user);
@@ -175,8 +229,8 @@ class ServerServiceTest {
 
     @Test
     void transferOwner_memberFound_updatesOwner() {
-        ServerMember newOwnerMember = ServerMember.builder().id("m-2")
-                .user(User.builder().id("user-2").build()).build();
+        ServerMember newOwnerMember =
+                ServerMember.builder().id("m-2").user(User.builder().id("user-2").build()).build();
 
         when(serverMemberRepository.findByIdAndServerId("m-2", "srv-1"))
                 .thenReturn(Optional.of(newOwnerMember));
@@ -188,11 +242,15 @@ class ServerServiceTest {
 
     @Test
     void transferOwner_memberNotFound_throwsNotAMember() {
-        when(serverMemberRepository.findByIdAndServerId("m-99", "srv-1")).thenReturn(Optional.empty());
+        when(serverMemberRepository.findByIdAndServerId("m-99", "srv-1"))
+                .thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> serverService.transferOwner("srv-1", "m-99"))
                 .isInstanceOf(AppException.class)
-                .satisfies(e -> assertThat(((AppException) e).getErrorCode()).isEqualTo(ErrorCode.NOT_A_MEMBER));
+                .satisfies(
+                        e ->
+                                assertThat(((AppException) e).getErrorCode())
+                                        .isEqualTo(ErrorCode.NOT_A_MEMBER));
     }
 
     @Test
@@ -210,10 +268,14 @@ class ServerServiceTest {
         BanMemberRequest request = new BanMemberRequest();
         request.setReason("spam");
 
-        when(serverMemberRepository.existsByServerIdAndUserId("srv-1", "banned-user")).thenReturn(true);
-        when(serverRepository.getReferenceById("srv-1")).thenReturn(Server.builder().id("srv-1").build());
-        when(userRepository.getReferenceById("banned-user")).thenReturn(User.builder().id("banned-user").build());
-        when(userRepository.getReferenceById("banner-user")).thenReturn(User.builder().id("banner-user").build());
+        when(serverMemberRepository.existsByServerIdAndUserId("srv-1", "banned-user"))
+                .thenReturn(true);
+        when(serverRepository.getReferenceById("srv-1"))
+                .thenReturn(Server.builder().id("srv-1").build());
+        when(userRepository.getReferenceById("banned-user"))
+                .thenReturn(User.builder().id("banned-user").build());
+        when(userRepository.getReferenceById("banner-user"))
+                .thenReturn(User.builder().id("banner-user").build());
 
         serverService.banMember("srv-1", "banned-user", "banner-user", request);
 
@@ -223,14 +285,21 @@ class ServerServiceTest {
 
     @Test
     void banMember_userNotMember_throwsNotAMember() {
-        when(serverMemberRepository.existsByServerIdAndUserId("srv-1", "non-member")).thenReturn(false);
+        when(serverMemberRepository.existsByServerIdAndUserId("srv-1", "non-member"))
+                .thenReturn(false);
 
         assertThatThrownBy(
                         () ->
                                 serverService.banMember(
-                                        "srv-1", "non-member", "banner-user", new BanMemberRequest()))
+                                        "srv-1",
+                                        "non-member",
+                                        "banner-user",
+                                        new BanMemberRequest()))
                 .isInstanceOf(AppException.class)
-                .satisfies(e -> assertThat(((AppException) e).getErrorCode()).isEqualTo(ErrorCode.NOT_A_MEMBER));
+                .satisfies(
+                        e ->
+                                assertThat(((AppException) e).getErrorCode())
+                                        .isEqualTo(ErrorCode.NOT_A_MEMBER));
     }
 
     @Test
@@ -242,14 +311,17 @@ class ServerServiceTest {
     @Test
     void joinByLink_validToken_joinsMemberAndIncrementsCount() {
         Server server = Server.builder().id("srv-1").name("TestSrv").build();
-        InviteLink inviteLink = InviteLink.builder().server(server).token("tok").useCount(0).build();
+        InviteLink inviteLink =
+                InviteLink.builder().server(server).token("tok").useCount(0).build();
         ServerMember member = ServerMember.builder().joinedAt(LocalDateTime.now()).build();
 
-        when(inviteLinkRepository.findValidInviteLinkByToken("tok")).thenReturn(Optional.of(inviteLink));
+        when(inviteLinkRepository.findValidInviteLinkByToken("tok"))
+                .thenReturn(Optional.of(inviteLink));
         when(serverMemberRepository.existsByServerIdAndUserId("srv-1", "user-1")).thenReturn(false);
         when(serverBanRepository.existsByServer_IdAndUser_Id("srv-1", "user-1")).thenReturn(false);
         when(serverRepository.getReferenceById("srv-1")).thenReturn(server);
-        when(userRepository.getReferenceById("user-1")).thenReturn(User.builder().id("user-1").build());
+        when(userRepository.getReferenceById("user-1"))
+                .thenReturn(User.builder().id("user-1").build());
         when(serverMemberRepository.save(any())).thenReturn(member);
         when(inviteLinkRepository.save(inviteLink)).thenReturn(inviteLink);
 
@@ -261,7 +333,8 @@ class ServerServiceTest {
 
     @Test
     void joinByLink_invalidToken_throwsInviteLinkNotFound() {
-        when(inviteLinkRepository.findValidInviteLinkByToken("bad-tok")).thenReturn(Optional.empty());
+        when(inviteLinkRepository.findValidInviteLinkByToken("bad-tok"))
+                .thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> serverService.jointByLink("bad-tok", "user-1"))
                 .isInstanceOf(AppException.class)
@@ -274,9 +347,11 @@ class ServerServiceTest {
     @Test
     void joinByLink_userAlreadyMember_throwsAlreadyMember() {
         Server server = Server.builder().id("srv-1").build();
-        InviteLink inviteLink = InviteLink.builder().server(server).token("tok").useCount(0).build();
+        InviteLink inviteLink =
+                InviteLink.builder().server(server).token("tok").useCount(0).build();
 
-        when(inviteLinkRepository.findValidInviteLinkByToken("tok")).thenReturn(Optional.of(inviteLink));
+        when(inviteLinkRepository.findValidInviteLinkByToken("tok"))
+                .thenReturn(Optional.of(inviteLink));
         when(serverMemberRepository.existsByServerIdAndUserId("srv-1", "user-1")).thenReturn(true);
 
         assertThatThrownBy(() -> serverService.jointByLink("tok", "user-1"))
@@ -290,15 +365,20 @@ class ServerServiceTest {
     @Test
     void joinByLink_userBanned_throwsUserBanned() {
         Server server = Server.builder().id("srv-1").build();
-        InviteLink inviteLink = InviteLink.builder().server(server).token("tok").useCount(0).build();
+        InviteLink inviteLink =
+                InviteLink.builder().server(server).token("tok").useCount(0).build();
 
-        when(inviteLinkRepository.findValidInviteLinkByToken("tok")).thenReturn(Optional.of(inviteLink));
+        when(inviteLinkRepository.findValidInviteLinkByToken("tok"))
+                .thenReturn(Optional.of(inviteLink));
         when(serverMemberRepository.existsByServerIdAndUserId("srv-1", "user-1")).thenReturn(false);
         when(serverBanRepository.existsByServer_IdAndUser_Id("srv-1", "user-1")).thenReturn(true);
 
         assertThatThrownBy(() -> serverService.jointByLink("tok", "user-1"))
                 .isInstanceOf(AppException.class)
-                .satisfies(e -> assertThat(((AppException) e).getErrorCode()).isEqualTo(ErrorCode.USER_BANNED));
+                .satisfies(
+                        e ->
+                                assertThat(((AppException) e).getErrorCode())
+                                        .isEqualTo(ErrorCode.USER_BANNED));
     }
 
     @Test
@@ -318,14 +398,16 @@ class ServerServiceTest {
         when(serverMemberRepository.existsByServerIdAndUserId("srv-1", "user-1")).thenReturn(false);
         when(serverBanRepository.existsByServer_IdAndUser_Id("srv-1", "user-1")).thenReturn(false);
         when(serverRepository.getReferenceById("srv-1")).thenReturn(server);
-        when(userRepository.getReferenceById("user-1")).thenReturn(User.builder().id("user-1").build());
+        when(userRepository.getReferenceById("user-1"))
+                .thenReturn(User.builder().id("user-1").build());
         when(serverMemberRepository.save(any())).thenReturn(ServerMember.builder().build());
 
         serverService.responseToServerDirectInvite("user-1", "inv-1", request);
 
         verify(serverMemberRepository).save(any());
         verify(serverInvitationRepository)
-                .updateAllPendingByInviteeIdAndServerId(InviteStatusEnum.ACCEPTED, "user-1", "srv-1");
+                .updateAllPendingByInviteeIdAndServerId(
+                        InviteStatusEnum.ACCEPTED, "user-1", "srv-1");
     }
 
     @Test
@@ -399,7 +481,8 @@ class ServerServiceTest {
 
     @Test
     void cancelDirectInvite_notFound_throwsCannotCancel() {
-        when(serverInvitationRepository.findByIdAndServerIdAndInviterId("inv-99", "srv-1", "user-1"))
+        when(serverInvitationRepository.findByIdAndServerIdAndInviterId(
+                        "inv-99", "srv-1", "user-1"))
                 .thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> serverService.cancelDirectInvite("user-1", "srv-1", "inv-99"))
